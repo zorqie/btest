@@ -1,3 +1,29 @@
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import RaisedButton from 'material-ui/RaisedButton';
+import AppBar from 'material-ui/AppBar';
+import Avatar from 'material-ui/Avatar';
+import Divider from 'material-ui/Divider';
+import {List, ListItem} from 'material-ui/List';
+import Paper from 'material-ui/Paper';
+import Subheader from 'material-ui/Subheader';
+import TextField from 'material-ui/TextField';
+import {grey600, darkBlack, lightBlack} from 'material-ui/styles/colors';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+// touchy-screen stuff 
+import injectTapEventPlugin from 'react-tap-event-plugin';
+injectTapEventPlugin();
+
+const feathers = require('feathers/client');
+const auth = require('feathers-authentication/client');
+const socketio = require('feathers-socketio/client');
+const hooks = require('feathers-hooks');
+const io = require('socket.io-client');
+
+console.log("Happning now.");
+
 // A placeholder image if the user does not have one
 const PLACEHOLDER = 'https://placeimg.com/60/60/people';
 // An anonymous user if the message does not have that information
@@ -7,14 +33,14 @@ const dummyUser = {
 };
 
 // Establish a Socket.io connection
-const socket = io();
+const socket = io('http://localhost:3030');
 // Initialize our Feathers client application through Socket.io
 // with hooks and authentication.
 const app = feathers()
-	.configure(feathers.socketio(socket))
-	.configure(feathers.hooks())
+	.configure(socketio(socket))
+	.configure(hooks())
 	// Use localStorage to store our login token
-	.configure(feathers.authentication({
+	.configure(auth({
 		storage: window.localStorage
 	}));
 
@@ -43,8 +69,13 @@ const ComposeMessage = React.createClass({
 		return (
 			<form className="ui form" onSubmit={this.sendMessage}>
 				<div className="ui fluid action input">
-					<input type="text" name="text" value={this.state.text} onChange={this.updateText} />
-					<button className="ui primary button" type="submit">Send</button>
+					<TextField
+						floatingLabelText="Message:"
+						fullWidth={true}
+						value={this.state.text} 
+						onChange={this.updateText}
+					/>
+					<RaisedButton label='Send' onTouchTap={this.sendMessage}/>
 				</div>
 			</form>
 		);
@@ -53,13 +84,11 @@ const ComposeMessage = React.createClass({
 
 const UserItem = function(props) {
 	return (
-		<li className="item" key={props.user._id}>
-			<div className="content">
-				<img src={props.user.avatar || ''} className="avatar" />
-				<span className="name">{props.user.name}</span>
-				<span className="username">{props.user.email}</span>
-			</div>
-		</li>
+		<ListItem  key={props.user._id}
+				primaryText={props.user.name}
+				secondaryText={props.user.email}
+				leftAvatar={<Avatar src={PLACEHOLDER} size={30}/>}
+		/>
 	);
 };
 const UserList = React.createClass({
@@ -71,22 +100,10 @@ const UserList = React.createClass({
 		const users = this.props.users;
 
 		return (
-			<aside className={this.props.className}>
-				<header className="header">
-					<h4>
-						<span className="">{users.length}</span> users
-					</h4>
-				</header>
-
-				<ul className="ui relaxed divided list">
-					{users.map(user => <UserItem user={user} key={user._id} /> )}
-				</ul>
-				<footer className="">
-					<a href="#" className="ui negative basic button " onClick={this.logout}>
-						Sign Out
-					</a>
-				</footer>
-			</aside>
+			<List>
+				<Subheader>{users.length} users</Subheader>
+				{users.map(user => <UserItem user={user} key={user._id} /> )}
+			</List>
 		);
 	}
 });
@@ -97,28 +114,29 @@ const MessageList = React.createClass({
 		const sender = message.sentBy || dummyUser;
 
 		return (
-			<div className="event" key={message._id}>
-				<div className="label"><img src={sender.avatar || PLACEHOLDER} alt={sender.email} className="small image" /></div>
-				<div className="content">
-					<div className="summary">
-						<span className="username">{sender.email}</span>
-						<span className="date">
+			<ListItem key={message._id}
+				leftAvatar={<Avatar src={sender.avatar || PLACEHOLDER} alt={sender.email} />}
+				primaryText={
+					<span>
+						<span style={{color: darkBlack}}>{sender.email}</span>
+						<span style={{color: grey600}}>
 							{moment(message.createdAt).format('MMM Do, hh:mm:ss')}
 						</span>
-					</div>
-					<p className="extra text">
-						{message.text}
-					</p>
-				</div>
-			</div>
+					</span>
+				}
+				secondaryText={message.text}
+			/>
+			
 		);
 	},
 
 	render() {
 		return (
-			<main id="chat" className="ui chat feed">
-				{this.props.messages.map(this.renderMessage)}
-			</main>
+			<Paper zDepth={2}>
+				<List>
+					{this.props.messages.map(this.renderMessage)}
+				</List>
+			</Paper>
 		);
 	}
 });
@@ -133,8 +151,8 @@ const ChatApp = React.createClass({
 
 	componentDidUpdate: function() {
 		// Whenever something happened, scroll to the bottom of the chat window
-		const node = document.getElementById('chat');
-		node.scrollTop = node.scrollHeight - node.clientHeight;
+		// const node = document.getElementById('chat');
+		// node.scrollTop = node.scrollHeight - node.clientHeight;
 	},
 
 	componentDidMount() {
@@ -162,31 +180,39 @@ const ChatApp = React.createClass({
 	},
 
 	render() {
-		return <div className="ui grid container">
+		return (
+			<div className="ui grid container">
+				<AppBar title="Ze Chat" />
 				<UserList users={this.state.users} className="five wide column"/>
-				<div className="nine wide column">
+				<Paper>
 					<MessageList messages={this.state.messages} />
 					<ComposeMessage />
-				</div>
-			</div>;
+				</Paper>
+				<footer>
+					<a href="#" className="ui negative basic button " onClick={this.logout}>
+						Sign Out
+					</a>
+				</footer>
+			</div>
+		);
 	}
 });
 
 app.authenticate().then(() => {
 	ReactDOM.render(
-		<div id="app" className="">
-			<header className="ui header">
-				<h1>
-					<span className="title">Ze Chat</span>
-				</h1>
-			</header>
+		<MuiThemeProvider>
+			
+				
 
-			<ChatApp />
-		</div>, document.body);
-}).catch(error => {
+				 <ChatApp />
+
+			
+		</MuiThemeProvider>, document.getElementById("app"));
+})
+/*.catch(error => {
 	if(error.code === 401) {
 		window.location.href = '/login.html'
 	}
 
 	console.error(error);
-});
+})*/;

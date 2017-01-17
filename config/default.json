@@ -29,6 +29,6 @@
         "scope": ["https://identity.x.com/xidentity/resources/profile/me"]
       }
     },
-    "successRedirect": "/bad.html"
+    "successRedirect": "/better.html"
   }
 }

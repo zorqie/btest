@@ -4,6 +4,7 @@ const path = require('path');
 const NeDB = require('nedb');
 const service = require('feathers-nedb');
 const hooks = require('./hooks');
+const winston = require('winston');
 
 module.exports = function(){
   const app = this;
@@ -32,4 +33,6 @@ module.exports = function(){
 
   // Set up our after hooks
   userService.after(hooks.after);
+
+ 
 };
