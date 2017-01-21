@@ -7,6 +7,8 @@ import socketio from 'feathers-socketio/client';
 import hooks from 'feathers-hooks';
 import io from 'socket.io-client';
 
+
+// import { ThemeProvider } from 'react-css-themr';
 import VenueForm from './venue-form.jsx';
 
 const socket = io('http://localhost:3030');
@@ -22,7 +24,7 @@ const app = feathers()
 	
 app.authenticate().then(() => {
 	ReactDOM.render(
-		<VenueForm feathers={app}/>	
+			<VenueForm feathers={app}/>	
 	, document.getElementById("app"));
 })
 /*.catch(error => {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from 'react-toolbox/lib/button';
-import Input from 'react-toolbox/lib/input';
+import { Button } from 'react-toolbox/components/button';
+import { Input } from 'react-toolbox/components/input';
 
 const BLANK_VENUE = { name: '', capacity: ''};
 
@@ -15,7 +15,9 @@ class VenueForm extends React.Component {
 	}
 
 	handleChange = (name, value) => {
-		this.setState({venue: {[name]: value}});
+		var v = this.state.venue;
+		Object.assign(v, {[name] : value});
+		this.setState({venue: v});
 		console.log("State: " + JSON.stringify(this.state));
 	};
 
@@ -33,18 +35,22 @@ class VenueForm extends React.Component {
 	};
 
 	saveVenue = (ev) => {
-		console.log('Saving ' + JSON.stringify(this.state.venue));
+		const v = this.state.venue;
+		console.log('Saving ' + JSON.stringify(v));
 		// Create a new message with the text from the input field
-		this.venueService.create(this.state.venue)
-		.then(() => console.log("Saved."))
-		.catch(err => console.log(err));
-
+		if(this.state.venue._id) {
+			this.venueService.patch(this.state.venue._id, v)
+			.then(() => console.log("Saved " + JSON.stringify(v)))
+			.catch(err => console.log("Errar: " + JSON.stringify(err)));
+		} else {
+			//create
+		}
 		ev.preventDefault();
 	};
 
 	render() {
 		return (
-			<form className="" onSubmit={this.saveVenue}>
+			<form onSubmit={this.saveVenue}>
 				<Input type='text'
 					name='name'
 					label="Name"
@@ -57,7 +63,7 @@ class VenueForm extends React.Component {
 					value={this.state.venue.capacity} 
 					onChange={this.handleChange.bind(this, 'capacity')} 
 				/>
-				<Button label='Save' onClick={this.saveVenue}/>
+				<Button label='Save' onClick={this.saveVenue} primary={true}/>
 			</form>
 		);
 	}
