@@ -5,21 +5,95 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
 		<title>Ze Chat</title>
 		<link rel="shortcut icon" href="img/favicon.png">
-		<!-- <link rel="stylesheet" href="style/semantic/dist/semantic.css"> -->
+
+		<!-- 	FONTS 
+		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+ 		-->
 		<link rel="stylesheet" href="script/bundlet.css">
-		<!-- <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/core-js/2.1.4/core.min.js"></script> -->
 
-		<!-- <script src="//fb.me/react-0.14.7.min.js"></script>
-		<script src="//fb.me/react-dom-0.14.7.min.js"></script> -->
 
-		<!-- <script src="https://unpkg.com/react@15/dist/react.js"></script>
-		<script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script> -->
-
-		<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script> -->
 		<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.js"></script>
 		<!-- <script src="//unpkg.com/feathers-client@^1.0.0/dist/feathers.js"></script> -->
 		<script src="/socket.io/socket.io.js"></script>
-		
+		<style>
+			@font-face {
+				font-family: 'Material Icons';
+				font-style: normal;
+				font-weight: 400;
+				src: url(https://example.com/MaterialIcons-Regular.eot); /* For IE6-8 */
+				src: local('Material Icons'),
+					local('MaterialIcons-Regular'),
+					url(fonts/MaterialIcons-Regular.woff2) format('woff2'),
+					url(fonts/MaterialIcons-Regular.woff) format('woff'),
+					url(fonts/MaterialIcons-Regular.ttf) format('truetype');
+			}
+			.material-icons {
+				font-family: 'Material Icons';
+				font-weight: normal;
+				font-style: normal;
+				font-size: 24px;  /* Preferred icon size */
+				display: inline-block;
+				line-height: 1;
+				text-transform: none;
+				letter-spacing: normal;
+				word-wrap: normal;
+				white-space: nowrap;
+				direction: ltr;
+
+				/* Support for all WebKit browsers. */
+				-webkit-font-smoothing: antialiased;
+				/* Support for Safari and Chrome. */
+				text-rendering: optimizeLegibility;
+
+				/* Support for Firefox. */
+				-moz-osx-font-smoothing: grayscale;
+
+				/* Support for IE. */
+				font-feature-settings: 'liga';
+			}
+			/* cyrillic-ext */
+			@font-face {
+			font-family: 'Roboto';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Roboto'), 
+				local('Roboto-Regular'), 
+				url(fonts/Roboto-Regular.woff2) format('woff2');
+			unicode-range: U+0460-052F, U+20B4, U+2DE0-2DFF, U+A640-A69F;
+			}
+			/* cyrillic */
+			@font-face {
+			font-family: 'Roboto';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Roboto'), 
+				local('Roboto-Regular'), 
+				url(fonts/Roboto-Regular.woff2) format('woff2');
+			unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+			}
+			/* latin-ext */
+			@font-face {
+			font-family: 'Roboto';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Roboto'), 
+				local('Roboto-Regular'), 
+				url(fonts/Roboto-Regular.woff2) format('woff2');
+			unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+			}
+			/* latin */
+			@font-face {
+			font-family: 'Roboto';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Roboto'), 
+				local('Roboto-Regular'), 
+				url(fonts/Roboto-Regular.woff2) format('woff2');
+			unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+			}
+
+		</style>
 	</head>
 	<body>
 		<div id="app"></div>

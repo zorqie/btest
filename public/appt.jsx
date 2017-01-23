@@ -7,6 +7,8 @@ import socketio from 'feathers-socketio/client';
 import hooks from 'feathers-hooks';
 import io from 'socket.io-client';
 
+import 'react-toolbox/lib/commons.scss';
+
 
 // import { ThemeProvider } from 'react-css-themr';
 import VenueForm from './venue-form.jsx';
