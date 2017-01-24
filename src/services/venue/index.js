@@ -5,7 +5,7 @@ const venue = require('./venue-model');
 const hooks = require('./hooks');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/test');
+mongoose.connect(app.get('mongodb'));
 
 module.exports = function() {
   const app = this;
