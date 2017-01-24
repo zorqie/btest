@@ -4,9 +4,6 @@ const service = require('feathers-mongoose');
 const venue = require('./venue-model');
 const hooks = require('./hooks');
 
-mongoose.Promise = global.Promise;
-mongoose.connect(app.get('mongodb'));
-
 module.exports = function() {
   const app = this;
 

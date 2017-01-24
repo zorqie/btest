@@ -14,6 +14,8 @@ const socketio = require('feathers-socketio');
 const middleware = require('./middleware');
 const services = require('./services');
 
+const mongoose = require('mongoose');
+
 const app = feathers();
 
 app.configure(configuration(path.join(__dirname, '..')));
@@ -30,5 +32,9 @@ app.use(compress())
   .configure(socketio())
   .configure(services)
   .configure(middleware);
+
+mongoose.Promise = global.Promise;
+mongoose.connect(app.get('mongodb'));
+
 
 module.exports = app;
