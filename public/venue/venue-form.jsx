@@ -1,12 +1,13 @@
 import React from 'react';
-import { Button } from 'react-toolbox/components/button';
-import { Input } from 'react-toolbox/lib/input';
-import { ThemeProvider } from 'react-css-themr';
-import { Layout, Panel } from 'react-toolbox/lib/layout';
+
+import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 import VenueList from './venue-list.jsx';
 
-const BLANK_VENUE = { name: '', capacity: ''};
+const BLANK_VENUE =  { name: '', capacity: ''};
+console.log("Blank: " + JSON.stringify(BLANK_VENUE));
 
 class VenueForm extends React.Component {
 	constructor(props) {
@@ -18,13 +19,19 @@ class VenueForm extends React.Component {
 		this.saveVenue = this.saveVenue.bind(this);
 	}
 
-	handleChange = (name, value) => {
+	handleChange = (e) => {
+		const { name, value } = e.target;
+		// console.log("Changed: " + name + " -> " + JSON.stringify(value));
 		var v = this.state.venue;
 		Object.assign(v, {[name] : value});
+		this.validate(v);
 		this.setState({venue: v});
-		console.log("State: " + JSON.stringify(this.state));
+		// console.log("State: " + JSON.stringify(this.state));
 	};
-
+	validate = (venue) => {
+		// const v = new mongoose.Document(venue, venueSchema);//
+		// console.log("Validificating: " + JSON.stringify(v));
+	};
 	componentDidMount() {
 		this.venueService.find({
 			query: {
@@ -59,8 +66,6 @@ class VenueForm extends React.Component {
 		}
 		ev.preventDefault();
 	};
-	
-	logout = () => { this.app.logout(); }
 
 	handleVenueSelection = (v) => {
 		// console.log("Handling venue selection: " + JSON.stringify(v));
@@ -69,29 +74,31 @@ class VenueForm extends React.Component {
 
 	render() {
 		return (
-			<Layout>
-				<Panel>
-				<VenueList 
-					onVenueSelected = {this.handleVenueSelection.bind(this)}
-					venues={this.state.venues} />
+			<div>
+				<Paper>
+					<VenueList 
+						onVenueSelected = {this.handleVenueSelection.bind(this)}
+						venues={this.state.venues} />
+				</Paper>
 				<form onSubmit={this.saveVenue}>
-					<Input type='text'
+					<TextField 
 						name='name'
-						label="Name"
+						hintText='Name'
+						floatingLabelText="Name"
 						value={this.state.venue.name} 
-						onChange={this.handleChange.bind(this, 'name')} 
+						onChange={this.handleChange} 
 					/>
-					<Input type='text'
+					<TextField 
 						name='capacity'
-						label="Max capacity"
+						hintText='Capacity'
+						floatingLabelText="Max capacity"
 						value={this.state.venue.capacity} 
-						onChange={this.handleChange.bind(this, 'capacity')} 
+						onChange={this.handleChange} 
 					/>
-					<Button label='Save' onClick={this.saveVenue} primary raised/>
+					<RaisedButton label='Save' onClick={this.saveVenue} primary/>
 				</form>
-				</Panel>
-				<Button label='Sign out' onClick={this.logout} />
-			</Layout>
+				
+			</div>
 		);
 	}
 };

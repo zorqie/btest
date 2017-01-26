@@ -1,7 +1,7 @@
 {
-  "host": "bfest-app.feathersjs.com",
+  "host": "bfest.herokuapps.com",
   "port": 80,
-  "nedb": "NEDB_BASE_PATH",
+  "mongoose": "MONGODB_URI",
   "public": "../public/",
   "auth": {
     "token": {
