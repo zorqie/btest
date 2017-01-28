@@ -9,6 +9,7 @@ module.exports = {
 	entry: {
 		// './src/index.js',
 		// app:  './public/app.jsx',
+		vapp: './public/vapp.jsx',
 		appt: './public/appt.jsx'
 	},
 	output: {
@@ -31,17 +32,10 @@ module.exports = {
 					loader: 'css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!sass-loader'
 				})
 			}
-
-
-
-
-
-
-
 		]
 	},
 	plugins: [
-		new ExtractTextPlugin({filename: 'bundlet.css', allChunks: true }),
+		new ExtractTextPlugin({filename: 'b[name]ed.css', allChunks: true }),
 		// new webpack.optimize.OccurenceOrderPlugin(),
 		// new webpack.optimize.CommonsChunkPlugin({
 		// 	name: 'vendor',
@@ -50,6 +44,9 @@ module.exports = {
 		// }),
 		new webpack.HotModuleReplacementPlugin(),
 		new webpack.NoEmitOnErrorsPlugin(),
+		new webpack.DefinePlugin({
+			'typeof window': "\"object\""
+		}),
 		// new webpack.DefinePlugin({
 		// 	'process.env.NODE_ENV': JSON.stringify('development')
 		// })

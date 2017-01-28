@@ -1,25 +1,23 @@
 'use strict';
 
 const path = require('path');
-const NeDB = require('nedb');
-const service = require('feathers-nedb');
+const mongoose = require('mongoose');
+const service = require('feathers-mongoose');
 const hooks = require('./hooks');
 const winston = require('winston');
+
+const UserModel = require('./user-model');
 
 module.exports = function(){
   const app = this;
 
-  const db = new NeDB({
-    filename: path.join(app.get('nedb'), 'users.db'),
-    autoload: true
-  });
-
   let options = {
-    Model: db,
+    Model: UserModel,
     paginate: {
       default: 5,
       max: 25
-    }
+    },
+    lean: true
   };
 
   // Initialize our service with any options it requires

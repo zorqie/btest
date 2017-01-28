@@ -11,6 +11,8 @@ const hooks = require('feathers-hooks');
 const rest = require('feathers-rest');
 const bodyParser = require('body-parser');
 const socketio = require('feathers-socketio');
+const mongoose = require('mongoose');
+
 const middleware = require('./middleware');
 const services = require('./services');
 
@@ -19,6 +21,9 @@ const mongoose = require('mongoose');
 const app = feathers();
 
 app.configure(configuration(path.join(__dirname, '..')));
+
+mongoose.Promise = global.Promise;
+mongoose.connect(app.get('mongoose'));
 
 app.use(compress())
   .options('*', cors())

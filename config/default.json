@@ -2,7 +2,11 @@
   "host": "localhost",
   "port": 3030,
   "nedb": "../data/",
+<<<<<<< HEAD
   "mongodb": "mongodb://localhost:27017/test",
+=======
+  "mongoose": "mongodb://localhost:27017/test",
+>>>>>>> 0badd9992d89464799765adcfb710aa3c57ddb68
   "public": "../public/",
   "auth": {
     "token": {
