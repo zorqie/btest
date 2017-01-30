@@ -8,9 +8,10 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
 	entry: {
 		// './src/index.js',
-		// app:  './public/app.jsx',
-		vapp: './public/vapp.jsx',
-		appt: './public/appt.jsx'
+		app:  './public/app.jsx',
+		main: './public/main.jsx',
+		// vapp: './public/vapp.jsx',
+		// appt: './public/appt.jsx'
 	},
 	output: {
 		filename: 'b[name].js',
@@ -35,7 +36,7 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new ExtractTextPlugin({filename: 'b[name]ed.css', allChunks: true }),
+		new ExtractTextPlugin({filename: 'b[name].css', allChunks: true }),
 		// new webpack.optimize.OccurenceOrderPlugin(),
 		// new webpack.optimize.CommonsChunkPlugin({
 		// 	name: 'vendor',

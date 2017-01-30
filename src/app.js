@@ -16,14 +16,10 @@ const mongoose = require('mongoose');
 const middleware = require('./middleware');
 const services = require('./services');
 
-const mongoose = require('mongoose');
-
 const app = feathers();
 
 app.configure(configuration(path.join(__dirname, '..')));
 
-mongoose.Promise = global.Promise;
-mongoose.connect(app.get('mongoose'));
 
 app.use(compress())
   .options('*', cors())
@@ -38,8 +34,10 @@ app.use(compress())
   .configure(services)
   .configure(middleware);
 
-mongoose.Promise = global.Promise;
-mongoose.connect(app.get('mongodb'));
-
+// mongoose.Promise = global.Promise;
+// const mongo_url = app.get('mongoose');
+// console.log(`Connectifying to ${mongo_url}`);
+// mongoose.connect();
+// console.log('Connectionized.');
 
 module.exports = app;

@@ -1,12 +1,8 @@
 {
   "host": "localhost",
   "port": 3030,
-  "nedb": "../data/",
-<<<<<<< HEAD
-  "mongodb": "mongodb://localhost:27017/test",
-=======
-  "mongoose": "mongodb://localhost:27017/test",
->>>>>>> 0badd9992d89464799765adcfb710aa3c57ddb68
+  "mongoose": "mongodb://heroku_7mdwht5j:2tl93s75r110gghl0qe5onhqgh@ds133279.mlab.com:33279/heroku_7mdwht5j",
+  "mongo_local": "mongodb://localhost:27017/test",
   "public": "../public/",
   "auth": {
     "token": {

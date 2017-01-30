@@ -41,6 +41,7 @@
     "material-ui": "^0.16.7",
     "mongoose": "^4.7.6",
     "nedb": "^1.8.0",
+    "node-sass": "^4.4.0",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
     "passport-facebook-token": "^3.3.0",
