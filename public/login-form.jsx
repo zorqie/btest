@@ -4,6 +4,7 @@ import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
+import { Link, browserHistory } from 'react-router';
 class LoginForm extends React.Component {
 	constructor(props) {
     	super(props);
@@ -29,7 +30,7 @@ class LoginForm extends React.Component {
 			email: this.state.email,
 			password: this.state.password
 		})
-			.then(() => console.log("Loginized"))
+			.then(() => {browserHistory.push('/');console.log("Loginized");})
 			.catch((error) => console.log("Errorated."));
 		ev.preventDefault();
 	};
@@ -56,6 +57,7 @@ class LoginForm extends React.Component {
 					/>
 					<RaisedButton label='Login' onClick={this.doLogin} primary/>
 				</form>
+				<Link to='/signup'>Sign up</Link>
 			</Paper>
 		);
 	}

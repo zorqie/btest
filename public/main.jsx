@@ -5,13 +5,14 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import AppBar from 'material-ui/AppBar';
 import Divider from 'material-ui/Divider';
+import FlatButton from 'material-ui/FlatButton'
 import {grey600, darkBlack, lightBlack} from 'material-ui/styles/colors';
 
 import VenueForm from './venue/venue-form.jsx';
 import LoginForm from './login-form.jsx';
 import SignupForm from './signup-form.jsx';
 
-import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router';
+import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router';
 
 // touchy-screen stuff 
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -40,10 +41,17 @@ const Layout = React.createClass({
 		return (
 		<MuiThemeProvider>
 			<div>
-				<h1>Ze Layout</h1>
+				<AppBar 
+					title="Ze App" 
+					iconElementRight={
+						<span>
+							<Link to='/login'><FlatButton label="Login" /></Link>
+							<FlatButton onClick={app.logout} label="Logout"/>
+						</span>
+					}/>
 				<ul>
-					<li><Link to='/login'>Login</Link></li>
-					<li><a onClick={app.logout}>Logout</a></li>
+					<li><Link to='/login'><FlatButton label="Login" /></Link></li>
+					<li><FlatButton onClick={app.logout} label="Logout"/></li>
 					<li><Link to='/signup'>Signup</Link></li>
 				</ul>
 				{this.props.children}
@@ -61,7 +69,7 @@ const Home = (props) => <p>We're home</p>;
 app.authenticate().then(() => {
 	console.log("Authentificated.");
 	ReactDOM.render(
-		<Router history={hashHistory}>
+		<Router history={browserHistory}>
 			<Route path="/" component={Layout}>
 				<IndexRoute component={Home} />
 				<Route path='login' component={LoginForm} />
