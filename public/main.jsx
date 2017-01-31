@@ -9,6 +9,9 @@ import {grey600, darkBlack, lightBlack} from 'material-ui/styles/colors';
 
 import VenueForm from './venue/venue-form.jsx';
 import LoginForm from './login-form.jsx';
+import SignupForm from './signup-form.jsx';
+
+import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router';
 
 // touchy-screen stuff 
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -31,16 +34,45 @@ const app = feathers()
 	// Use localStorage to store our login token
 	.configure(auth({ storage: window.localStorage }));
 
+
+const Layout = React.createClass({
+	render() { 
+		return (
+		<MuiThemeProvider>
+			<div>
+				<h1>Ze Layout</h1>
+				<ul>
+					<li><Link to='/login'>Login</Link></li>
+					<li><a onClick={app.logout}>Logout</a></li>
+					<li><Link to='/signup'>Signup</Link></li>
+				</ul>
+				{this.props.children}
+				<footer>
+					Footing business goes here
+				</footer>
+			</div>
+		</MuiThemeProvider>
+		)
+	}
+});
+
+const Home = (props) => <p>We're home</p>;
+
 app.authenticate().then(() => {
 	console.log("Authentificated.");
 	ReactDOM.render(
-		<MuiThemeProvider>
-			<VenueForm feathers={app}/>
-		</MuiThemeProvider>, 
+		<Router history={hashHistory}>
+			<Route path="/" component={Layout}>
+				<IndexRoute component={Home} />
+				<Route path='login' component={LoginForm} />
+				<Route path='signup' component={SignupForm} />
+			</Route>
+		</Router>
+		, 
 		document.getElementById("app")
 	);
 }).catch(error => {
-	console.log("Not happening.");
+	console.log("Not happening.", error);
 	ReactDOM.render(
 		<MuiThemeProvider>
 			<LoginForm feathers={app}/>			
