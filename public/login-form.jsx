@@ -25,10 +25,11 @@ class LoginForm extends React.Component {
 	doLogin = (ev) => {
 		console.log("Attemptifying to login...");
 		console.log("In state: " + JSON.stringify(this.state));
+		const { email, password } = this.state;
 		this.app.authenticate({
 			type: 'local',
-			email: this.state.email,
-			password: this.state.password
+			email,
+			password,
 		})
 			.then(() => {browserHistory.push('/');console.log("Loginized");})
 			.catch((error) => console.log("Errorated."));
@@ -57,7 +58,7 @@ class LoginForm extends React.Component {
 					/>
 					<RaisedButton label='Login' onClick={this.doLogin} primary/>
 				</form>
-				<Link to='/signup'>Sign up</Link>
+				<p>No account? Perhaps you can <Link to='/signup'>Sign up</Link></p>
 			</Paper>
 		);
 	}

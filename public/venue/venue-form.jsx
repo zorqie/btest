@@ -7,16 +7,13 @@ import TextField from 'material-ui/TextField';
 import VenueList from './venue-list.jsx';
 
 const BLANK_VENUE =  { name: '', capacity: ''};
-console.log("Blank: " + JSON.stringify(BLANK_VENUE));
 
 class VenueForm extends React.Component {
 	constructor(props) {
     	super(props);
-    	this.app = props.feathers;
+    	this.app = props.feathers || props.route.feathers;
     	this.venueService = this.app.service('venues');
 		this.state = {venue: BLANK_VENUE, venues: []};
-		// console.log("INITIAL STATE: " + JSON.stringify(this.state));
-		this.saveVenue = this.saveVenue.bind(this);
 	}
 
 	handleChange = (e) => {
@@ -77,7 +74,7 @@ class VenueForm extends React.Component {
 			<div>
 				<Paper>
 					<VenueList 
-						onVenueSelected = {this.handleVenueSelection.bind(this)}
+						onVenueSelected = {this.handleVenueSelection}
 						venues={this.state.venues} />
 				</Paper>
 				<form onSubmit={this.saveVenue}>

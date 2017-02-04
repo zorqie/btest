@@ -32,3 +32,4 @@ data/
 
 # Fonts
 public\fonts\
+public\script\*.hot-update.js*

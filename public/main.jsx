@@ -7,6 +7,8 @@ import AppBar from 'material-ui/AppBar';
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton'
 import {grey600, darkBlack, lightBlack} from 'material-ui/styles/colors';
+import Drawer from 'material-ui/Drawer';
+import MenuItem from 'material-ui/MenuItem';
 
 import VenueForm from './venue/venue-form.jsx';
 import LoginForm from './login-form.jsx';
@@ -36,24 +38,58 @@ const app = feathers()
 	.configure(auth({ storage: window.localStorage }));
 
 
-const Layout = React.createClass({
+class Layout extends React.Component {
+	constructor(props) {
+		super(props);
+		this.app = props.route.feathers;
+		this.state = { drawerOpen: false, user: this.app.get('user'), section: 'BFest' };
+		console.log("Stated: ", this.state);
+		this.closeDrawer = this.closeDrawer.bind(this);
+		this.toggleDrawer = this.toggleDrawer.bind(this);
+		this.handleMenu = this.handleMenu.bind(this);
+
+		this.sections = [
+			{ text: "Venues", path: "/venues"},
+			{ text: "Events", path: "/events"},
+		]
+		window.appstate = this.state;
+	}
+	closeDrawer() {
+		this.setState({...this.state, drawerOpen: false})
+	}
+	toggleDrawer() {
+		this.setState({...this.state, drawerOpen: !this.state.drawerOpen});
+	}
+	handleMenu = (section) => {
+		console.log("Menu: ", section);
+		const {path, text} = section;
+		this.setState({...this.state, section: text});
+		this.closeDrawer();
+		browserHistory.push(path)
+	}
 	render() { 
 		return (
 		<MuiThemeProvider>
 			<div>
 				<AppBar 
-					title="Ze App" 
+					title={this.state.section}
 					iconElementRight={
-						<span>
-							<Link to='/login'><FlatButton label="Login" /></Link>
+						this.state.user ? 
 							<FlatButton onClick={app.logout} label="Logout"/>
-						</span>
-					}/>
-				<ul>
-					<li><Link to='/login'><FlatButton label="Login" /></Link></li>
-					<li><FlatButton onClick={app.logout} label="Logout"/></li>
-					<li><Link to='/signup'>Signup</Link></li>
-				</ul>
+							:
+							<Link to='/login'><FlatButton label="Login" /></Link>
+					}
+					onLeftIconButtonTouchTap={this.toggleDrawer}
+				/>
+				<Drawer 
+					docked={false}
+					width={200}
+					open={this.state.drawerOpen}
+					>
+					{this.sections.map( section => 
+						<MenuItem onTouchTap={this.handleMenu.bind(this, section)} primaryText={section.text} key={section.path}/>
+					)}
+				</Drawer>
 				{this.props.children}
 				<footer>
 					Footing business goes here
@@ -62,22 +98,25 @@ const Layout = React.createClass({
 		</MuiThemeProvider>
 		)
 	}
-});
+};
 
-const Home = (props) => <p>We're home</p>;
+const Home = () => <p>We're home</p>;
+const NotFound = () => <p>She's not here.</p>;
 
 app.authenticate().then(() => {
-	console.log("Authentificated.");
+	console.log("Authentificated.", app.get('user'));
 	ReactDOM.render(
 		<Router history={browserHistory}>
-			<Route path="/" component={Layout}>
+			<Route path="/" component={Layout} feathers={app}>
 				<IndexRoute component={Home} />
 				<Route path='login' component={LoginForm} />
 				<Route path='signup' component={SignupForm} />
+				<Route path='venues' component={VenueForm} feathers={app} />
+
+				<Route path='*' component={NotFound} />
 			</Route>
 		</Router>
-		, 
-		document.getElementById("app")
+		, document.getElementById("app")
 	);
 }).catch(error => {
 	console.log("Not happening.", error);
