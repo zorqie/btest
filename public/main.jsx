@@ -10,9 +10,10 @@ import {grey600, darkBlack, lightBlack} from 'material-ui/styles/colors';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 
-import VenueForm from './venue/venue-form.jsx';
-import LoginForm from './login-form.jsx';
-import SignupForm from './signup-form.jsx';
+import VenueForm from './mui/venue-form.jsx';
+import GigForm from './mui/gig-form.jsx';
+import LoginForm from './mui/login-form.jsx';
+import SignupForm from './mui/signup-form.jsx';
 
 import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router';
 
@@ -26,6 +27,7 @@ const socketio = require('feathers-socketio/client');
 const hooks = require('feathers-hooks');
 const io = require('socket.io-client');
 
+// FIXME this should be in configuration somewhere.
 // Establish a Socket.io connection
 // const socket = io('http://localhost:3017');
 const socket = io('https://fathomless-gorge-78924.herokuapp.com/');
@@ -50,7 +52,7 @@ class Layout extends React.Component {
 
 		this.sections = [
 			{ text: "Venues", path: "/venues"},
-			{ text: "Events", path: "/events"},
+			{ text: "Events", path: "/gigs"},
 		]
 		window.appstate = this.state;
 	}
@@ -61,13 +63,14 @@ class Layout extends React.Component {
 		this.setState({...this.state, drawerOpen: !this.state.drawerOpen});
 	}
 	handleMenu = (section) => {
-		console.log("Menu: ", section);
+		// console.log("Menu: ", section);
 		const {path, text} = section;
-		this.setState({...this.state, section: text});
-		this.closeDrawer();
+		this.setState({...this.state, section: text, drawerOpen: false});
+		// this.closeDrawer();
 		browserHistory.push(path)
 	}
 	render() { 
+		console.log("STATED: ", this.state);
 		return (
 		<MuiThemeProvider>
 			<div>
@@ -112,6 +115,7 @@ app.authenticate().then(() => {
 				<Route path='login' component={LoginForm} />
 				<Route path='signup' component={SignupForm} />
 				<Route path='venues' component={VenueForm} feathers={app} />
+				<Route path='gigs' component={GigForm} feathers={app} />
 
 				<Route path='*' component={NotFound} />
 			</Route>
