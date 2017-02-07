@@ -15,7 +15,7 @@ module.exports = {
 	},
 	output: {
 		filename: 'b[name].js',
-		path: './public/script'
+		path: './public/bundle'
 	},
 	module: {
 		rules: [

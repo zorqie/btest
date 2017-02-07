@@ -19,7 +19,7 @@ const middleware = require('./middleware');
 const services = require('./services');
 
 const routing = function (request, response){
-  console.log("Routing ",request._parsedUrl);
+  // console.log("Routing ",request._parsedUrl);
   response.sendFile(path.resolve(__dirname, app.get('public'), 'index.html'))
 };
 

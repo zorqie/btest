@@ -43,9 +43,9 @@ const app = feathers()
 class Layout extends React.Component {
 	constructor(props) {
 		super(props);
-		this.app = props.route.feathers;
-		this.state = { drawerOpen: false, user: this.app.get('user'), section: 'BFest' };
-		console.log("Stated: ", this.state);
+		this.state = { drawerOpen: false, user: app.get('user'), section: 'BFest' };
+
+		console.log("Layout stated: ", this.state);
 		this.closeDrawer = this.closeDrawer.bind(this);
 		this.toggleDrawer = this.toggleDrawer.bind(this);
 		this.handleMenu = this.handleMenu.bind(this);
@@ -67,7 +67,15 @@ class Layout extends React.Component {
 		const {path, text} = section;
 		this.setState({...this.state, section: text, drawerOpen: false});
 		// this.closeDrawer();
-		browserHistory.push(path)
+		browserHistory.push(path);
+	}
+	handleLogout = () => {
+		this.setState({user: null});
+		app.logout();
+		browserHistory.push('/out');
+	}
+	handleLogin = () => {
+		this.setState({user: app.get('user')});
 	}
 	render() { 
 		console.log("STATED: ", this.state);
@@ -78,7 +86,7 @@ class Layout extends React.Component {
 					title={this.state.section}
 					iconElementRight={
 						this.state.user ? 
-							<FlatButton onClick={app.logout} label="Logout"/>
+							<FlatButton onClick={this.handleLogout} label="Logout"/>
 							:
 							<Link to='/login'><FlatButton label="Login" /></Link>
 					}
@@ -112,7 +120,7 @@ app.authenticate().then(() => {
 		<Router history={browserHistory}>
 			<Route path="/" component={Layout} feathers={app}>
 				<IndexRoute component={Home} />
-				<Route path='login' component={LoginForm} />
+				<Route path='login' component={LoginForm} feathers={app} />
 				<Route path='signup' component={SignupForm} />
 				<Route path='venues' component={VenueForm} feathers={app} />
 				<Route path='gigs' component={GigForm} feathers={app} />
@@ -123,11 +131,14 @@ app.authenticate().then(() => {
 		, document.getElementById("app")
 	);
 }).catch(error => {
-	console.log("Not happening.", error);
-	ReactDOM.render(
-		<MuiThemeProvider>
-			<LoginForm feathers={app}/>			
-		</MuiThemeProvider>, 
-		document.getElementById("app")
-	);
+	console.error("Not happening.", error);
+	if(error.code === 401) {
+		// browserHistory.push('/login');
+		ReactDOM.render(
+			<MuiThemeProvider>
+				<LoginForm feathers={app}/>			
+			</MuiThemeProvider>, 
+			document.getElementById("app")
+		);
+	}
 });

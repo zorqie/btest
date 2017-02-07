@@ -5,16 +5,15 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
 import { Link, browserHistory } from 'react-router';
+
 class LoginForm extends React.Component {
 	constructor(props) {
     	super(props);
-    	this.app = props.feathers;
 		this.state = {email: "", password: ""};
 	}
 
 	handleChange = (e) => {
 		const { name, value } = e.target;
-		console.log("Changed: " + name + " -> " + JSON.stringify(value));
 		this.setState({...this.state, [name] : value});
 	};
 
@@ -22,24 +21,33 @@ class LoginForm extends React.Component {
 
 	// };
 
-	doLogin = (ev) => {
+	doLogin = (e) => {
+		e.preventDefault();
 		console.log("Attemptifying to login...");
-		console.log("In state: " + JSON.stringify(this.state));
+		console.log("In state: ", this.state);
 		const { email, password } = this.state;
-		this.app.authenticate({
+		const app = this.props.feathers || this.props.route.feathers;
+		app.authenticate({
 			type: 'local',
 			email,
 			password,
 		})
-			.then(() => {browserHistory.push('/');console.log("Loginized");})
-			.catch((error) => console.log("Errorated."));
-		ev.preventDefault();
+		.then(() => {
+			browserHistory.push('/home');
+			const handler = this.props.onSuccess || this.props.route.onSuccess;
+			if(handler) {
+				handler();
+			}
+			console.log("Loginized");
+		})
+		.catch((error) => console.error("Errorated: ", error));
+		
 	};
 
 	render() {
 		return (
 			<Paper>
-				<h2>Lag in</h2>			
+				<h2>Laag in</h2>			
 				<form onSubmit={this.doLogin}>
 					<TextField 
 						name='email'

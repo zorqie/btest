@@ -1,6 +1,7 @@
 import React from 'react';
 
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import ActionDelete from 'material-ui/svg-icons/action/delete';
 
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import IconButton from 'material-ui/IconButton';
@@ -19,6 +20,8 @@ class GigItem extends React.Component {
 		const cleck = () => this.props.onSelect(this.props.gig);
 		
 		const editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" onClick={clack.bind(this)}>edit</IconButton>;
+		const deleteIcon2 = <IconButton iconClassName="material-icons" tooltip="Delete" onClick={clack.bind(this)}>delete</IconButton>;
+		const deleteIcon = <IconButton><ActionDelete /></IconButton>;
 		const text = <span>
 			<b>{moment(this.props.gig.start).format('MM/DD/YY')}</b> to <b>{moment(this.props.gig.end).format('MM/DD/YY')}</b>
 		</span>;
@@ -27,7 +30,7 @@ class GigItem extends React.Component {
 				onClick={cleck.bind(this)}
 				primaryText={this.props.gig.name} 
 				secondaryText={text}
-				rightIcon={editIcon}
+				rightIcon={deleteIcon2}
 			/>
 		);
 	}

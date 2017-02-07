@@ -14,8 +14,6 @@ const BLANK_GIG =  { name: '', description: '', type: '', start: new Date(), end
 class GigForm extends React.Component {
 	constructor(props) {
     	super(props);
-    	this.app = props.feathers || props.route.feathers;
-    	this.gigService = this.app.service('gigs');
 		this.state = {gig: BLANK_GIG, gigs: [], snackOpen: false, message: ''};
 	}
 
@@ -33,7 +31,10 @@ class GigForm extends React.Component {
 		// console.log("Validificating: " + JSON.stringify(v));
 	};
 	componentDidMount() {
-		this.gigService.find({
+    	const app = this.props.feathers || this.props.route.feathers;	
+    	const service = app.service('gigs');
+
+		service.find({
 			query: {
 				$sort: { createdAt: -1 },
 				$limit: this.props.limit || 7
@@ -41,9 +42,12 @@ class GigForm extends React.Component {
 		}).then(page => this.setState({
 			gigs: page.data,
 			gig: page.data[0] || BLANK_GIG
-		}));
+		}))
+		.catch(err => {
+			console.log("Errified: " + JSON.stringify(err));
+		});
 		// Listen to newly created messages
-		this.gigService.on('created', gig => this.setState({
+		service.on('created', gig => this.setState({
 			gigs: this.state.gigs.concat(gig)
 		}));
 	};
@@ -52,8 +56,11 @@ class GigForm extends React.Component {
 		const v = this.state.gig;
 		console.log('Saving gig: ', v);
 		
+		const app = this.props.feathers || this.props.route.feathers;	// FIXME we should not be passing app as prop
+    	const service = app.service('gigs');
+
 		if(this.state.gig._id) {
-			this.gigService.patch(this.state.gig._id, v)
+			service.patch(this.state.gig._id, v)
 			.then(() => {
 				this.setState({snackOpen: true, message: "Updated gig"}); 
 				console.log("Saviated gig: ", v)
@@ -62,7 +69,7 @@ class GigForm extends React.Component {
 		} else {
 			//create
 			console.log("Createning..")
-			this.gigService.create(v)
+			service.create(v)
 			.then(() => {
 				this.setState({snackOpen: true, message: "Created gig"}); 
 				console.log("Created gig: ", v)
@@ -107,6 +114,12 @@ class GigForm extends React.Component {
 						floatingLabelText="Start"
 						value={moment(this.state.gig.start).format('YYYY-MM-DD')} 
 						onChange={this.handleChange} 
+					/>
+					<TextField 
+						type='time'
+						name='startTime'
+						hintText='Start time'
+						floatingLabelText="Start time"
 					/>
 					<TextField 
 						type='date'

@@ -5,6 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
 import VenueList from './venue-list.jsx';
+import errorHandler from './err';
 
 const BLANK_VENUE =  { name: '', capacity: ''};
 
@@ -39,14 +40,16 @@ class VenueForm extends React.Component {
 		}).then(page => this.setState({
 			venues: page.data,
 			venue: page.data[0] || BLANK_VENUE
-		}));
+		}))
+		.catch(errorHandler);
 		// Listen to newly created messages
 		this.venueService.on('created', venue => this.setState({
 			venues: this.state.venues.concat(venue)
 		}));
 	};
 
-	saveVenue = (ev) => {
+	saveVenue = (e) => {
+		e.preventDefault();
 		const v = this.state.venue;
 		console.log('Saving ' + JSON.stringify(v));
 		
@@ -61,7 +64,7 @@ class VenueForm extends React.Component {
 			.then(() => console.log("Created " + JSON.stringify(v)))
 			.catch(err => console.log("Erroir: " + JSON.stringify(err)));
 		}
-		ev.preventDefault();
+		
 	};
 
 	handleVenueSelection = (v) => {
