@@ -10,10 +10,11 @@ import {grey600, darkBlack, lightBlack} from 'material-ui/styles/colors';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 
-import VenueForm from './mui/venue-form.jsx';
 import GigForm from './mui/gig-form.jsx';
 import LoginForm from './mui/login-form.jsx';
 import SignupForm from './mui/signup-form.jsx';
+import VenueForm from './mui/venue-form.jsx';
+import VenuePage from './mui/venue-page.jsx';
 
 import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router';
 
@@ -78,7 +79,6 @@ class Layout extends React.Component {
 		this.setState({user: app.get('user')});
 	}
 	render() { 
-		console.log("STATED: ", this.state);
 		return (
 		<MuiThemeProvider>
 			<div>
@@ -103,7 +103,7 @@ class Layout extends React.Component {
 				</Drawer>
 				{this.props.children}
 				<footer>
-					Footing business goes here
+					Footering business goes here
 				</footer>
 			</div>
 		</MuiThemeProvider>
@@ -114,20 +114,52 @@ class Layout extends React.Component {
 const Home = () => <p>We're home</p>;
 const NotFound = () => <p>She's not here.</p>;
 
-app.authenticate().then(() => {
-	console.log("Authentificated.", app.get('user'));
-	ReactDOM.render(
-		<Router history={browserHistory}>
-			<Route path="/" component={Layout} feathers={app}>
+const handleRouteChange = (prevState, nextState, replace, callback) => {
+	console.log("Previous state: ", prevState);
+	console.log("Nextious state: ", nextState);
+	// console.log("Replace: ", replace);
+	console.log("callback: ", callback);
+	callback();
+}
+const handleRouteEnter = (nextState, replace, callback) => {
+	console.log("Entering ", nextState);
+	// console.log("Replacing ", replace);
+	callback();
+}
+
+const venueEnter = (nextState, replace, callback) => {
+	const venueService = app.service('venues');
+	venueService.get(nextState.params.venueId)
+		.then(() => callback())
+		.catch(err => callback(err));
+
+}
+const routes = <Router history={browserHistory}>
+			<Route path="/" component={Layout} feathers={app} onChange={handleRouteChange} >
 				<IndexRoute component={Home} />
 				<Route path='login' component={LoginForm} feathers={app} />
 				<Route path='signup' component={SignupForm} />
-				<Route path='venues' component={VenueForm} feathers={app} />
-				<Route path='gigs' component={GigForm} feathers={app} />
+				<Route 
+					path='venues' 
+					component={VenueForm} 
+					onEnter={handleRouteEnter}
+					
+					feathers={app} >
+					
+				</Route>
+				<Route path='venues/:venueId' component={VenuePage} onEnter={venueEnter}/>
+				<Route path='gigs' component={GigForm} feathers={app} >
+
+				</Route>
 
 				<Route path='*' component={NotFound} />
 			</Route>
-		</Router>
+		</Router>;
+
+app.authenticate().then(() => {
+	console.log("Authentificated.", app.get('user'));
+	ReactDOM.render(
+		routes
 		, document.getElementById("app")
 	);
 }).catch(error => {
@@ -142,3 +174,6 @@ app.authenticate().then(() => {
 		);
 	}
 });
+
+// FIXME remove this!!!
+window.appx = app;

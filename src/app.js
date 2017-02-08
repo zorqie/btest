@@ -18,9 +18,14 @@ const mongoose = require('mongoose');
 const middleware = require('./middleware');
 const services = require('./services');
 
-const routing = function (request, response){
-  // console.log("Routing ",request._parsedUrl);
-  response.sendFile(path.resolve(__dirname, app.get('public'), 'index.html'))
+const routing = function (request, response, next){
+  // console.log("Routing " + request.path);
+  // console.log("Nexting ", next);
+  if(request.path.indexOf('/img/') < 0) {
+    response.sendFile(path.resolve(__dirname, app.get('public'), 'index.html'))
+  } else {
+    next();
+  }
 };
 
 const app = feathers();

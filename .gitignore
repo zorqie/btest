@@ -31,5 +31,5 @@ lib/
 data/
 
 # Fonts
-public\fonts\
-public\bundle\
+public/fonts/
+public/bundle/
