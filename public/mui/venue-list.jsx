@@ -1,4 +1,5 @@
 import React from 'react';
+import { browserHistory } from 'react-router';
 
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
@@ -7,18 +8,16 @@ import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 
 class VenueItem extends React.Component {
+	clicked = () => this.props.onSelect(this.props.venue);
+	edit = (e) => browserHistory.push('/venues/'+ this.props.venue._id);
 	render() {
-		const clack = function(e) {
-			console.log('Clacked. ' + JSON.stringify(this.props.venue.name));
-		}
-		const cleck = () => this.props.onSelect(this.props.venue);
-		
-		const editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" onClick={clack.bind(this)}>edit</IconButton>;
+		const { venue } = this.props;		
+		const editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" onClick={this.edit}>edit</IconButton>;
 		return (
 			<ListItem 
-				onClick={cleck.bind(this)}
-				primaryText={this.props.venue.name} 
-				secondaryText={'Capacity: ' + this.props.venue.capacity}
+				onClick={this.clicked}
+				primaryText={venue.name} 
+				secondaryText={'Capacity: ' + venue.capacity}
 				rightIcon={editIcon}
 			/>
 		);

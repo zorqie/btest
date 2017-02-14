@@ -15,6 +15,7 @@ import LoginForm from './mui/login-form.jsx';
 import SignupForm from './mui/signup-form.jsx';
 import VenueForm from './mui/venue-form.jsx';
 import VenuePage from './mui/venue-page.jsx';
+import errorHandler from './mui/err';
 
 import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router';
 
@@ -118,7 +119,7 @@ const handleRouteChange = (prevState, nextState, replace, callback) => {
 	console.log("Previous state: ", prevState);
 	console.log("Nextious state: ", nextState);
 	// console.log("Replace: ", replace);
-	console.log("callback: ", callback);
+	console.log("callback: ", callback); 
 	callback();
 }
 const handleRouteEnter = (nextState, replace, callback) => {
@@ -131,9 +132,10 @@ const venueEnter = (nextState, replace, callback) => {
 	const venueService = app.service('venues');
 	venueService.get(nextState.params.venueId)
 		.then(() => callback())
-		.catch(err => callback(err));
+		.catch(errorHandler);
 
 }
+
 const routes = <Router history={browserHistory}>
 			<Route path="/" component={Layout} feathers={app} onChange={handleRouteChange} >
 				<IndexRoute component={Home} />
@@ -174,6 +176,8 @@ app.authenticate().then(() => {
 		);
 	}
 });
+
+export default app;
 
 // FIXME remove this!!!
 window.appx = app;

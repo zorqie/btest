@@ -95,7 +95,7 @@ class VenueForm extends React.Component {
 						value={this.state.venue.capacity} 
 						onChange={this.handleChange} 
 					/>
-					<RaisedButton label='Save' onClick={this.saveVenue} primary/>
+					<RaisedButton label='Save' onClick={this.saveVenue} primary type='submit'/>
 				</form>
 				
 			</div>

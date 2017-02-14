@@ -6,12 +6,10 @@ import TextField from 'material-ui/TextField';
 
 const BLANK_VENUE =  { name: '', capacity: ''};
 
-class VenueForm extends React.Component {
+class VenueDialog extends React.Component {
 	constructor(props) {
     	super(props);
-    	this.app = props.feathers || props.route.feathers;
-    	this.venueService = this.app.service('venues');
-		this.state = {venue: BLANK_VENUE, venues: []};
+		this.state = {venue: BLANK_VENUE};
 	}
 
 	handleChange = (e) => {
@@ -28,38 +26,6 @@ class VenueForm extends React.Component {
 		// console.log("Validificating: " + JSON.stringify(v));
 	};
 	componentDidMount() {
-		this.venueService.find({
-			query: {
-				parent: { $exists: false},
-				$sort: { createdAt: -1 },
-				$limit: this.props.limit || 7
-			}
-		}).then(page => this.setState({
-			venues: page.data,
-			venue: page.data[0] || BLANK_VENUE
-		}));
-		// Listen to newly created messages
-		this.venueService.on('created', venue => this.setState({
-			venues: this.state.venues.concat(venue)
-		}));
-	};
-
-	saveVenue = (e) => {
-		e.preventDefault();
-		const v = this.state.venue;
-		console.log('Saving ' + JSON.stringify(v));
-		
-		if(this.state.venue._id) {
-			this.venueService.patch(this.state.venue._id, v)
-			.then(() => console.log("Saviated ", v))
-			.catch(err => console.log("Errar: " + JSON.stringify(err)));
-		} else {
-			//create
-			console.log("Createning..")
-			this.venueService.create(v)
-			.then(() => console.log("Created ", v))
-			.catch(err => console.log("Erroir: " + JSON.stringify(err)));
-		}
 		
 	};
 
