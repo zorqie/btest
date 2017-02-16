@@ -7,136 +7,169 @@ import Snackbar from 'material-ui/Snackbar';
 
 import moment from 'moment';
 
+import app from '../main.jsx';
 import GigList from './gig-list.jsx';
 
-const BLANK_GIG =  { name: '', description: '', type: '', start: new Date(), end: new Date()};
+const blankGig = () => {
+	return { 
+		name: '', 
+		description: '', 
+		venue: '',
+		type: '', 
+		start: new Date(), 
+		end: new Date()
+	}
+};
 
 class GigForm extends React.Component {
 	constructor(props) {
     	super(props);
-		this.state = {gig: BLANK_GIG, gigs: [], snackOpen: false, message: ''};
+		this.state = {gig: blankGig(), snackOpen: false, message: '', errors:{}};
 	}
 
 	handleChange = (e) => {
 		const { name, value } = e.target;
+		var gig = this.state.gig;
 		// console.log("Changed: " + name + " -> " + JSON.stringify(value));
-		var v = this.state.gig;
-		Object.assign(v, {[name] : value});
-		this.validate(v);
-		this.setState({gig: v});
+		if( name.indexOf("Time") > -1 ) {
+			//handle time changes
+			const dateName = name.substr(0, name.indexOf("Time"));
+			const date = this.state.gig[dateName];
+			const hours = moment(value, 'HH:mm');
+			const newDate = moment(date)
+				.hours(hours.hours())
+				.minutes(hours.minutes())
+				.toDate();
+			// console.log("Changing: " + dateName + " = " + (date) + "\n--> " + newDate);
+			Object.assign(gig, {[dateName] : newDate});
+		} else {
+			Object.assign(gig, {[name] : value});
+		}
+		this.validate(gig);
+		this.setState({ gig });
 		// console.log("State: " + JSON.stringify(this.state));
 	};
 	validate = (gig) => {
 		// const v = new mongoose.Document(Gig, GigSchema);//
 		// console.log("Validificating: " + JSON.stringify(v));
 	};
-	componentDidMount() {
-    	const app = this.props.feathers || this.props.route.feathers;	
-    	const service = app.service('gigs');
-
-		service.find({
-			query: {
-				$sort: { createdAt: -1 },
-				$limit: this.props.limit || 7
-			}
-		}).then(page => this.setState({
-			gigs: page.data,
-			gig: page.data[0] || BLANK_GIG
-		}))
-		.catch(err => {
-			console.log("Errified: " + JSON.stringify(err));
-		});
-		// Listen to newly created messages
-		service.on('created', gig => this.setState({
-			gigs: this.state.gigs.concat(gig)
-		}));
-	};
+	
 
 	saveGig = (e) => {
-		const v = this.state.gig;
-		console.log('Saving gig: ', v);
+		e.preventDefault();
+		const { gig } = this.state;
+		console.log('Saving gig: ', gig);
 		
-		const app = this.props.feathers || this.props.route.feathers;	// FIXME we should not be passing app as prop
     	const service = app.service('gigs');
 
-		if(this.state.gig._id) {
-			service.patch(this.state.gig._id, v)
+		if(gig._id) {
+			service.patch(gig._id, gig)
 			.then(() => {
-				this.setState({snackOpen: true, message: "Updated gig"}); 
-				console.log("Saviated gig: ", v)
+				this.setState({...this.state, snackOpen: true, message: "Updated gig"}); 
+				console.log("Saved gig: ", gig)
 			})
-			.catch(err => console.error("Errar: ", err));
+			.catch(err => console.error("Error saving gig: ", err));
 		} else {
 			//create
-			console.log("Createning..")
-			service.create(v)
+			service.create(gig)
 			.then(() => {
-				this.setState({snackOpen: true, message: "Created gig"}); 
-				console.log("Created gig: ", v)
+				this.setState({...this.state, snackOpen: true, message: "Created gig"}); 
+				console.log("Created gig: ", gig)
 			})
-			.catch(err => console.error("Erroir: ", err));
+			.catch(err => {
+				console.error("Error creating gig: ", err);
+				console.log("Errors: " + JSON.stringify(err));
+				this.setState({
+					...this.state, 
+					snackOpen: true, 
+					message: 'Save failed. Fix errors first.',
+					errors: err.errors
+				});
+			});
 		}
-		e.preventDefault();
 	};
 
-	handleGigSelection = (v) => {
-		// console.log("Handling Gig selection: " + JSON.stringify(v));
-		this.setState({gig: v});
+	handleGigSelection = (gig) => {
+		this.setState({...this.state, errors:{}, gig});
 	}
+	handleRequestClose = () => { this.setState({ snackOpen:false }); }
 
 	render() {
+		const {gig, errors} = this.state;
 		return (
 			<div>
 				<Paper>
-					<GigList 
-						onGigSelected = {this.handleGigSelection}
-						gigs={this.state.gigs} />
+					<GigList onGigSelected = {this.handleGigSelection} />
 				</Paper>
 				<form onSubmit={this.saveGig}>
 					<TextField 
 						name='name'
 						hintText='Name'
 						floatingLabelText="Name"
-						value={this.state.gig.name} 
-						onChange={this.handleChange} 
-					/>
-					<TextField 
-						name='type'
-						hintText='Gig type'
-						floatingLabelText="Type"
-						value={this.state.gig.type} 
-						onChange={this.handleChange} 
-					/>
-					<TextField 
-						type='date'
-						name='start'
-						hintText='Gig start'
-						floatingLabelText="Start"
-						value={moment(this.state.gig.start).format('YYYY-MM-DD')} 
-						onChange={this.handleChange} 
-					/>
-					<TextField 
-						type='time'
-						name='startTime'
-						hintText='Start time'
-						floatingLabelText="Start time"
-					/>
-					<TextField 
-						type='date'
-						name='end'
-						hintText='Gig end'
-						floatingLabelText="End"
-						value={moment(this.state.gig.end).format('YYYY-MM-DD')} 
+						value={gig.name} 
 						onChange={this.handleChange} 
 					/>
 					<TextField 
 						name='description'
 						hintText='Description'
 						floatingLabelText="Gig description"
-						value={this.state.gig.description} 
+						value={gig.description} 
 						onChange={this.handleChange} 
 					/>
-					<RaisedButton label='Save' onClick={this.saveGig} primary/>
+					<TextField 
+						name='type'
+						hintText='Gig type'
+						floatingLabelText="Type"
+						value={gig.type} 
+						onChange={this.handleChange} 
+						errorText={(errors.type && errors.type.message) || ''}
+					/>
+					<TextField 
+						name='venue'
+						hintText='Venue'
+						floatingLabelText="Venue"
+						value={gig.venue || ''} 
+						onChange={this.handleChange} 
+						errorText={(errors.venue && errors.venue.message) || ''}
+					/>
+					<div>
+						<TextField 
+							type='date'
+							name='start'
+							hintText='Gig start'
+							floatingLabelText="Start"
+							value={moment(gig.start).format('YYYY-MM-DD')} 
+							onChange={this.handleChange} 
+						/>
+						<TextField 
+							type='time'
+							name='startTime'
+							floatingLabelFixed={true}
+							floatingLabelText="Start time"
+							value={moment(gig.start).format('HH:mm')} 
+							onChange={this.handleChange} 
+						/>
+					</div>
+					<div>
+						<TextField 
+							type='date'
+							name='end'
+							hintText='Gig end'
+							floatingLabelText="End"
+							value={moment(gig.end).format('YYYY-MM-DD')} 
+							onChange={this.handleChange} 
+						/>
+						<TextField 
+							type='time'
+							name='endTime'
+							floatingLabelFixed={true}
+							floatingLabelText="Start time"
+							value={moment(gig.end).format('HH:mm')} 
+							onChange={this.handleChange} 
+						/>
+					</div>
+					
+					<RaisedButton type='submit' label='Save' onClick={this.saveGig} primary/>
 				</form>
 				<Snackbar
 					open={this.state.snackOpen}

@@ -12,13 +12,13 @@ class VenueItem extends React.Component {
 	edit = (e) => browserHistory.push('/venues/'+ this.props.venue._id);
 	render() {
 		const { venue } = this.props;		
-		const editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" onClick={this.edit}>edit</IconButton>;
+		const editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" onTouchTap={this.edit}>edit</IconButton>;
 		return (
 			<ListItem 
-				onClick={this.clicked}
+				onTouchTap={this.clicked}
 				primaryText={venue.name} 
 				secondaryText={'Capacity: ' + venue.capacity}
-				rightIcon={editIcon}
+				rightIconButton={editIcon}
 			/>
 		);
 	}
@@ -38,7 +38,6 @@ export default class VenueList extends React.Component {
 		
 		return (
 			<List >
-				<Subheader>Venues</Subheader>
 				{this.props.venues.map((v) => (
 					<VenueItem onSelect={this.handleSelection.bind(this, v)} venue={v} key={v._id}/>)
 				)}

@@ -1,58 +1,63 @@
 import React from 'react';
 
 import Paper from 'material-ui/Paper';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 
-const BLANK_VENUE =  { name: '', capacity: ''};
+const BLANK_VENUE =  { name: '', capacity: '', type: '' };
 
-class VenueDialog extends React.Component {
+export default class VenueDialogForm extends React.Component {
 	constructor(props) {
     	super(props);
-		this.state = {venue: BLANK_VENUE};
+		this.state = {
+			open: false,
+			venue: props.venue || BLANK_VENUE
+		};
+		// console.log("Dialog venue: ", this.state.venue);
 	}
 
 	handleChange = (e) => {
 		const { name, value } = e.target;
 		// console.log("Changed: " + name + " -> " + JSON.stringify(value));
-		var v = this.state.venue;
-		Object.assign(v, {[name] : value});
-		this.validate(v);
-		this.setState({venue: v});
-		// console.log("State: " + JSON.stringify(this.state));
+		let {venue} = this.state;
+		Object.assign(venue, {[name] : value});
+		this.validate(venue);
+		this.setState({...this.state, venue});
+		
 	};
 	validate = (venue) => {
 		// const v = new mongoose.Document(venue, venueSchema);//
 		// console.log("Validificating: " + JSON.stringify(v));
 	};
-	componentDidMount() {
-		
-	};
 
 	render() {
+		const {venue} = this.state;
+		// console.log("Dialog state: ", venue);
 		return (
-			<div>
-				<form onSubmit={this.saveVenue}>
+				<form onSubmit={this.props.handleSubmit}>
 					<TextField 
 						name='name'
 						hintText='Name'
 						floatingLabelText="Name"
-						value={this.state.venue.name} 
+						value={venue.name} 
+						onChange={this.handleChange} 
+					/>
+					<TextField 
+						name='type'
+						hintText='Type'
+						floatingLabelText="Type"
+						value={venue.type} 
 						onChange={this.handleChange} 
 					/>
 					<TextField 
 						name='capacity'
+						type='number' min='0'
 						hintText='Capacity'
 						floatingLabelText="Max capacity"
-						value={this.state.venue.capacity} 
+						value={venue.capacity} 
 						onChange={this.handleChange} 
 					/>
-					<RaisedButton label='Save' onClick={this.saveVenue} primary/>
 				</form>
-				
-			</div>
 		);
 	}
 };
-
-export default VenueForm;
