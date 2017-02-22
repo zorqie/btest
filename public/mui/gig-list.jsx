@@ -45,7 +45,7 @@ class GigItem extends React.Component {
 		  </IconMenu>
 		);
 
-		const deleteIcon2 = <IconButton iconClassName="material-icons" tooltip="Delete" onTouchTap={this.delete}>delete</IconButton>;
+		// const deleteIcon2 = <IconButton iconClassName="material-icons" tooltip="Delete" onTouchTap={this.delete}>delete</IconButton>;
 		const startDate = moment(gig.start).format('ddd M/D/YY');
 		const endDate = moment(gig.end).format('ddd M/D/YY');
 		const text = <span>
@@ -77,9 +77,7 @@ export default class GigList extends React.Component {
 		this.setState({gigs: this.state.gigs.filter(g => g._id !== gig._id)})
 	};
 	componentDidMount() {
-    	const service = app.service('gigs');
-
-		service.find({
+		app.service('gigs').find({
 			query: {
 				$sort: { start: 1 },
 				$limit: this.props.limit || 77
@@ -91,19 +89,21 @@ export default class GigList extends React.Component {
 		.catch(errorHandler);
 
 		// Listen to newly created/removed gigs
-		service.on('created', this.createdListener);
-		service.on('removed', this.removedListener);
+		app.service('gigs').on('created', this.createdListener);
+		app.service('gigs').on('removed', this.removedListener);
 	};
 	componentWillUnmount() {
-		const service = app.service('gigs');
-		service.removeListener('created', this.createdListener);
-		service.removeListener('removed', this.removedListener);	
+		if(app) {
+			app.service('gigs').removeListener('created', this.createdListener);
+			app.service('gigs').removeListener('removed', this.removedListener);	
+		}
 	}
 	handleSelection(v){
 		this.props.onGigSelected(v || blankGig())
 	}
     
 	render() {
+		console.log("___GIG-LIST");
 		return (
 			<List >
 				{this.state.gigs.map((v) => (

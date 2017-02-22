@@ -11,6 +11,8 @@ import app from '../main.jsx';
 import errorHandler from './err';
 import GigList from './gig-list.jsx';
 
+console.log("APP in gig-form.jsx: ", app);
+
 const blankGig = () => {
 	return { 
 		name: '', 
@@ -25,10 +27,17 @@ const blankGig = () => {
 class GigForm extends React.Component {
 	constructor(props) {
     	super(props);
-		this.state = {gig: blankGig(), snackOpen: false, message: '', errors:{}};
+		this.state = {
+			gig: blankGig(), 
+			snackOpen: false, 
+			message: '', 
+			errors:{}
+		};
 	}
 
 	handleChange = (e) => {
+		// TODO: ensure end Date is after start Date
+
 		const { name, value } = e.target;
 		var gig = this.state.gig;
 		// console.log("Changed: " + name + " -> " + JSON.stringify(value));
@@ -96,6 +105,7 @@ class GigForm extends React.Component {
 	handleRequestClose = () => { this.setState({ snackOpen:false }); }
 
 	render() {
+		console.log("GIG-FORM________");
 		const {gig, errors} = this.state;
 		return (
 			<div>
