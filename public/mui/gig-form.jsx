@@ -8,6 +8,7 @@ import Snackbar from 'material-ui/Snackbar';
 import moment from 'moment';
 
 import app from '../main.jsx';
+import errorHandler from './err';
 import GigList from './gig-list.jsx';
 
 const blankGig = () => {
@@ -65,7 +66,7 @@ class GigForm extends React.Component {
 		if(gig._id) {
 			service.patch(gig._id, gig)
 			.then(() => {
-				this.setState({...this.state, snackOpen: true, message: "Updated gig"}); 
+				this.setState({...this.state, snackOpen: true, message: "Updated gig", errors: {}}); 
 				console.log("Saved gig: ", gig)
 			})
 			.catch(err => console.error("Error saving gig: ", err));
@@ -73,7 +74,7 @@ class GigForm extends React.Component {
 			//create
 			service.create(gig)
 			.then(() => {
-				this.setState({...this.state, snackOpen: true, message: "Created gig"}); 
+				this.setState({...this.state, snackOpen: true, message: "Created gig", errors:{}}); 
 				console.log("Created gig: ", gig)
 			})
 			.catch(err => {

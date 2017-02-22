@@ -21,12 +21,12 @@ const editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" >edit
 const addIcon = <FontIcon className="material-icons" >add</FontIcon>;
 	// <IconButton iconClassName="material-icons" >add</IconButton>;
 
-const Subvenue = ({ venue, onEdit }) => <ListItem 
+const Subvenue = ({ venue, onEdit, onDelete }) => <ListItem 
 		primaryText={venue.name} 
 		secondaryText={"Capacity " + venue.capacity} 
 		rightIconButton={<span>
 			<FlatButton label="Edit" onTouchTap={onEdit}/>
-			<FlatButton label="Delete" />
+			<FlatButton label="Delete" onTouchTap={onDelete}/>
 		</span>}
 	/>;
 
@@ -34,7 +34,6 @@ const Subvenue = ({ venue, onEdit }) => <ListItem
 export default class VenuePage extends React.Component {
 	constructor(props) {
 		super(props);
-		console.log("Constructed VP");
 		this.state = {
 			venues:[], 
 			venue: props.venue || {},
@@ -65,6 +64,12 @@ export default class VenuePage extends React.Component {
 		const dv = v ? Object.assign({}, v) : Object.assign({}, {parent: this.state.venue._id, type});
 		this.setState({dialog: true, dialogVenue: dv});
 	}
+	handleDelete = (v) => {
+		console.log("Deleting venue ", v);
+		app.service('venues').remove(v._id)
+		.then(v => console.log("Deleted venue", v))
+		.catch(err => console.error("Delete failed: ", err));
+	}
 	actions = [
 			<FlatButton
 				label="Cancel"
@@ -77,11 +82,23 @@ export default class VenuePage extends React.Component {
 				onTouchTap={this.handleSubmit}
 			/>,
 		];
-	componentDidMount() {
+	createdListener = venue => {
+		console.log("Removed: ", venue);
+		this.setState({venues: this.state.venues.filter(v => v._id !== venue._id)})
+	}
+	removedListener = venue => {
+		console.log("Added: ", venue);
+		this.setState({venues: this.state.venues.concat(venue)});
+	}
+	componentWillMount() {
 		const parentId = this.props.params.venueId;
 		// console.log("Looking for parent: " + parentId);
 		app.service('venues').get(parentId)
-		.then((venue) => this.setState({...this.state, venue}))
+		.then((venue) => {
+			this.setState({...this.state, venue});
+			document.title = venue.name;
+			console.log("document.title: ", document.title)
+		})
 		.then(() =>
 			app.service('venues').find({
 				query: {
@@ -99,11 +116,23 @@ export default class VenuePage extends React.Component {
 		// this.venueService.on('created', venue => this.setState({
 		// 	venues: this.state.venues.concat(venue)
 		// }));
+		app.service('venues').on('removed', this.createdListener);
+		app.service('venues').on('created', this.removedListener);
 	}
-
+	componentWillUnmount() {
+		if(app) {
+			app.service('venues').removeListener('removed', this.createdListener);
+			app.service('venues').removeListener('created', this.removedListener);
+		}
+	}
 	list = (type) => this.state.venues
 		.filter(v => v.type===type)
-		.map(v => <Subvenue key={v._id} venue={v} onEdit={this.handleEdit.bind(this, v)} />)
+		.map(v => <Subvenue 
+			key={v._id} 
+			venue={v} 
+			onEdit={this.handleEdit.bind(this, v)} 
+			onDelete={this.handleDelete.bind(this, v)} 
+		/>)
 
 	render() {
 		// console.log("VenuePage props: ", this.props);
@@ -128,7 +157,7 @@ export default class VenuePage extends React.Component {
 						</Tab>
 						<Tab label="Service">
 							<List>
-								{ this.list('volunteer') }
+								{ this.list('service') }
 							</List>
 							<FloatingActionButton onTouchTap={this.handleEdit.bind(this, null, 'service')}>{addIcon}</FloatingActionButton>
 						</Tab>

@@ -9,7 +9,7 @@ module.exports = function(app) {
     	password: body.password,
         name: body.name
     })
-    .then(user => res.redirect('/login.html'))
+    .then(user => res.redirect('/login'))
     .catch(next);
     // next();
   };

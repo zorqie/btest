@@ -48,13 +48,13 @@ export default class SignupForm extends React.Component {
 					/>
 					<TextField 
 						type='password'
-						name='password'
-						hintText='Password'
-						floatingLabelText="Password"
+						name='password2'
+						hintText='Confirm password'
+						floatingLabelText="Confirm password"
 						value={this.state.password2} 
 						onChange={this.handleChange} 
 					/>
-					<RaisedButton label='Signup' primary/>
+					<RaisedButton type='submit' label='Signup' primary/>
 				</form>
 			</Paper>
 		)

@@ -14,6 +14,7 @@ import Subheader from 'material-ui/Subheader';
 import moment from 'moment'
 
 import app from '../main.jsx';
+import errorHandler from './err';
 
 const blankGig = () => { return { name: '', description: '', type: '', start: new Date(), end: new Date()}};
 
@@ -69,31 +70,35 @@ export default class GigList extends React.Component {
 		this.state = {gigs:[]};
 		// this.handleSelection.bind(this);
 	}
+	createdListener = gig => this.setState({
+		gigs: this.state.gigs.concat(gig)
+	});
+	removedListener = gig => {
+		this.setState({gigs: this.state.gigs.filter(g => g._id !== gig._id)})
+	};
 	componentDidMount() {
     	const service = app.service('gigs');
 
 		service.find({
 			query: {
 				$sort: { start: 1 },
-				$limit: this.props.limit || 7
+				$limit: this.props.limit || 77
 			}
 		})
 		.then(page => this.setState({
 			gigs: page.data
 		}))
-		.catch(err => {
-			console.log("Errified: " + JSON.stringify(err));
-		});
+		.catch(errorHandler);
 
 		// Listen to newly created/removed gigs
-		service.on('created', gig => this.setState({
-			gigs: this.state.gigs.concat(gig)
-		}));
-		service.on('removed', gig => {
-			console.log("Removed: ", gig);
-			this.setState({gigs: this.state.gigs.filter(g => g._id !== gig._id)})
-		});
+		service.on('created', this.createdListener);
+		service.on('removed', this.removedListener);
 	};
+	componentWillUnmount() {
+		const service = app.service('gigs');
+		service.removeListener('created', this.createdListener);
+		service.removeListener('removed', this.removedListener);	
+	}
 	handleSelection(v){
 		this.props.onGigSelected(v || blankGig())
 	}

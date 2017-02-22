@@ -5,6 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
 import VenueList from './venue-list.jsx';
+import app from '../main.jsx';
 import errorHandler from './err';
 
 const BLANK_VENUE =  { name: '', capacity: ''};
@@ -12,9 +13,7 @@ const BLANK_VENUE =  { name: '', capacity: ''};
 class VenueForm extends React.Component {
 	constructor(props) {
     	super(props);
-    	this.app = props.feathers || props.route.feathers;
-    	this.venueService = this.app.service('venues');
-		this.state = {venue: BLANK_VENUE, venues: []};
+		this.state = {venue: BLANK_VENUE, venues: [], errors: {}};
 	}
 
 	handleChange = (e) => {
@@ -30,49 +29,69 @@ class VenueForm extends React.Component {
 		// const v = new mongoose.Document(venue, venueSchema);//
 		// console.log("Validificating: " + JSON.stringify(v));
 	};
+	createdListener = venue => this.setState({
+		venues: this.state.venues.concat(venue)
+	});
+	removedListener = venue => this.setState({
+		venues: this.state.venues.filter(v => v._id!==venue._is)
+	});
 	componentDidMount() {
-		this.venueService.find({
+		app.service('venues').find({
 			query: {
 				parent: { $exists: false},
 				$sort: { createdAt: -1 },
-				$limit: this.props.limit || 7
+				$limit: this.props.limit || 37
 			}
 		}).then(page => this.setState({
 			venues: page.data,
 			venue: page.data[0] || BLANK_VENUE
 		}))
 		.catch(errorHandler);
-		// Listen to newly created messages
-		this.venueService.on('created', venue => this.setState({
-			venues: this.state.venues.concat(venue)
-		}));
+		// Listen to newly created venues
+		app.service('venues').on('created', this.createdListener);
+		app.service('venues').on('removed', this.removedListener);
 	};
-
+	componentWillUnmount() {
+		if(app) {
+			app.service('venues').removeListener('created', this.createdListener);
+			app.service('venues').removeListener('removed', this.removedListener);
+		}
+	};
 	saveVenue = (e) => {
 		e.preventDefault();
-		const v = this.state.venue;
-		console.log('Saving ' + JSON.stringify(v));
+		const {venue} = this.state;
+		console.log('Saving venue', venue);
 		
-		if(this.state.venue._id) {
-			this.venueService.patch(this.state.venue._id, v)
-			.then(() => console.log("Saviated " + JSON.stringify(v)))
+		if(venue._id) {
+			app.service('venues').patch(venue._id, venue)
+			.then(() => {
+				console.log("Saviated venue.");
+				this.setState({...this.state, errors: {}});
+			})
 			.catch(err => console.log("Errar: " + JSON.stringify(err)));
 		} else {
 			//create
 			console.log("Createning..")
-			this.venueService.create(v)
-			.then(() => console.log("Created " + JSON.stringify(v)))
-			.catch(err => console.log("Erroir: " + JSON.stringify(err)));
+			app.service('venues').create(venue)
+			.then(() => {
+				console.log("Created venue");
+				this.setState({...this.state, errors: {}});
+			})
+			.catch(err => {
+				// FIXME check for error type
+				console.log("Erroir: " + JSON.stringify(err));
+				this.setState({...this.state, errors: err.errors});
+			});
 		}
-		
 	};
 
-	handleVenueSelection = (v) => {
+	handleVenueSelection = (venue) => {
 		// console.log("Handling venue selection: " + JSON.stringify(v));
-		this.setState({venue: v});
+		this.setState({venue});
 	}
 
 	render() {
+		const { venue, errors } = this.state;
 		return (
 			<div>
 				<Paper>
@@ -85,15 +104,18 @@ class VenueForm extends React.Component {
 						name='name'
 						hintText='Name'
 						floatingLabelText="Name"
-						value={this.state.venue.name} 
+						value={venue.name} 
 						onChange={this.handleChange} 
+						errorText={(errors.name && errors.name.message) || ''}
 					/>
 					<TextField 
 						name='capacity'
+						type='number' min='0'
 						hintText='Capacity'
 						floatingLabelText="Max capacity"
-						value={this.state.venue.capacity} 
+						value={venue.capacity} 
 						onChange={this.handleChange} 
+						errorText={(errors.capacity && errors.capacity.message) || ''}
 					/>
 					<RaisedButton label='Save' onClick={this.saveVenue} primary type='submit'/>
 				</form>

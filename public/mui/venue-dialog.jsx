@@ -39,7 +39,7 @@ export default class VenueDialogForm extends React.Component {
 						name='name'
 						hintText='Name'
 						floatingLabelText="Name"
-						value={venue.name} 
+						value={venue.name || ''} 
 						onChange={this.handleChange} 
 					/>
 					<TextField 
@@ -54,7 +54,7 @@ export default class VenueDialogForm extends React.Component {
 						type='number' min='0'
 						hintText='Capacity'
 						floatingLabelText="Max capacity"
-						value={venue.capacity} 
+						value={venue.capacity || 1} 
 						onChange={this.handleChange} 
 					/>
 				</form>

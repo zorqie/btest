@@ -47,21 +47,18 @@ class Layout extends React.Component {
 		super(props);
 		this.state = { drawerOpen: false, user: app.get('user'), section: 'BFest' };
 
-		console.log("Layout stated: ", this.state);
-		this.closeDrawer = this.closeDrawer.bind(this);
-		this.toggleDrawer = this.toggleDrawer.bind(this);
-		this.handleMenu = this.handleMenu.bind(this);
+		// console.log("Layout constructed: ", this.state);
 
 		this.sections = [
 			{ text: "Venues", path: "/venues"},
 			{ text: "Events", path: "/gigs"},
 		]
-		window.appstate = this.state;
+		window.layout = this; // FIXME REMOVE!
 	}
-	closeDrawer() {
+	closeDrawer = () => {
 		this.setState({...this.state, drawerOpen: false})
 	}
-	toggleDrawer() {
+	toggleDrawer = () => {
 		this.setState({...this.state, drawerOpen: !this.state.drawerOpen});
 	}
 	handleMenu = (section) => {
@@ -77,10 +74,21 @@ class Layout extends React.Component {
 		browserHistory.push('/out');
 	}
 	handleLogin = () => {
+		console.log("-=-=- AUTHENTICATED -=-=-");
 		this.setState({user: app.get('user')});
 	}
+	componentDidMount() {
+		app.authenticate().then(this.handleLogin);
+		app.on('authenticated', this.handleLogin);
+	}
+	componentWillUnmount() {
+		if(app) {
+			app.removeListener('authenticated', this.handleLogin);
+		}
+	}
 	render() { 
-		return (
+		// console.log("------------ LAYOUT ------------", this.state);
+		return ( 
 		<MuiThemeProvider>
 			<div>
 				<AppBar 
@@ -117,6 +125,9 @@ const NotFound = () => <p>She's not here.</p>;
 
 const handleRouteChange = (prevState, nextState, replace, callback) => {
 	console.log("Previous state: ", prevState);
+	if("/login" === prevState.location.pathname) {
+
+	}
 	console.log("Nextious state: ", nextState);
 	// console.log("Replace: ", replace);
 	console.log("callback: ", callback); 
@@ -129,53 +140,69 @@ const handleRouteEnter = (nextState, replace, callback) => {
 }
 
 const venueEnter = (nextState, replace, callback) => {
-	const venueService = app.service('venues');
-	venueService.get(nextState.params.venueId)
+	app.service('venues').get(nextState.params.venueId)
 		.then(() => callback())
 		.catch(errorHandler);
 
 }
 
-const routes = <Router history={browserHistory}>
-			<Route path="/" component={Layout} feathers={app} onChange={handleRouteChange} >
+class App extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {user: {}}
+	}
+	handleRouteChange = () => {
+		const user = app.get('user');
+		console.log("Got user: ", user)
+		this.setState({...this.state, user});
+	}	
+	render() {
+		return <Router history={browserHistory}>
+			<Route path="/" component={Layout} onChange={handleRouteChange} >
 				<IndexRoute component={Home} />
-				<Route path='login' component={LoginForm} feathers={app} />
+				<Route path='login' component={LoginForm} />
 				<Route path='signup' component={SignupForm} />
 				<Route 
 					path='venues' 
 					component={VenueForm} 
 					onEnter={handleRouteEnter}
-					
-					feathers={app} >
+				>
 					
 				</Route>
-				<Route path='venues/:venueId' component={VenuePage} onEnter={venueEnter}/>
-				<Route path='gigs' component={GigForm} feathers={app} >
+				<Route path='venues/:venueId' component={VenuePage} />
+				<Route path='gigs' component={GigForm} >
 
 				</Route>
 
 				<Route path='*' component={NotFound} />
 			</Route>
 		</Router>;
-
-app.authenticate().then(() => {
+	}
+}
+// app.authenticate().then(() => {
 	console.log("Authentificated.", app.get('user'));
 	ReactDOM.render(
-		routes
+		<App />
 		, document.getElementById("app")
 	);
-}).catch(error => {
-	console.error("Not happening.", error);
-	if(error.code === 401) {
-		// browserHistory.push('/login');
-		ReactDOM.render(
-			<MuiThemeProvider>
-				<LoginForm feathers={app}/>			
-			</MuiThemeProvider>, 
-			document.getElementById("app")
-		);
-	}
-});
+// }).catch(error => {
+// 	console.error("Not happening.", error);
+// 	if(error.code === 401) {
+// 		// browserHistory.push('/login');
+// 		ReactDOM.render(
+// 			<MuiThemeProvider>
+// 				<LoginForm />			
+// 			</MuiThemeProvider>, 
+// 			document.getElementById("app")
+// 		);
+// 	}
+// });
+
+
+// socket.io.engine.on('upgrade', function(transport) {
+//     console.log('transport changed');
+//     app.authenticate();
+//   });
 
 export default app;
 

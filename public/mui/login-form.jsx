@@ -6,6 +6,8 @@ import TextField from 'material-ui/TextField';
 
 import { Link, browserHistory } from 'react-router';
 
+import app from '../main.jsx';
+
 class LoginForm extends React.Component {
 	constructor(props) {
     	super(props);
@@ -23,10 +25,9 @@ class LoginForm extends React.Component {
 
 	doLogin = (e) => {
 		e.preventDefault();
-		console.log("Attemptifying to login...");
-		console.log("In state: ", this.state);
+		console.log("Attemptifying to login with state: ", this.state);
 		const { email, password } = this.state;
-		const app = this.props.feathers || this.props.route.feathers;
+
 		app.authenticate({
 			type: 'local',
 			email,
@@ -34,10 +35,11 @@ class LoginForm extends React.Component {
 		})
 		.then(() => {
 			browserHistory.push('/home');
-			const handler = this.props.onSuccess || this.props.route.onSuccess;
-			if(handler) {
-				handler();
-			}
+			// const handler = this.props.onSuccess || this.props.route.onSuccess;
+			// if(handler) {
+			// 	handler();
+			// }
+			app.emit('authenticated');
 			console.log("Loginized");
 		})
 		.catch((error) => console.error("Errorated: ", error));
@@ -47,9 +49,10 @@ class LoginForm extends React.Component {
 	render() {
 		return (
 			<Paper>
-				<h2>Laag in</h2>			
+				<h2>Llogin</h2>			
 				<form onSubmit={this.doLogin}>
 					<TextField 
+						type='email'
 						name='email'
 						hintText='Email'
 						floatingLabelText="Email"
@@ -64,7 +67,7 @@ class LoginForm extends React.Component {
 						value={this.state.password} 
 						onChange={this.handleChange} 
 					/>
-					<RaisedButton label='Login' onClick={this.doLogin} primary/>
+					<RaisedButton type='submit' label='Login' onTouchTap={this.doLogin} primary/>
 				</form>
 				<p>No account? Perhaps you can <Link to='/signup'>Sign up</Link></p>
 			</Paper>
