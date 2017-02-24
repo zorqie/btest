@@ -27,20 +27,24 @@ class LoginForm extends React.Component {
 		e.preventDefault();
 		console.log("Attemptifying to login with state: ", this.state);
 		const { email, password } = this.state;
-
+		app.service('users').on('authenticated', u => console.log('\n---\n~~~\n--- STOP THE PRESSES: ', u));
 		app.authenticate({
 			type: 'local',
 			email,
 			password,
 		})
 		.then(() => {
-			browserHistory.push('/home');
 			// const handler = this.props.onSuccess || this.props.route.onSuccess;
 			// if(handler) {
 			// 	handler();
 			// }
-			app.emit('authenticated');
-			console.log("Loginized");
+			const user = app.get('user');
+			app.service('users').patch(user._id, {online: true}).then(u => {
+				app.emit('authenticated', user);
+				app.service('users').emit('authenticated', user);
+				browserHistory.push('/home');
+				console.log("Login complete");
+			});
 		})
 		.catch((error) => console.error("Errorated: ", error));
 		
@@ -49,7 +53,8 @@ class LoginForm extends React.Component {
 	render() {
 		return (
 			<Paper>
-				<h2>Llogin</h2>			
+				<h2>Llogin</h2>
+				<p>No account? Perhaps you can <Link to='/signup'>Sign up</Link></p>
 				<form onSubmit={this.doLogin}>
 					<TextField 
 						type='email'
@@ -69,7 +74,7 @@ class LoginForm extends React.Component {
 					/>
 					<RaisedButton type='submit' label='Login' onTouchTap={this.doLogin} primary/>
 				</form>
-				<p>No account? Perhaps you can <Link to='/signup'>Sign up</Link></p>
+				
 			</Paper>
 		);
 	}

@@ -1,8 +1,10 @@
 import React from 'react';
 
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
+import CommunicationChatBubbleOutline from 'material-ui/svg-icons/communication/chat-bubble-outline';
 
-import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors';
+import {grey400, darkBlack, lightBlack, lightGreen500} from 'material-ui/styles/colors';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -16,14 +18,14 @@ import moment from 'moment'
 import app from '../main.jsx';
 import errorHandler from './err';
 
-const iconButtonElement = (
-  <IconButton
-    touch={true}
-    tooltip="more"
-    tooltipPosition="bottom-left"
-  >
-    <MoreVertIcon color={grey400} />
-  </IconButton>
+const moreButton = (
+	<IconButton
+		touch={true}
+		tooltip="more"
+		tooltipPosition="bottom-left"
+	>
+		<MoreVertIcon color={grey400} />
+	</IconButton>
 );
 
 
@@ -31,21 +33,23 @@ class UserItem extends React.Component {
 	edit = (e) => this.props.onSelect(this.props.user);
 	delete = (e) => {
 		e.preventDefault();
-		app.service('users').remove(this.props.user._id);
+		app.service('users').remove(this.props.user._id)
+		.catch(err => console.error("Couldn't delete.", err));
 		console.log('Deleting... ', this.props.user)
 	};
 	render() {
 		const { user } = this.props;
 		console.log("User: ", user);
 		const rightIconMenu = (
-		  <IconMenu iconButtonElement={iconButtonElement}>
+		  <IconMenu iconButtonElement={moreButton}>
 		    <MenuItem onTouchTap={this.edit}>Edit</MenuItem>
 		    <MenuItem onTouchTap={this.delete}>Delete</MenuItem>
 		  </IconMenu>
 		);
-
+		const chatIcon = user.online ? <CommunicationChatBubble color={lightGreen500}/> : <CommunicationChatBubbleOutline />
 		return (
 			<ListItem 
+				leftIcon={chatIcon}
 				onTouchTap={this.edit}
 				primaryText={user.name} 
 				secondaryText={user.email}
@@ -67,6 +71,10 @@ export default class UserList extends React.Component {
 	removedListener = user => {
 		this.setState({users: this.state.users.filter(u => u._id !== user._id)})
 	};
+	patchedListener = user => {
+		console.log("<<<<<<<<<< PATCHED >>>>>>>>>>", user);
+	}
+
 	componentDidMount() {
 		app.service('users').find({
 			query: {
@@ -82,6 +90,7 @@ export default class UserList extends React.Component {
 		// Listen to newly created/removed users
 		app.service('users').on('created', this.createdListener);
 		app.service('users').on('removed', this.removedListener);
+		app.service('users').on('patched', this.patchedListener);
 	};
 	componentWillUnmount() {
 		if(app) {
@@ -89,10 +98,11 @@ export default class UserList extends React.Component {
 			app.service('users').removeListener('removed', this.removedListener);	
 		}
 	}
+
 	handleSelect(u){
 		this.props.onUserSelected(u || {})
 	}
-    
+
 	render() {
 		console.log(">>>>___USER-LIST");
 		return (
