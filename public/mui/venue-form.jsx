@@ -4,7 +4,7 @@ import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
-import VenueList from './venue-list-compact.jsx';
+import VenueList from './venue-list.jsx';
 import app from '../main.jsx';
 import errorHandler from './err';
 
