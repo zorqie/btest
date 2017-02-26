@@ -39,7 +39,7 @@ const app = feathers()
 
 
 const Home = () => <p>We're home</p>;
-const NotFound = () => <div><h2>She's not here.</h2></div>;
+const NotFound = () => <div style={{color:'red'}}><h2>She's not here.</h2></div>;
 
 const handleRouteChange = (prevState, nextState, replace, callback) => {
 	console.log("APP: ", app);
@@ -66,7 +66,7 @@ class App extends React.Component {
 	render() {
 		console.log("___ROUTE___")
 		return <Router history={browserHistory}>
-			<Route path="/" component={Layout} onChange={handleRouteChange} >
+			<Route path="/" component={Layout}  >
 				<IndexRoute component={Home} />
 
 				<Route path='login' component={LoginForm} />
@@ -86,6 +86,7 @@ class App extends React.Component {
 	}
 }
 
+// FIXME hack to make app available to pages when not going through / first
 app.authenticate().then(() => {
 
 	ReactDOM.render( <App />, document.getElementById("app") );
@@ -93,7 +94,7 @@ app.authenticate().then(() => {
 
 }).catch(error => {
 	ReactDOM.render( <App />, document.getElementById("app") );
-// 	console.error("Not happening.", error);
+	console.error("Not authenticated.", error);
 // 	if(error.code === 401) {
 // 		// browserHistory.push('/login');
 // 		ReactDOM.render(
@@ -113,8 +114,6 @@ app.authenticate().then(() => {
 
 // FIXME remove this!!!
 window.appx = app;
-console.log("MAIN APP IS: ", app);
 
-export {app};
 export default app;
 
