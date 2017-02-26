@@ -103,8 +103,8 @@ class GigForm extends React.Component {
 	handleRequestClose = () => { this.setState({ snackOpen:false }); }
 
 	render() {
-		console.log("GIG-FORM________");
 		const {gig, errors} = this.state;
+		console.log("GIG-FORM________");
 		return (
 			<div>
 				<Paper>
@@ -178,7 +178,7 @@ class GigForm extends React.Component {
 						/>
 					</div>
 					
-					<RaisedButton type='submit' label='Save' onClick={this.saveGig} primary/>
+					<RaisedButton type='submit' label={gig._id ? 'Save' : 'Add'} onClick={this.saveGig} primary/>
 				</form>
 				<Snackbar
 					open={this.state.snackOpen}

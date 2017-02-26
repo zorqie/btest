@@ -107,7 +107,7 @@ export default class GigList extends React.Component {
 						key={g._id}
 					/>
 				)}
-				<FloatingActionButton secondary onTouchTap={this.select.bind(this, null)}>
+				<FloatingActionButton secondary onTouchTap={this.edit.bind(this, null)}>
 					<ContentAdd />
 				</FloatingActionButton>
 			</List>

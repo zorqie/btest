@@ -15,6 +15,28 @@ class VenueForm extends React.Component {
     	super(props);
 		this.state = {venue: BLANK_VENUE, venues: [], errors: {}};
 	}
+	componentDidMount() {
+		app.service('venues').find({
+			query: {
+				parent: { $exists: false},
+				$sort: { createdAt: -1 },
+				$limit: this.props.limit || 37
+			}
+		})
+		.then(page => this.setState({
+			venues: page.data
+		}))
+		.catch(errorHandler);
+		// Listen to newly created venues
+		app.service('venues').on('created', this.createdListener);
+		app.service('venues').on('removed', this.removedListener);
+	};
+	componentWillUnmount() {
+		if(app) {
+			app.service('venues').removeListener('created', this.createdListener);
+			app.service('venues').removeListener('removed', this.removedListener);
+		}
+	};
 
 	handleChange = (e) => {
 		const { name, value } = e.target;
@@ -35,28 +57,6 @@ class VenueForm extends React.Component {
 	removedListener = venue => this.setState({
 		venues: this.state.venues.filter(v => v._id!==venue._is)
 	});
-	componentDidMount() {
-		app.service('venues').find({
-			query: {
-				parent: { $exists: false},
-				$sort: { createdAt: -1 },
-				$limit: this.props.limit || 37
-			}
-		}).then(page => this.setState({
-			venues: page.data,
-			venue: page.data[0] || BLANK_VENUE
-		}))
-		.catch(errorHandler);
-		// Listen to newly created venues
-		app.service('venues').on('created', this.createdListener);
-		app.service('venues').on('removed', this.removedListener);
-	};
-	componentWillUnmount() {
-		if(app) {
-			app.service('venues').removeListener('created', this.createdListener);
-			app.service('venues').removeListener('removed', this.removedListener);
-		}
-	};
 	saveVenue = (e) => {
 		e.preventDefault();
 		const {venue} = this.state;
@@ -102,8 +102,7 @@ class VenueForm extends React.Component {
 				<form onSubmit={this.saveVenue}>
 					<TextField 
 						name='name'
-						hintText='Name'
-						floatingLabelText="Name"
+						floatingLabelText="Venue name"
 						value={venue.name} 
 						onChange={this.handleChange} 
 						errorText={(errors.name && errors.name.message) || ''}
@@ -111,13 +110,12 @@ class VenueForm extends React.Component {
 					<TextField 
 						name='capacity'
 						type='number' min='0'
-						hintText='Capacity'
 						floatingLabelText="Max capacity"
 						value={venue.capacity} 
 						onChange={this.handleChange} 
 						errorText={(errors.capacity && errors.capacity.message) || ''}
 					/>
-					<RaisedButton label='Save' onClick={this.saveVenue} primary type='submit'/>
+					<RaisedButton label={venue._id ? 'Save' : 'Add'} onClick={this.saveVenue} primary type='submit'/>
 				</form>
 				
 			</div>
