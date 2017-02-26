@@ -4,7 +4,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 
-const BLANK_VENUE =  { name: '', capacity: '', type: '' };
+const BLANK_VENUE =  { name: '', capacity: '', description: '', type: '' };
 
 const focus = input => input && input.focus();
 
@@ -44,25 +44,34 @@ export default class VenueDialogForm extends React.Component {
 
 	render() {
 		const {venue} = this.state;
+		const {errors} = this.props;
 		// console.log("Dialog state: ", venue);
 		return (
 				<form onSubmit={this.props.handleSubmit}>
 					<TextField 
 						name='name'
-						
 						floatingLabelText='Name'
+						errorText={(errors.name && errors.name.message) || ''}
 						value={venue.name || ''} 
 						onChange={this.handleChange} 
 						ref={focus}
 					/>
+					<TextField 
+						name='description'
+						floatingLabelText='Description'
+						value={venue.description || ''} 
+						onChange={this.handleChange} 
+						fullWidth={true}
+					/>
 					<AutoComplete 
 						name='type'
-						hintText='Type'
 						floatingLabelText='Type'
+						errorText={(errors.type && errors.type.message) || ''}
 						searchText={venue.type || ''}
 						value={venue.type}
 						onChange={this.handleChange}
 						openOnFocus={true}
+						filter={AutoComplete.caseInsensitiveFilter}
 						onNewRequest={this.handleNewRequest}
 						onUpdateInput={this.handleUpdateInput}
 						dataSource={this.props.types}
@@ -71,9 +80,9 @@ export default class VenueDialogForm extends React.Component {
 					<TextField 
 						name='capacity'
 						type='number' min='0'
-						hintText='Capacity'
 						floatingLabelText="Max capacity"
-						value={venue.capacity || 1} 
+						errorText={(errors.capacity && errors.capacity.message) || ''}
+						value={venue.capacity || ''} 
 						onChange={this.handleChange} 
 					/>
 				</form>

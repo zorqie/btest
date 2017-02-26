@@ -68,10 +68,7 @@ export default class EventPage extends React.Component {
 			this.setState({...this.state, gigs: page.data });
 		})
 		.catch(err => console.error("ERAR: ", err));
-		// Listen to newly created messages
-		// this.gigService.on('created', gig => this.setState({
-		// 	gigs: this.state.gigs.concat(gig)
-		// }));
+
 		app.service('gigs').on('removed', this.removedListener);
 		app.service('gigs').on('created', this.createdListener);
 	}
@@ -87,29 +84,29 @@ export default class EventPage extends React.Component {
 		this.setState({dialog: false})
 	}
 	handleSubmit = (e) => {
-		const v = this.state.dialoggig;
-		// console.log("Submitting...", v);
-		if(v._id) {
-			app.service('gigs').patch(v._id, v)
-			.then(v => console.log("Updated v", v))
+		const gig = this.state.dialoggig;
+		// console.log("Submitting...", gig);
+		if(gig._id) {
+			app.service('gigs').patch(gig._id, v)
+			.then(gig => console.log("Updated gig", gig))
 			.catch(err => console.error("Didn't update", err));
 		} else {
-			app.service('gigs').create(v)
-			.then(v => console.log("Created v", v))
+			app.service('gigs').create(gig)
+			.then(gig => console.log("Created gig", gig))
 			.catch(err => console.error("Didn't create gig", JSON.stringify(err)));
 		}
 		this.setState({dialog: false})
 	}
 
-	handleEdit = (v, type) => {
+	handleEdit = (g, type) => {
 		// console.log("Hanlediting...", v);
-		const dv = v ? Object.assign({}, v) : Object.assign({}, {parent: this.state.gig._id, type});
-		this.setState({dialog: true, dialoggig: dv});
+		const dg = g ? Object.assign({}, g) : Object.assign({}, {parent: this.state.gig._id, type});
+		this.setState({dialog: true, dialoggig: dg});
 	}
-	handleDelete = (v) => {
-		console.log("Deleting gig ", v);
-		app.service('gigs').remove(v._id)
-		.then(v => console.log("Deleted gig", v))
+	handleDelete = (gig) => {
+		console.log("Deleting gig ", gig);
+		app.service('gigs').remove(gig._id)
+		// .then(gig => console.log("Deleted gig", gig)) // this is handled in removedListener
 		.catch(err => console.error("Delete failed: ", err));
 	}
 	actions = [

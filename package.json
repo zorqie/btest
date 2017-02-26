@@ -1,7 +1,7 @@
 {
   "name": "bfest",
   "description": "Balkan Fests",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "homepage": "",
   "main": "src/",
   "keywords": [
@@ -18,7 +18,7 @@
   "scripts": {
     "test": "npm run jshint && npm run mocha",
     "jshint": "jshint src/. test/. --config",
-    "debag": "webpack --config webpack-toolbox.config.js --watch && node src/",
+    "debag": "webpack --config webpack-toolbox.config.js --watch",
     "start": "node src/",
     "build": "webpack --config webpack-prod.config.js",
     "mocha": "mocha test/ --recursive"
@@ -34,14 +34,12 @@
     "feathers-errors": "^2.5.0",
     "feathers-hooks": "^1.7.1",
     "feathers-mongoose": "^3.6.1",
-    "feathers-nedb": "^2.6.0",
     "feathers-rest": "^1.6.0",
-    "feathers-socketio": "^1.4.2",
+    "feathers-socketio": "^1.4.3",
     "handlebars": "^4.0.6",
-    "material-ui": "^0.16.7",
+    "material-ui": "^0.17.0",
     "moment": "^2.17.1",
     "mongoose": "^4.7.6",
-    "nedb": "^1.8.0",
     "node-sass": "^4.4.0",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",

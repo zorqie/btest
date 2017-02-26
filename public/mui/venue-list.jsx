@@ -8,17 +8,16 @@ import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 
 class VenueItem extends React.Component {
-	clicked = () => this.props.onSelect(this.props.venue);
 	edit = (e) => browserHistory.push('/venues/'+ this.props.venue._id);
+	editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" onTouchTap={this.edit}>edit</IconButton>;
 	render() {
 		const { venue } = this.props;		
-		const editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" onTouchTap={this.edit}>edit</IconButton>;
 		return (
 			<ListItem 
-				onTouchTap={this.clicked}
+				onTouchTap={this.props.onSelect}
 				primaryText={venue.name} 
 				secondaryText={'Capacity: ' + venue.capacity}
-				rightIconButton={editIcon}
+				rightIconButton={this.editIcon}
 			/>
 		);
 	}
@@ -38,7 +37,7 @@ export default class VenueList extends React.Component {
 		
 		return (
 			<List >
-				{this.props.venues.map((v) => (
+				{this.props.venues.map(v => (
 					<VenueItem onSelect={this.handleSelection.bind(this, v)} venue={v} key={v._id}/>)
 				)}
 				<FloatingActionButton secondary onClick={this.handleSelection.bind(this, {name:"", capacity:""})}>
