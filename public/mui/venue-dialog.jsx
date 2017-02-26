@@ -1,17 +1,20 @@
 import React from 'react';
 
-import Paper from 'material-ui/Paper';
+import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 
 const BLANK_VENUE =  { name: '', capacity: '', type: '' };
+
+const focus = input => input && input.focus();
 
 export default class VenueDialogForm extends React.Component {
 	constructor(props) {
     	super(props);
 		this.state = {
 			open: false,
-			venue: props.venue || BLANK_VENUE
+			venue: props.venue || BLANK_VENUE,
+			types: props.types
 		};
 		// console.log("Dialog venue: ", this.state.venue);
 	}
@@ -25,6 +28,15 @@ export default class VenueDialogForm extends React.Component {
 		this.setState({...this.state, venue});
 		
 	};
+	handleNewRequest = (text, i) => {
+		console.log("Selected: ", text);
+	}
+	handleUpdateInput = (text, data, params) => {
+		// console.log("Updated: ", text);
+		// console.log("Data: ", data);
+		// console.log("Params: ", params);
+		this.handleChange({target:{name:'type', value: text}});
+	}
 	validate = (venue) => {
 		// const v = new mongoose.Document(venue, venueSchema);//
 		// console.log("Validificating: " + JSON.stringify(v));
@@ -37,17 +49,24 @@ export default class VenueDialogForm extends React.Component {
 				<form onSubmit={this.props.handleSubmit}>
 					<TextField 
 						name='name'
-						hintText='Name'
-						floatingLabelText="Name"
+						
+						floatingLabelText='Name'
 						value={venue.name || ''} 
 						onChange={this.handleChange} 
+						ref={focus}
 					/>
-					<TextField 
+					<AutoComplete 
 						name='type'
 						hintText='Type'
-						floatingLabelText="Type"
-						value={venue.type} 
-						onChange={this.handleChange} 
+						floatingLabelText='Type'
+						searchText={venue.type || ''}
+						value={venue.type}
+						onChange={this.handleChange}
+						openOnFocus={true}
+						onNewRequest={this.handleNewRequest}
+						onUpdateInput={this.handleUpdateInput}
+						dataSource={this.props.types}
+						maxLength={30}
 					/>
 					<TextField 
 						name='capacity'

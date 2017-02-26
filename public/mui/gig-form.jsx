@@ -11,8 +11,6 @@ import app from '../main.jsx';
 import errorHandler from './err';
 import GigList from './gig-list.jsx';
 
-console.log("APP in gig-form.jsx: ", app);
-
 const blankGig = () => {
 	return { 
 		name: '', 

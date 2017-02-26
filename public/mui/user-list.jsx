@@ -1,6 +1,7 @@
 import React from 'react';
 
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import ActionSettings from 'material-ui/svg-icons/action/settings';
 import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bubble';
 import CommunicationChatBubbleOutline from 'material-ui/svg-icons/communication/chat-bubble-outline';
 
@@ -39,6 +40,7 @@ class UserItem extends React.Component {
 	};
 	render() {
 		const { user } = this.props;
+		const self = user._id === app.get("user")._id;
 		console.log("User: ", user);
 		const rightIconMenu = (
 		  <IconMenu iconButtonElement={moreButton}>
@@ -46,7 +48,7 @@ class UserItem extends React.Component {
 		    <MenuItem onTouchTap={this.delete}>Delete</MenuItem>
 		  </IconMenu>
 		);
-		const chatIcon = user.online ? <CommunicationChatBubble color={lightGreen500}/> : <CommunicationChatBubbleOutline />
+		const chatIcon = self ? <ActionSettings /> : user.online ? <CommunicationChatBubble color={lightGreen500}/> : <CommunicationChatBubbleOutline />
 		return (
 			<ListItem 
 				leftIcon={chatIcon}
@@ -73,9 +75,27 @@ export default class UserList extends React.Component {
 	};
 	patchedListener = user => {
 		console.log("<<<<<<<<<< PATCHED >>>>>>>>>>", user);
+		// FIXME update only user perhaps?
+		this.fetchUsers();
 	}
 
 	componentDidMount() {
+		this.fetchUsers();
+
+		// Listen to newly created/removed users
+		app.service('users').on('created', this.createdListener);
+		app.service('users').on('removed', this.removedListener);
+		app.service('users').on('patched', this.patchedListener);
+	};
+	componentWillUnmount() {
+		if(app) {
+			app.service('users').removeListener('created', this.createdListener);
+			app.service('users').removeListener('removed', this.removedListener);
+			app.service('users').removeListener('patched', this.patchedListener);
+		}
+	}
+
+	fetchUsers = () => {
 		app.service('users').find({
 			query: {
 				$sort: { email: 1 },
@@ -86,21 +106,12 @@ export default class UserList extends React.Component {
 			users: page.data
 		}))
 		.catch(errorHandler);
-
-		// Listen to newly created/removed users
-		app.service('users').on('created', this.createdListener);
-		app.service('users').on('removed', this.removedListener);
-		app.service('users').on('patched', this.patchedListener);
-	};
-	componentWillUnmount() {
-		if(app) {
-			app.service('users').removeListener('created', this.createdListener);
-			app.service('users').removeListener('removed', this.removedListener);	
-		}
 	}
 
 	handleSelect(u){
-		this.props.onUserSelected(u || {})
+		if(this.props.onUserSelected) {
+			this.props.onUserSelected(u || {});
+		}
 	}
 
 	render() {

@@ -11,7 +11,7 @@ import app from '../main.jsx';
 class LoginForm extends React.Component {
 	constructor(props) {
     	super(props);
-		this.state = {email: "", password: ""};
+		this.state = {email: "", password: "", errors: {}};
 	}
 
 	handleChange = (e) => {
@@ -41,27 +41,33 @@ class LoginForm extends React.Component {
 			const user = app.get('user');
 			app.service('users').patch(user._id, {online: true}).then(u => {
 				app.emit('authenticated', user);
-				app.service('users').emit('authenticated', user);
 				browserHistory.push('/home');
 				console.log("Login complete");
 			});
 		})
-		.catch((error) => console.error("Errorated: ", error));
+		.catch(error => {
+			console.error("Errorated: ", error);
+			this.setState({...this.state, errors: error});
+		});
 		
 	};
 
 	render() {
+		const { email, password, errors } = this.state;
 		return (
 			<Paper>
-				<h2>Llogin</h2>
+				<h2>Login</h2>
 				<p>No account? Perhaps you can <Link to='/signup'>Sign up</Link></p>
 				<form onSubmit={this.doLogin}>
+					<div style={{visibility: errors.message ? 'visible' : 'hidden'}}>
+						{errors.message}
+					</div>
 					<TextField 
 						type='email'
 						name='email'
 						hintText='Email'
 						floatingLabelText="Email"
-						value={this.state.email} 
+						value={email} 
 						onChange={this.handleChange} 
 					/>
 					<TextField 
@@ -69,10 +75,10 @@ class LoginForm extends React.Component {
 						name='password'
 						hintText='Password'
 						floatingLabelText="Password"
-						value={this.state.password} 
+						value={password} 
 						onChange={this.handleChange} 
 					/>
-					<RaisedButton type='submit' label='Login' onTouchTap={this.doLogin} primary/>
+					<RaisedButton type='submit' label='Login' primary/>
 				</form>
 				
 			</Paper>
