@@ -23,6 +23,8 @@ const blankGig = () => {
 	}
 };
 
+const focus = input => input && input.focus();
+
 export default class GigDialogForm extends React.Component {
 	constructor(props) {
     	super(props);
@@ -32,9 +34,10 @@ export default class GigDialogForm extends React.Component {
 		};
 	}
 
-	handleChange = (e) => {
+	handleChange = e => {
 		// TODO: ensure end Date is after start Date
-
+		// TODO: keep the time if the date changes
+		
 		const { name, value } = e.target;
 		const { gig } = this.state;
 		// console.log("Changed: " + name + " -> " + JSON.stringify(value));
@@ -89,7 +92,7 @@ export default class GigDialogForm extends React.Component {
 		const {gig} = this.state;
 		const {errors} = this.props;
 		return (
-			<form onSubmit={this.saveGig}>
+			<form >
 				<TextField 
 					name='name'
 					floatingLabelText="Name"
@@ -97,6 +100,7 @@ export default class GigDialogForm extends React.Component {
 					maxLength={30}
 					onChange={this.handleChange} 
 					errorText={(errors.name && errors.name.message) || ''}
+					ref={focus}
 				/>
 				<TextField 
 					name='description'

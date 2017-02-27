@@ -44,7 +44,7 @@ const GigTimeSpan = ({gig, showRelative, ...others}) => {
 
 const Subgig = ({ gig, onEdit, onDelete }) => <ListItem 
 		primaryText={gig.name} 
-		secondaryText={<GigTimeSpan gig={gig} showRelative={true} />} 
+		secondaryText={<GigTimeSpan gig={gig} />} 
 		rightIconButton={<Kspan>
 			<FlatButton label="Edit" onTouchTap={onEdit}/>
 			<FlatButton label="Delete" onTouchTap={onDelete}/>
@@ -200,18 +200,19 @@ export default class EventPage extends React.Component {
 				<CardText >
 					<p>{gig.description}</p>
 
-					{this.state.gigs.map(gig => <Subgig 
-						key={gig._id} 
-						gig={gig}
-						onEdit={this.handleEdit.bind(this, gig)}
-						onDelete={this.handleDelete.bind(this, gig)}
+					{this.state.gigs.map(
+						gig => <Subgig 
+							key={gig._id} 
+							gig={gig}
+							onEdit={this.handleEdit.bind(this, gig)}
+							onDelete={this.handleDelete.bind(this, gig)}
 					/>)}
 
 					<FloatingActionButton onTouchTap={this.handleEdit.bind(this, null, '')}>{addIcon}</FloatingActionButton>
 					
 				</CardText>
 				<Dialog
-					title="Geegue"
+					
 					open={this.state.dialogOpen}
 					actions={this.dialogActions()}
 					onRequestClose={this.handleDialogCancel}
@@ -222,8 +223,8 @@ export default class EventPage extends React.Component {
 						errors={this.state.errors}/>
 				</Dialog>
 				<CardActions>
-					<FlatButton label="Actionize" />
-					<FlatButton label="Deactionify" />
+					<FlatButton icon={addIcon} label="Performance" onTouchTap={this.handleEdit.bind(this, null, 'performance')} />
+					<FlatButton icon={addIcon} label="Workshop" />
 				</CardActions>
 			</Card>
 		);
