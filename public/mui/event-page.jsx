@@ -17,6 +17,7 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 
 import app from '../main.jsx';
 import GigDialogForm from './gig-dialog-form.jsx';
+import GigTypes from './gig-types.jsx';
 
 //hack because Material-UI forces a onKeyboardFocus onto the span and React complains
 const Kspan = ({onKeyboardFocus, ...others}) => <span {...others}/>; 
@@ -24,6 +25,7 @@ const Kspan = ({onKeyboardFocus, ...others}) => <span {...others}/>;
 const editIcon = <IconButton iconClassName="material-icons" tooltip="Edit" >edit</IconButton>;
 		
 const addIcon = <FontIcon className="material-icons" >add</FontIcon>;
+const addBoxIcon = <FontIcon className="material-icons" >add_box</FontIcon>;
 	// <IconButton iconClassName="material-icons" >add</IconButton>;
 
 const GigTimeSpan = ({gig, showRelative, ...others}) => {
@@ -63,6 +65,7 @@ export default class EventPage extends React.Component {
 			dialogOpen: false,
 			dialogGig: {},
 			errors: {},
+			typesOpen: false,
 		};
 	}
 	componentWillMount() {
@@ -178,6 +181,19 @@ export default class EventPage extends React.Component {
 		// do something
 	}
 
+// types 
+	handleTypesCancel = () => {
+		// console.log("Canceling...");
+		this.setState({typesOpen: false})
+	}
+	handleTypesSelect = type => {
+		this.setState({typesOpen: false});
+		this.handleEdit(null, type.name);
+	}
+	handleTypesOpen = () => {
+		this.setState({typesOpen: true});
+	}
+
 	render() {
 		const {gig, venue} = this.state;
 		// console.log("GIGGGINGING: ", this.state);
@@ -222,9 +238,21 @@ export default class EventPage extends React.Component {
 						venues={this.state.sites}
 						errors={this.state.errors}/>
 				</Dialog>
+				<Dialog
+					title="Select activity type"
+					open={this.state.typesOpen}
+					actions={[<FlatButton
+						label="Cancel"
+						primary={true}
+						onTouchTap={this.handleTypesCancel}
+					/>]}
+					onRequestClose={this.handleTypesCancel}
+				>
+					<GigTypes onSelect={this.handleTypesSelect} />
+				</Dialog>
+				
 				<CardActions>
-					<FlatButton icon={addIcon} label="Performance" onTouchTap={this.handleEdit.bind(this, null, 'performance')} />
-					<FlatButton icon={addIcon} label="Workshop" />
+					<FlatButton icon={addIcon} label="Activity" onTouchTap={this.handleTypesOpen}/>
 				</CardActions>
 			</Card>
 		);
