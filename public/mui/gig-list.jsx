@@ -62,6 +62,7 @@ export default class GigList extends React.Component {
 	componentDidMount() {
 		app.service('gigs').find({
 			query: {
+				parent: {$exists: false},
 				$sort: { start: 1 },
 				$limit: this.props.limit || 77
 			}

@@ -12,9 +12,7 @@ export default class VenueDialogForm extends React.Component {
 	constructor(props) {
     	super(props);
 		this.state = {
-			open: false,
 			venue: props.venue || BLANK_VENUE,
-			types: props.types
 		};
 		// console.log("Dialog venue: ", this.state.venue);
 	}

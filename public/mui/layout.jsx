@@ -24,14 +24,11 @@ export default class Layout extends React.Component {
 			message: ''
 		};
 
-		// console.log("Layout constructed: ", this.state);
-
 		this.sections = [
 			{ text: "Venues", path: "/venues"},
 			{ text: "Events", path: "/gigs"},
 			{ text: "Users", path: "/users"},
 		]
-		window.layout = this; // FIXME REMOVE!
 	}
 	componentDidMount() {
 		app.authenticate()
@@ -106,7 +103,7 @@ export default class Layout extends React.Component {
 				/>
 				<Drawer 
 					docked={false}
-					width={200}
+					width={266}
 					open={this.state.drawerOpen}
 					onRequestChange={this.handleDrawer}
 					>

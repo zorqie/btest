@@ -88,7 +88,10 @@ class VenueForm extends React.Component {
 	handleVenueSelection = (venue) => {
 		// console.log("Handling venue selection: " + JSON.stringify(v));
 		this.setState({venue});
+		this.nameInput.focus();
 	}
+
+	focus = input => this.nameInput = input;
 
 	render() {
 		const { venue, errors } = this.state;
@@ -106,6 +109,7 @@ class VenueForm extends React.Component {
 						value={venue.name} 
 						onChange={this.handleChange} 
 						errorText={(errors.name && errors.name.message) || ''}
+						ref={this.focus}
 					/>
 					<TextField 
 						name='capacity'

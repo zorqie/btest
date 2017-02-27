@@ -1,5 +1,4 @@
 import React from 'react';
-import { browserHistory } from 'react-router';
 
 import Checkbox from 'material-ui/Checkbox';
 import ContentAdd from 'material-ui/svg-icons/content/add';
@@ -18,17 +17,14 @@ class ExpandableVenueItem extends React.Component {
 	}
 	handleNested = (v) => {
 		const { venue } = this.props;
-		console.log("Loading...")
 		app.service("venues").find({query:{parent: venue._id}})
 		.then(page => {
-			console.log("Got data", page.data);
 			const venues = page.data.map(
 				v => <ListItem 
 					key={v._id} 
 					leftCheckbox={<Checkbox />}
 					primaryText={v.name} 
 					secondaryText={'Capacity: ' + v.capacity} 
-
 				/>
 			);
 			this.setState({...this.state, venues});
@@ -64,14 +60,11 @@ export default class VenueList extends React.Component {
 		return (
 			<List >
 				{this.props.venues.map(
-					v => (<ExpandableVenueItem 
+					v => <ExpandableVenueItem 
 							onSelect={this.handleSelection.bind(this, v)} 
 							venue={v} 
 							key={v._id}
-						>
-							<Divider/>
-						</ExpandableVenueItem> 
-					)
+						/>
 				)}
 				<FloatingActionButton secondary onClick={this.handleSelection.bind(this, {name:"", capacity:""})}>
 					<ContentAdd />

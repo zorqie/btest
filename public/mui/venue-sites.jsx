@@ -31,7 +31,7 @@ export default class VenueSites extends React.Component {
 					.map(v => <ListItem 
 							key={v._id} 
 							primaryText={v.name}
-							onTouchTap={this.select}
+							onTouchTap={this.select.bind(this, v)}
 							secondaryText={'Capacity: ' + v.capacity}
 							rightIconButton={<Kspan>
 								{onEdit && <FlatButton label="Edit" onTouchTap={this.edit.bind(this, v)}/>}
