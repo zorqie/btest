@@ -117,14 +117,14 @@ export default class EventPage extends React.Component {
 		// console.log("Submitting...", gig);
 		if(gig._id) {
 			app.service('gigs').patch(gig._id, gig)
-			.then(gig => console.log("Updated gig", gig))
+			// .then(gig => console.log("Updated gig", gig)) // this is handled in patchedListener
 			.catch(err => {
 				console.error("Didn't update", err);
 				this.setState({...this.state, errors: err.errors});
 			});
 		} else {
 			app.service('gigs').create(gig)
-			.then(gig => console.log("Created gig", gig))
+			// .then(gig => console.log("Created gig", gig)) // handled in createdListener
 			.catch(err => {
 				console.error("Didn't create gig", JSON.stringify(err));
 				this.setState({...this.state, errors: err.errors});
@@ -132,17 +132,17 @@ export default class EventPage extends React.Component {
 		}
 		
 	}
-
-	handleEdit = (gig, type) => {
-		// console.log("Hanlediting...", g);
-		const dg = gig ? Object.assign({}, gig) : Object.assign({}, {parent: this.state.gig._id, start: this.state.gig.start, type});
-		this.setState({dialogOpen: true, dialogGig: dg});
-	}
 	handleDelete = (gig) => {
 		console.log("Deleting gig ", gig);
 		app.service('gigs').remove(gig._id)
 		// .then(gig => console.log("Deleted gig", gig)) // this is handled in removedListener
 		.catch(err => console.error("Delete failed: ", err));
+	}
+
+	handleEdit = (gig, type) => {
+		// console.log("Hanlediting...", g);
+		const dg = gig ? Object.assign({}, gig) : Object.assign({}, {parent: this.state.gig._id, start: this.state.gig.start, type});
+		this.setState({dialogOpen: true, dialogGig: dg});
 	}
 	dialogActions = () => [
 		<FlatButton
@@ -176,9 +176,9 @@ export default class EventPage extends React.Component {
 		});
 	}
 	patchedListener = gig => {
-		console.log("Updated: ", gig);
+		// console.log("Updated: ", gig);
+		// do something to reflect update
 		this.setState({...this.state, dialogOpen: false, errors:{}});
-		// do something
 	}
 
 // types 
