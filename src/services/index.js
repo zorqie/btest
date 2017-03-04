@@ -8,6 +8,6 @@ mongoose.Promise = global.Promise;
 module.exports = function() {
   const app = this;
 
-  app.configure(authentication);
-  app.configure(user);
+  // app.configure(authentication);
+  // app.configure(user);
 };
