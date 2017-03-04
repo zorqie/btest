@@ -1,5 +1,5 @@
 {
-  "host": "bfest.herokuapps.com",
+  "host": "kuuker.herokuapp.com",
   "port": 80,
   "mongoose": "MONGODB_URI",
   "public": "../public/",
