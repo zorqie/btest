@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 
 import Layout from './mui/layout.jsx';
 
+import ActsPage from './mui/acts-page.jsx';
 import EventPage from './mui/event-page.jsx';
+import GigPage from './mui/gig-page.jsx';
 import GigForm from './mui/gig-form.jsx';
 import LoginForm from './mui/login-form.jsx';
 import SignupForm from './mui/signup-form.jsx';
@@ -26,7 +28,7 @@ const io = require('socket.io-client');
 
 // FIXME this should be in configuration somewhere.
 // Establish a Socket.io connection
-// const socket = io('http://localhost:3017');
+// const socket = io('http://localhost:2017');
 const socket = io('https://fathomless-gorge-78924.herokuapp.com/');
 // Initialize our Feathers client application through Socket.io
 // with hooks and authentication.
@@ -76,8 +78,11 @@ class App extends React.Component {
 				<Route path='venues/:venueId' component={VenuePage} />
 
 				<Route path='gigs' component={GigForm} />
+				<Route path='gigs/:gigId' component={GigPage} />
 				<Route path='events/:eventId' component={EventPage} />
 				
+				<Route path='acts' component={ActsPage} />
+
 				<Route path='users' component={UserList} />
 				
 				<Route path='*' component={NotFound} />

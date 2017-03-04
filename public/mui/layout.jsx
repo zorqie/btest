@@ -25,8 +25,9 @@ export default class Layout extends React.Component {
 		};
 
 		this.sections = [
-			{ text: "Venues", path: "/venues"},
 			{ text: "Events", path: "/gigs"},
+			{ text: "Acts", path: "/acts"},
+			{ text: "Venues", path: "/venues"},
 			{ text: "Users", path: "/users"},
 		]
 	}
@@ -121,8 +122,8 @@ export default class Layout extends React.Component {
 					)}
 				</Drawer>
 				{this.props.children}
-				<footer>
-					Footering business goes here
+				<footer style={{position: 'fixed', bottom: 0, right: 0, fontSize: 'smaller', paddingRight:'1em'}}>
+					© 2017 Intergalactic Balkan Festivals Unlimited
 				</footer>
 			</div>
 		</MuiThemeProvider>

@@ -73,7 +73,7 @@ export default class GigDialogForm extends React.Component {
 	handleDialogSelect = venue => {
 		console.log("Selected ", venue);
 		const { gig } = this.state;
-		Object.assign(gig, {venue: venue._id});
+		Object.assign(gig, {venue_id: venue._id});
 		this.setState({...this.state, dialogOpen: false, gig})
 	}
 	handleDialogCancel = (e) => {
@@ -119,12 +119,12 @@ export default class GigDialogForm extends React.Component {
 				/>
 				<div>
 					<TextField 
-						name='venue'
+						name='venue_id'
 						hintText='Venue'
 						floatingLabelText="Venue"
-						value={gig.venue || ''} 
+						value={gig.venue_id || ''} 
 						onChange={this.handleChange} 
-						errorText={(errors.venue && errors.venue.message) || ''}
+						errorText={(errors.venue_id && errors.venue_id.message) || ''}
 					/>
 					<RaisedButton label="Choose" onTouchTap={this.chooseVenue}/>
 				</div>
