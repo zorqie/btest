@@ -11,11 +11,10 @@ import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import {Tabs, Tab} from 'material-ui/Tabs';
 
+import {addIcon} from './icons.jsx'
 
 //hack because Material-UI forces a onKeyboardFocus onto the span and React complains
 const Kspan = ({onKeyboardFocus, ...others}) => <span {...others}/>; 
-
-const addIcon = <FontIcon className="material-icons" >add</FontIcon>;
 
 export default class VenueSites extends React.Component { 
 	edit = (venue, type) => this.props.onEdit(venue, type);

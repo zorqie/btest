@@ -1,6 +1,8 @@
 import React from 'react';
+import { browserHistory } from 'react-router';
 
-import Paper from 'material-ui/Paper';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
@@ -11,10 +13,13 @@ import errorHandler from './err';
 const BLANK_VENUE =  { name: '', capacity: ''};
 
 class VenueForm extends React.Component {
-	constructor(props) {
-    	super(props);
-		this.state = {venue: BLANK_VENUE, venues: [], errors: {}};
+	state = {
+		venue: BLANK_VENUE, 
+		venues: [], 
+		errors: {},
+		dialog: false
 	}
+	
 	componentDidMount() {
 		app.service('venues').find({
 			query: {
@@ -30,13 +35,14 @@ class VenueForm extends React.Component {
 		// Listen to newly created venues
 		app.service('venues').on('created', this.createdListener);
 		app.service('venues').on('removed', this.removedListener);
-	};
+	}
+
 	componentWillUnmount() {
 		if(app) {
 			app.service('venues').removeListener('created', this.createdListener);
 			app.service('venues').removeListener('removed', this.removedListener);
 		}
-	};
+	}
 
 	handleChange = (e) => {
 		const { name, value } = e.target;
@@ -46,18 +52,18 @@ class VenueForm extends React.Component {
 		this.validate(v);
 		this.setState({venue: v});
 		// console.log("State: " + JSON.stringify(this.state));
-	};
-	validate = (venue) => {
+	}
+	validate = venue => {
 		// const v = new mongoose.Document(venue, venueSchema);//
 		// console.log("Validificating: " + JSON.stringify(v));
-	};
+	}
 	createdListener = venue => this.setState({
 		venues: this.state.venues.concat(venue)
-	});
+	})
 	removedListener = venue => this.setState({
 		venues: this.state.venues.filter(v => v._id!==venue._is)
-	});
-	saveVenue = (e) => {
+	})
+	saveVenue = e => {
 		e.preventDefault();
 		const {venue} = this.state;
 		console.log('Saving venue', venue);
@@ -66,62 +72,79 @@ class VenueForm extends React.Component {
 			app.service('venues').patch(venue._id, venue)
 			.then(() => {
 				console.log("Saviated venue.");
-				this.setState({...this.state, errors: {}});
+				this.setState({...this.state, dialog: false, errors: {}});
 			})
-			.catch(err => console.log("Errar: " + JSON.stringify(err)));
+			.catch(err => {
+				console.log("Errar: " + JSON.stringify(err))
+				this.setState({...this.state, errors: err.errors})
+			});
 		} else {
 			//create
 			console.log("Createning..")
 			app.service('venues').create(venue)
 			.then(() => {
-				console.log("Created venue");
-				this.setState({...this.state, errors: {}});
+				console.log("Created venue")
+				this.setState({...this.state, dialog: false, errors: {}})
 			})
 			.catch(err => {
 				// FIXME check for error type
-				console.log("Erroir: " + JSON.stringify(err));
-				this.setState({...this.state, errors: err.errors});
+				console.log("Erroir: " + JSON.stringify(err))
+				this.setState({...this.state, errors: err.errors})
 			});
 		}
-	};
+	}
 
-	handleVenueSelection = (venue) => {
+	handleVenueSelect = venue => {
 		// console.log("Handling venue selection: " + JSON.stringify(v));
-		this.setState({venue});
-		this.nameInput.focus();
+		browserHistory.push('venues/' + venue._id)
+	}
+
+	handleVenueEdit = venue => {
+		this.setState({...this.state, dialog: true, venue})
+	}
+
+	handleDialogCancel = () => {
+		this.setState({...this.state, dialog: false, errors: {}})
 	}
 
 	focus = input => this.nameInput = input;
+
+
 
 	render() {
 		const { venue, errors } = this.state;
 		return (
 			<div>
-				<Paper>
-					<VenueList 
-						onVenueSelected = {this.handleVenueSelection}
-						venues={this.state.venues} />
-				</Paper>
-				<form onSubmit={this.saveVenue}>
-					<TextField 
-						name='name'
-						floatingLabelText="Venue name"
-						value={venue.name} 
-						onChange={this.handleChange} 
-						errorText={(errors.name && errors.name.message) || ''}
-						ref={this.focus}
-					/>
-					<TextField 
-						name='capacity'
-						type='number' min='0'
-						floatingLabelText="Max capacity"
-						value={venue.capacity} 
-						onChange={this.handleChange} 
-						errorText={(errors.capacity && errors.capacity.message) || ''}
-					/>
-					<RaisedButton label={venue._id ? 'Save' : 'Add'} onClick={this.saveVenue} primary type='submit'/>
-				</form>
-				
+				<VenueList 
+					onSelect={this.handleVenueSelect}
+					onEdit={this.handleVenueEdit}
+					venues={this.state.venues} 
+				/>
+				<Dialog
+					title={venue._id ? 'Save venue' : 'Add venue'}
+					open={this.state.dialog}
+					onRequestClose={this.handleDialogCancel}
+				>
+					<form onSubmit={this.saveVenue}>
+						<TextField 
+							name='name'
+							floatingLabelText="Venue name"
+							value={venue.name} 
+							onChange={this.handleChange} 
+							errorText={(errors.name && errors.name.message) || ''}
+							ref={this.focus}
+						/>
+						<TextField 
+							name='capacity'
+							type='number' min='0'
+							floatingLabelText="Max capacity"
+							value={venue.capacity} 
+							onChange={this.handleChange} 
+							errorText={(errors.capacity && errors.capacity.message) || ''}
+						/>
+						<RaisedButton label={venue._id ? 'Save' : 'Add'} onClick={this.saveVenue} primary type='submit'/>
+					</form>
+				</Dialog>
 			</div>
 		);
 	}
