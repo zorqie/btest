@@ -32,4 +32,4 @@ data/
 
 # Fonts
 public/fonts/
-public/bundle/
+public/bundle/*.hot-update.*
