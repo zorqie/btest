@@ -39,8 +39,8 @@ app.use(compress())
   .use(cors())
   .use(favicon( path.join(app.get('public'), 'favicon.ico') ))
   .use('/', serveStatic( app.get('public') ))
-  .use('/img', serveStatic( app.get('public')+'/img/' ))
-  .use('/bundle', serveStatic( app.get('public')+'/bundle/' ))
+  // .use('/img', serveStatic( app.get('public')+'/img/' ))
+  // .use('/bundle', serveStatic( app.get('public')+'/bundle/' ))
   .get('*', routing)  // handle every other route with index.html, which will contain
                       // a script tag to your application's JavaScript file(s).
   .use(bodyParser.json())
