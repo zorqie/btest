@@ -21,7 +21,7 @@ const services = require('./services');
 const routing = function (request, response, next){
   
   // console.log("Nexting ", next);
-   if(request.path.indexOf('/img/') < 0 && request.path.indexOf('/bundle/') < 0) {
+   if(request.originalUrl.indexOf('/img/') < 0 && request.originalUrl.indexOf('/bundle/') < 0) {
     console.log("Routing " + request.path);
     response.sendFile(path.resolve(__dirname, app.get('public'), 'index.html'))
    } else {
