@@ -4,7 +4,6 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import Snackbar from 'material-ui/Snackbar';
 
 import moment from 'moment';
 
@@ -76,7 +75,7 @@ export default class GigDialogForm extends React.Component {
 		Object.assign(gig, {venue_id: venue._id});
 		this.setState({...this.state, dialogOpen: false, gig})
 	}
-	handleDialogCancel = (e) => {
+	handleDialogCancel = e => {
 		// console.log("Canceling...");
 		this.setState({dialogOpen: false})
 	}
@@ -90,7 +89,7 @@ export default class GigDialogForm extends React.Component {
 
 	render() {
 		const {gig} = this.state;
-		const {errors} = this.props;
+		const {errors, venues} = this.props;
 		return (
 			<form >
 				<TextField 
@@ -120,13 +119,12 @@ export default class GigDialogForm extends React.Component {
 				<div>
 					<TextField 
 						name='venue_id'
-						hintText='Venue'
-						floatingLabelText="Venue"
+						floatingLabelText="Venue ID"
 						value={gig.venue_id || ''} 
 						onChange={this.handleChange} 
 						errorText={(errors.venue_id && errors.venue_id.message) || ''}
 					/>
-					<RaisedButton label="Choose" onTouchTap={this.chooseVenue}/>
+					{venues && <RaisedButton label="Choose" onTouchTap={this.chooseVenue}/>}
 				</div>
 				<div>
 					<TextField 
@@ -172,7 +170,7 @@ export default class GigDialogForm extends React.Component {
 					actions={this.dialogActions()}
 					onRequestClose={this.handleDialogCancel}
 				>
-					<VenueSites venues={this.props.venues} onSelect={this.handleDialogSelect}/>
+					<VenueSites venues={venues} onSelect={this.handleDialogSelect}/>
 				</Dialog>
 			</form>
 		);

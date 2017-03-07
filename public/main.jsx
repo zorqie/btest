@@ -4,14 +4,15 @@ import ReactDOM from 'react-dom';
 import Layout from './mui/layout.jsx';
 
 import ActsPage from './mui/acts-page.jsx';
-import EventPage from './mui/event-page.jsx';
-import GigPage from './mui/gig-page.jsx';
-import GigForm from './mui/gig-form.jsx';
+import ActDetailsPage from './mui/act-details-page.jsx';
+import EventDetailsPage from './mui/event-details-page.jsx';
+import EventsPage from './mui/events-page.jsx';
+import GigDetailsPage from './mui/gig-details-page.jsx';
 import LoginForm from './mui/login-form.jsx';
 import SignupForm from './mui/signup-form.jsx';
 import UserList from './mui/user-list.jsx';
-import VenueForm from './mui/venue-form.jsx';
-import VenuePage from './mui/venue-page.jsx';
+import VenuePage from './mui/venues-page.jsx';
+import VenueDetailsPage from './mui/venue-details-page.jsx';
 import errorHandler from './mui/err';
 
 import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router';
@@ -29,6 +30,7 @@ const io = require('socket.io-client');
 // FIXME this should be in configuration somewhere.
 // Establish a Socket.io connection
 // const socket = io('http://localhost:2017');
+// perhaps based on process.env.NODE_ENV
 const socket = io('https://fathomless-gorge-78924.herokuapp.com/');
 // Initialize our Feathers client application through Socket.io
 // with hooks and authentication.
@@ -61,44 +63,41 @@ const handleRouteEnter = (nextState, replace, callback) => {
 	callback();
 }
 
-class App extends React.Component {
-	constructor(props) {
-		super(props);
-	}
-	render() {
-		console.log("___ROUTE___")
-		return <Router history={browserHistory}>
+const routes = 
+		<Router history={browserHistory}>
 			<Route path="/" component={Layout}  >
 				<IndexRoute component={Home} />
+
+				<Route path='home' component={EventsPage} />
 
 				<Route path='login' component={LoginForm} />
 				<Route path='signup' component={SignupForm} />
 
-				<Route path='venues' component={VenueForm} />
-				<Route path='venues/:venueId' component={VenuePage} />
+				<Route path='venues' component={VenuePage} />
+				<Route path='venues/:venueId' component={VenueDetailsPage} details-/>
 
-				<Route path='gigs' component={GigForm} />
-				<Route path='gigs/:gigId' component={GigPage} />
-				<Route path='events/:eventId' component={EventPage} />
+				<Route path='events' component={EventsPage} />
+				<Route path='events/:eventId' component={EventDetailsPage} />
+				<Route path='gigs/:gigId' component={GigDetailsPage} />
 				
 				<Route path='acts' component={ActsPage} />
+				<Route path='acts/:actId' component={ActDetailsPage} />
 
 				<Route path='users' component={UserList} />
 				
 				<Route path='*' component={NotFound} />
 			</Route>
-		</Router>;
-	}
-}
+		</Router>
+
 
 // FIXME hack to make app available to pages when not going through / first
 app.authenticate().then(() => {
 
-	ReactDOM.render( <App />, document.getElementById("app") );
+	ReactDOM.render( routes, document.getElementById("app") );
 
 
 }).catch(error => {
-	ReactDOM.render( <App />, document.getElementById("app") );
+	ReactDOM.render( routes, document.getElementById("app") );
 	console.error("Not authenticated.", error);
 // 	if(error.code === 401) {
 // 		// browserHistory.push('/login');
@@ -112,10 +111,10 @@ app.authenticate().then(() => {
  });
 
 
-// socket.io.engine.on('upgrade', function(transport) {
-//     console.log('transport changed');
-//     app.authenticate();
-//   });
+socket.io.engine.on('upgrade', function(transport) {
+	console.log('transport changed');
+	app.authenticate();
+});
 
 // FIXME remove this!!!
 window.appx = app;

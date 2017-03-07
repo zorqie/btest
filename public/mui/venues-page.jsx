@@ -10,7 +10,7 @@ import VenueList from './venue-list.jsx';
 import app from '../main.jsx';
 import errorHandler from './err';
 
-const BLANK_VENUE =  { name: '', capacity: ''};
+const BLANK_VENUE =  { name: '', description: '', capacity: ''};
 
 class VenueForm extends React.Component {
 	state = {
@@ -46,12 +46,10 @@ class VenueForm extends React.Component {
 
 	handleChange = (e) => {
 		const { name, value } = e.target;
-		// console.log("Changed: " + name + " -> " + JSON.stringify(value));
 		var v = this.state.venue;
 		Object.assign(v, {[name] : value});
 		this.validate(v);
 		this.setState({venue: v});
-		// console.log("State: " + JSON.stringify(this.state));
 	}
 	validate = venue => {
 		// const v = new mongoose.Document(venue, venueSchema);//
@@ -71,7 +69,6 @@ class VenueForm extends React.Component {
 		if(venue._id) {
 			app.service('venues').patch(venue._id, venue)
 			.then(() => {
-				console.log("Saviated venue.");
 				this.setState({...this.state, dialog: false, errors: {}});
 			})
 			.catch(err => {
@@ -80,10 +77,8 @@ class VenueForm extends React.Component {
 			});
 		} else {
 			//create
-			console.log("Createning..")
 			app.service('venues').create(venue)
 			.then(() => {
-				console.log("Created venue")
 				this.setState({...this.state, dialog: false, errors: {}})
 			})
 			.catch(err => {
@@ -121,18 +116,31 @@ class VenueForm extends React.Component {
 					venues={this.state.venues} 
 				/>
 				<Dialog
-					title={venue._id ? 'Save venue' : 'Add venue'}
+					title={venue._id ? null : 'Add new venue'}
 					open={this.state.dialog}
 					onRequestClose={this.handleDialogCancel}
+					actions={[
+						<FlatButton label='Cancel' onTouchTap={this.handleDialogCancel} />,
+						<RaisedButton label={venue._id ? 'Save' : 'Add'} onTouchTap={this.saveVenue} primary/>
+					]}
 				>
 					<form onSubmit={this.saveVenue}>
 						<TextField 
 							name='name'
 							floatingLabelText="Venue name"
 							value={venue.name} 
+							maxLength='30'
 							onChange={this.handleChange} 
 							errorText={(errors.name && errors.name.message) || ''}
 							ref={this.focus}
+						/>
+						<TextField 
+							name='description'
+							floatingLabelText="Venue description"
+							fullWidth={true}
+							maxLength='60'
+							value={venue.description || ''} 
+							onChange={this.handleChange} 
 						/>
 						<TextField 
 							name='capacity'
@@ -142,7 +150,7 @@ class VenueForm extends React.Component {
 							onChange={this.handleChange} 
 							errorText={(errors.capacity && errors.capacity.message) || ''}
 						/>
-						<RaisedButton label={venue._id ? 'Save' : 'Add'} onClick={this.saveVenue} primary type='submit'/>
+						
 					</form>
 				</Dialog>
 			</div>

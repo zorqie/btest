@@ -19,20 +19,17 @@ import VenueDialogForm from './venue-dialog.jsx';
 import VenueSites from './venue-sites.jsx';
 
 export default class VenuePage extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			venues:[], 
-			venue: props.venue || {},
-			dialog: false,
-			dialogVenue: props.venue || {},
-			types: ['performance', 'service'],
-			errors: {}
-		};
+	state = {
+		venues:[], 
+		venue: this.props.venue || {},
+		dialog: false,
+		dialogVenue: this.props.venue || {},
+		types: ['performance', 'service'],
+		errors: {}
 	}
 
 	componentWillMount() {
-		this.fetchData();
+		app.authenticate().then(this.fetchData);
 		// Listen to newly created messages
 		// this.venueService.on('created', venue => this.setState({
 		// 	venues: this.state.venues.concat(venue)
@@ -76,7 +73,8 @@ export default class VenuePage extends React.Component {
 		const types = this.state.venues.map(v => v.type).filter((e, i, a) => a.indexOf(e)===i);
 		this.setState({dialog: true, dialogVenue: dv, types});
 	}
-	handleDelete = (v) => {
+	handleDelete = v => {
+		// check that there aren't events perhaps? 
 		app.service('venues').remove(v._id)
 		// .then(v => console.log("Deleted venue", v))  // on('removed') handles this
 		.catch(err => console.error("Delete failed: ", err));
@@ -105,11 +103,11 @@ export default class VenuePage extends React.Component {
 	}
 
 	fetchData = () => {
-		const parentId = this.props.params.venueId;
+		const parentId = this.props.params.venueId
 		// console.log("Looking for parent: " + parentId);
 		app.service('venues').get(parentId)
 		.then(venue => {
-			this.setState({...this.state, venue});
+			this.setState({...this.state, venue})
 			document.title = venue.name;
 		})
 		.then(() =>
@@ -121,9 +119,9 @@ export default class VenuePage extends React.Component {
 				}
 			}))
 		.then(page => {
-			this.setState({...this.state,  venues: page.data });
+			this.setState({...this.state,  venues: page.data })
 		})
-		.catch(err => console.error("ERAR: ", err));
+		.catch(err => console.error("ERAR: ", err))
 	}
 
 	dialogActions = [
@@ -137,20 +135,26 @@ export default class VenuePage extends React.Component {
 				primary={true}
 				onTouchTap={this.handleSubmit}
 			/>,
-	];
-	zEdit = (e) => {
+	]
+
+	zEdit = e => {
 		console.log("Attempting an edit perhaps: ", e.target);
 	}
 	render() {
 		// console.log("VenuePage props: ", this.props);
-		const v = this.state.venue;
-		const title = <CardTitle title={v.name} subtitle={"Capacity: " + v.capacity} actAsExpander={true} showExpandableButton={true}/>;
+		const {venue} = this.state;
+		const title = <CardTitle 
+			title={venue.name} 
+			subtitle={"Capacity: " + venue.capacity} 
+			actAsExpander={true} 
+			showExpandableButton={true}
+		/>;
 		return (
 			<Card>
 			    {/*<CardHeader title={v.name} subtitle="Venue" />*/}
 			    {title}
 			    <CardMedia overlay={title} expandable={true}>
-					<img src={`/img/${v._id}.jpg`} />
+					<img src={`/img/${venue._id}.jpg`} />
 				</CardMedia>
 				{/*<CardTitle title="Card title" subtitle="Card subtitle" />*/}
 				<CardText>

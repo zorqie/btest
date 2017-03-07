@@ -9,6 +9,7 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import Drawer from 'material-ui/Drawer';
 import FlatButton from 'material-ui/FlatButton'
 import MenuItem from 'material-ui/MenuItem';
+import Snackbar from 'material-ui/Snackbar';
 
 import app from '../main.jsx';
 import errorHandler from './err'
@@ -20,12 +21,15 @@ export default class Layout extends React.Component {
 			drawerOpen: false, 
 			user: null, 
 			section: 'BFest',
-			snackbarOpen: false,
-			message: ''
+			snackbar: {
+				open: false, 
+				message: '', 
+				undo: null,
+			},
 		};
 
 		this.sections = [
-			{ text: "Events", path: "/gigs"},
+			{ text: "Events", path: "/events"},
 			{ text: "Acts", path: "/acts"},
 			{ text: "Venues", path: "/venues"},
 			{ text: "Users", path: "/users"},
@@ -35,18 +39,26 @@ export default class Layout extends React.Component {
 		app.authenticate()
 			.then(this.handleLogin())
 			.catch(errorHandler);
+
 		app.on('authenticated', this.handleLogin);
+		app.on('notify', this.notifyListener);
 	}
 	componentWillUnmount() {
 		if(app) {
 			app.removeListener('authenticated', this.handleLogin);
+			app.removeListener('notify', this.notifyListener);
 		}
 	}
 
-	handleUserChange = (u) => {
+	handleUserChange = u => {
 		console.log("User loginified: ", u);
-		this.setState({snackbarOpen: true, message: "User logged in"});
+		this.setState({snackbarOpen: true, message: u.name + " just logged in"});
 	}
+
+	notifyListener = (message, undo) => {
+		this.setState({...this.state, snackbar: {open: true, message, undo}})
+	}
+	handleSnackbarClose = () => this.setState({ snackbar: {open: false, message: '', undo: null}});
 
 	closeDrawer = () => {
 		this.setState({...this.state, drawerOpen: false})
@@ -54,7 +66,7 @@ export default class Layout extends React.Component {
 	toggleDrawer = () => {
 		this.setState({...this.state, drawerOpen: !this.state.drawerOpen});
 	}
-	handleMenu = (section) => {
+	handleMenu = section => {
 		// console.log("Menu: ", section);
 		const {path, text} = section;
 		this.setState({...this.state, section: text, drawerOpen: false});
@@ -69,16 +81,10 @@ export default class Layout extends React.Component {
 			browserHistory.push('/out');
 		});
 	}
-	handleLogin = (u) => {
+	handleLogin = u => {
 		const user = app.get('user');
 		if(user) {
 			console.log("-=-=- AUTHENTICATED (app.user) -=-=-", user);
-			if(!this.state.user || user.online != this.state.user.online) {
-				// app.service('users').patch(user._id, {online: true})
-				// .then(u => {
-				// 	app.emit('loginified', u);
-				// });
-			}
 			this.setState({user});
 		}
 	}
@@ -87,8 +93,8 @@ export default class Layout extends React.Component {
 		this.setState({...this.state, drawerOpen: open})
 	}
 	render() { 
-		console.log("------------ LAYOUT ------------");
-		const {user} = this.state;
+		// console.log("------------ LAYOUT ------------");
+		const {user, snackbar} = this.state;
 		return ( 
 		<MuiThemeProvider>
 			<div>
@@ -122,6 +128,14 @@ export default class Layout extends React.Component {
 					)}
 				</Drawer>
 				{this.props.children}
+				<Snackbar
+					open={snackbar.open}
+					message={snackbar.message}
+					autoHideDuration={4000}
+					action={snackbar.undo ? 'Undo' : null}
+					onActionTouchTap={snackbar.undo}
+					onRequestClose={this.handleSnackbarClose}
+		        />
 				<footer style={{position: 'fixed', bottom: 0, right: 0, fontSize: 'smaller', paddingRight:'1em'}}>
 					© 2017 Intergalactic Balkan Festivals Unlimited
 				</footer>

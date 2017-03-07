@@ -1,5 +1,4 @@
 import React from 'react';
-import { browserHistory } from 'react-router';
 
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Dialog from 'material-ui/Dialog';
@@ -25,7 +24,7 @@ export default class VenueSites extends React.Component {
 		const { venues, allowAdd, allowNewType, onEdit, onDelete} = this.props;
 		const types = venues.map(v => v.type).filter((e, i, a) => a.indexOf(e)===i);
 		return <Tabs>
-			{types.map(type => <Tab key={type} label={type}>
+			{types.map(type => <Tab key={type || 'Venue'} label={type || 'Venue'}>
 				{venues.filter(v => v.type===type)
 					.map(v => <ListItem 
 							key={v._id} 

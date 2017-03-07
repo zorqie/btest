@@ -1,6 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 import mongoose from 'mongoose'
+import { browserHistory } from 'react-router';
 
 import Avatar from 'material-ui/Avatar'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card'
@@ -15,6 +16,8 @@ import ActDialogForm from './act-dialog-form.jsx'
 import GigTimespan from './gig-timespan.jsx'
 import app from '../main.jsx'
 import { mic } from './icons.jsx'
+
+import PerformanceCard from './cards/performance-card.jsx'
 
 const styles = {
 	acts: {
@@ -31,9 +34,10 @@ const styles = {
 const WorkshopCard = ({gig, acts, fans}) => <div>
 	<span style={styles.gigType}>{gig.type}</span>
 	<h2>{gig.name}</h2>
+	<p>{gig.description}</p>
 	{gig.acts && gig.acts.length ?
 		<div>
-			<Divider />
+			<Divider style={{marginTop:'1em'}} />
 			Performing: 
 			<ul>
 				{gig.acts.map(act => <li key={act._id}>{act.name}</li>)}
@@ -41,7 +45,7 @@ const WorkshopCard = ({gig, acts, fans}) => <div>
 		</div>
 		: ''
 	}
-	<Divider />
+	<Divider style={{marginTop:'1em'}} />
 	<div>
 		Attending: {fans.length}
 		<ul>
@@ -55,26 +59,13 @@ const VolunteerCard = ({gig}) => <div>
 	<h2>{gig.name}</h2>
 </div>
 
-const PerformanceCard = ({gig}) => <div>
-	<h2>{gig.name}</h2>
-	<Divider />
-	{gig.acts && gig.acts.length ?
-		<div>
-			With performances by: 
-			<ul>
-				{gig.acts.map(act => <li key={act._id}>{act.name}</li>)}
-			</ul>
-		</div>
-		: ''
-	}
-</div>
 
-export default class GigPage extends React.Component {
+export default class GigDetailsPage extends React.Component {
 	state = {
 		fans: [],  
 		gig: {},
 		venue: {},
-		dialog: false,
+		selectDialog: false,
 		dialogActs: [],
 		editDialog: {open: false, act: {}, errors: {}},
 	}
@@ -95,40 +86,51 @@ export default class GigPage extends React.Component {
 		const { gigId } = this.props.params
 		
 		 
-			app.service('gigs').get(gigId)
-			.then(gig => {
-				
-				this.setState({venue: gig.venue, gig})
-			})
-			.then(() => app.service('fans')
-				.find({query:{gig_id:gigId, status: 'Attending'}})
-				.then(result => this.setState({fans: result.data})))
+		app.service('gigs').get(gigId)
+		.then(gig => {		
+			this.setState({venue: gig.venue, gig})
+		})
+		.then(() => app.service('fans')
+			.find({query:{gig_id:gigId, status: 'Attending'}})
+			.then(result => this.setState({fans: result.data})))
 	} 
 
 	selectAct = () => {
 		app.service('acts').find()
 		.then(result => {
 			if(result.total > 0) {
-				this.setState({dialogActs: result.data, dialog: true})
+				this.setState({dialogActs: result.data, selectDialog: true})
 			}
 		})
 	}
+	removeAct = act => {
+		console.log("Remove act", act)
+		const { gig } = this.state
+		Object.assign(gig, {act_id: gig.act_id.filter(a_id => a_id !== act._id)})
+		app.service('gigs').patch(gig._id, gig)
+	}
+	replaceAct = act => {
+		this.removeAct(act)
+		this.selectAct()
+	}
+	viewActDetails = act => browserHistory.push('/acts/'+act._id)
+
 	handleActsEdit = act => {
 		console.log("Editing act", act)
 		const {editDialog} = this.state
-		Object.assign(editDialog, {open: true, errors:{}, act})
-		this.setState({dialog:false, editDialog})
+		Object.assign(editDialog, {open: true, errors:{}, act: act || {}})
+		this.setState({selectDialog:false, editDialog})
 	}
 	handleActsSelect = act => {
 		console.log("Act selected", act)
 		const { gig } = this.state
-		Object.assign(gig, {act_id: act._id})
+		Object.assign(gig, {act_id: gig.act_id.concat(act._id)})
 		app.service('gigs').patch(gig._id, gig)
 		.then(gig => console.log("Gig patched", gig))
 		.catch(err => console.error("Most erroneous thing happened", err))
 	}
 	handleActsCancel = () => {
-		this.setState({dialog: false})
+		this.setState({selectDialog: false})
 	}
 
 
@@ -136,31 +138,60 @@ export default class GigPage extends React.Component {
 		this.setState({editDialog: {open: false}})
 	}
 
-	handleActEditSubmit = act => {
+	handleActEditSubmit = e => {
+		const {act} = this.state.editDialog
 		if(act._id) {
-			//create
-
-		} else {
 			// patch
+			app.service('acts').patch(act._id, act)
+			.then(this.selectAct)
+			.catch(this.handleActEditError)
+		} else {
+			//create
+			app.service('acts').create(act)
+			.then(this.selectAct)
+			.catch(this.handleActEditError)
 		}
-		this.setState({editDialog: {open: false}})
-		this.selectAct()
+		// this.selectAct()
+	}
+
+	handleActEditError = err => {
+		console.log("Act error", err)
+		const { editDialog } = this.state;
+		Object.assign(editDialog, {errors: err.errors})
+		this.setState({...this.state, editDialog})
 	}
 
 	render() {
 		const { gig, venue, fans, dialogActs } =  this.state
-		console.log("GIIG", this.state)
-		const card = gig.type==='Workshop' ? <WorkshopCard gig={gig} fans={fans}/> : 
-			gig.type==='Volunteer' ? <VolunteerCard gig={gig} /> : <PerformanceCard gig={gig} />
+		// console.log("GIIG", this.state)
+		const card = 
+			gig.type==='Workshop' ? 
+				<WorkshopCard 
+					gig={gig} 
+					fans={fans}
+					onMasterSelect={this.viewActDetails}
+					onMasterEdit={this.replaceAct} 
+					onMasterDelete={this.removeAct} 
+				/> : 
+				gig.type==='Volunteer' ?
+					<VolunteerCard gig={gig} /> : 
+					<PerformanceCard 
+						gig={gig} 
+						onPerformerSelect={this.viewActDetails}
+						onPerformerEdit={this.replaceAct} 
+						onPerformerDelete={this.removeAct} 
+					/>
+		const gigTitle = <span>
+					<span className='acts'>{gig.acts && gig.acts.map(a => a.name).join(', ')}</span>
+					{venue && <span> at the {venue.name}</span>}</span>
 		return <Card>
 			<CardHeader 
-				title={gig.name} 
-				subtitle={<GigTimespan gig={gig} />}
-				avatar={<Avatar>{gig.type && gig.type.charAt(0)}</Avatar>}/>
+				title={gigTitle} 
+				subtitle={<GigTimespan gig={gig} showDuration={true} />}
+				avatar={<Avatar>{gig.type && gig.type.charAt(0)}</Avatar>}>
+			</CardHeader>
 			<CardText>
-				<p>
-					<span className='acts'>{gig.acts && gig.acts.map(a => a.name).join(',')}</span>
-					{venue && <span> at the {venue.name}</span>}</p>
+				
 				{card}
 			</CardText>
 			<CardActions>
@@ -168,7 +199,7 @@ export default class GigPage extends React.Component {
 			</CardActions>
 			<Dialog
 				title='Acts'
-				open={this.state.dialog}
+				open={this.state.selectDialog}
 					actions={[
 						<FlatButton
 							label="Cancel"

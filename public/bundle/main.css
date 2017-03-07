@@ -1,0 +1,10 @@
+.gig-duration {
+	font-size: smaller;
+	font-weight: 300;
+}
+.gig-duration::before {
+	content: ' (';
+}
+.gig-duration::after {
+	content: ')';
+}

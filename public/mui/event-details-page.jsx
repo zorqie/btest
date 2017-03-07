@@ -21,6 +21,8 @@ import GigTypes from './gig-types.jsx'
 import GigTimespan from './gig-timespan.jsx'
 import { plusOutline } from './icons.jsx'
 
+const types = gigs => gigs.map(g => g.type).filter((e, i, a) => a.indexOf(e)===i)
+
 //hack because Material-UI forces a onKeyboardFocus onto the span and React complains
 const Kspan = ({onKeyboardFocus, ...others}) => <span {...others}/>; 
 
@@ -36,42 +38,20 @@ const Subgig = ({ gig, onSelect, onEdit, onDelete }) => <ListItem
 
 
 export default class EventPage extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			gigs:[], 
-			gig: props.gig || {},
-			venue: {},
-			sites: [],
-			dialogOpen: false,
-			dialogGig: {},
-			errors: {},
-			typesOpen: false,
-		};
+	state = {
+		gigs:[], 
+		event: {},
+		dialog: {
+			open: false, 
+			gig: {}, 
+			sites:[], 
+			errors: {}
+		},
+		typesOpen: false,
 	}
 	componentWillMount() {
-		const eventId = this.props.params.eventId;
-
-		app.service('gigs').get(eventId)
-		.then(gig => {
-			app.service('venues')
-			.find({query: {parent: new mongoose.Types.ObjectId(gig.venue_id)}})
-			.then(page => this.setState({...this.state, sites: page.data, gig, venue: gig.venue}))
-		})
-		.then(() =>
-			app.service('gigs').find({
-				query: {
-					parent: new mongoose.Types.ObjectId(eventId),
-					$sort: { start: 1 },
-					// $limit: this.props.limit || 7
-				}
-			}))
-		.then(page => {
-			// console.log("Got result: ", page);
-			
-			this.setState({...this.state, gigs: page.data });
-		})
-		.catch(err => console.error("ERAR: ", err));
+		app.authenticate()
+		.then(this.fetchData)
 
 		app.service('gigs').on('removed', this.removedListener);
 		app.service('gigs').on('created', this.createdListener);
@@ -84,13 +64,39 @@ export default class EventPage extends React.Component {
 			app.service('gigs').removeListener('patched', this.patchedListener);
 		}
 	}
+	fetchData = () => {
+		const eventId = this.props.params.eventId;
 
-	handleDialogCancel = (e) => {
-		// console.log("Canceling...");
-		this.setState({dialogOpen: false})
+		app.service('gigs').get(eventId)
+		.then(event => {
+			app.service('gigs').find({
+				query: {
+					parent: new mongoose.Types.ObjectId(eventId),
+					$sort: { start: 1 },
+					// $limit: this.props.limit || 7
+				}
+			})
+			.then(page => {
+				// console.log("Got result: ", page);
+				
+				this.setState({...this.state, event, gigs: page.data });
+			})
+		})
+		.catch(err => console.error("ERAR: ", err));
 	}
-	handleDialogSubmit = (e) => {
-		const gig = this.state.dialogGig;
+
+	/*
+	
+	*/
+
+	handleDialogCancel = e => {
+		// console.log("Canceling...");
+		const { dialog } = this.state
+		Object.assign(dialog, {open: false})
+		this.setState({...this.state, dialog})
+	}
+	handleDialogSubmit = e => {
+		const {gig} = this.state.dialog;
 		// console.log("Submitting...", gig);
 		if(!gig.venue_id) { //mutating ?!?!?!
 			gig.venue_id = this.state.venue_id
@@ -100,33 +106,47 @@ export default class EventPage extends React.Component {
 			// .then(gig => console.log("Updated gig", gig)) // this is handled in patchedListener
 			.catch(err => {
 				console.error("Didn't update", err);
-				this.setState({...this.state, errors: err.errors});
+				this.setState({...this.state, dialog: {errors: err.errors, gig}});
 			});
 		} else {
 			app.service('gigs').create(gig)
 			// .then(gig => console.log("Created gig", gig)) // handled in createdListener
 			.catch(err => {
 				console.error("Didn't create gig", JSON.stringify(err));
-				this.setState({...this.state, errors: err.errors});
+				this.setState({...this.state, dialog: {errors: err.errors, gig}});
 			});
 		}
 		
 	}
-	handleGigDelete = (gig) => {
+	handleGigDelete = gig => {
 		console.log("Deleting gig ", gig);
 		app.service('gigs').remove(gig._id)
 		// .then(gig => console.log("Deleted gig", gig)) // this is handled in removedListener
 		.catch(err => console.error("Delete failed: ", err));
 	}
 	handleGigEdit = (gig, type) => {
-		// console.log("Hanlediting...", g);
-		const dg = gig ? Object.assign({}, gig) : Object.assign({}, {parent: this.state.gig._id, start: this.state.gig.start, type});
-		this.setState({dialogOpen: true, dialogGig: dg});
+		// console.log("Hanlediting...", gig);
+		const { dialog, event } = this.state;
+		const dg = gig ? 
+			Object.assign({}, gig) 
+			: Object.assign({}, {
+				parent: event._id, 
+				start: event.start, 
+				type
+			})
+		app.service('venues')
+		.find({query: {parent: new mongoose.Types.ObjectId(event.venue_id)}})
+		.then(page => {
+			Object.assign(dialog, {open: true, gig: dg, sites: page.data, errors:{}})
+
+			this.setState({...this.state, typesOpen: false, gig, })
+		})
 	}
 	handleGigSelect = gig => {
 		console.log("Selected gig, forwarding", gig)
 		browserHistory.push('/gigs/'+ gig._id) //seems a waste to having gig -> id > get(id)
 	}
+
 	dialogActions = () => [
 		<FlatButton
 			label="Cancel"
@@ -134,34 +154,42 @@ export default class EventPage extends React.Component {
 			onTouchTap={this.handleDialogCancel}
 		/>,
 		<FlatButton
-			label={this.state.dialogGig._id ? "Save" : "Add"}
+			label={this.state.dialog.gig._id ? "Save" : "Add"}
 			primary={true}
 			onTouchTap={this.handleDialogSubmit}
 		/>,
-	];
+	]
 
 	removedListener = gig => {
 		// console.log("Removed: ", gig);
+		const {dialog, gigs} = this.state
+		Object.assign(dialog, {open: false,  errors:{}})
 		this.setState({
 			...this.state, 
-			dialogOpen: false,
-			errors: {},
-			gigs: this.state.gigs.filter(g => g._id !== gig._id),
+			gigs: gigs.filter(g => g._id !== gig._id),
+			dialog
 		});
 	}
 	createdListener = gig => {
 		// console.log("Added: ", gig);
+		const {dialog, gigs} = this.state;
+		Object.assign(dialog, {open: false, errors: {}})
 		this.setState({
 			...this.state, 
-			dialogOpen: false, 
-			errors: {},
-			gigs: this.state.gigs.concat(gig),
+			gigs: gigs.concat(gig),
+			dialog,
 		});
 	}
 	patchedListener = gig => {
 		// console.log("Updated: ", gig);
 		// do something to reflect update
-		this.setState({...this.state, dialogOpen: false, errors:{}});
+		const {dialog, gigs} = this.state;
+		Object.assign(dialog, {open: false, errors: {}})
+		this.setState({
+			...this.state, 
+			gigs: gigs.filter(g => g._id !== gig._id).concat(gig), //remove+add ?
+			dialog,
+		});
 	}
 
 // types 
@@ -170,19 +198,19 @@ export default class EventPage extends React.Component {
 		this.setState({typesOpen: false})
 	}
 	handleTypesSelect = type => {
-		this.setState({typesOpen: false});
+		// this.setState({...this.state, typesOpen: false});
 		this.handleGigEdit(null, type.name);
 	}
 	handleTypesOpen = () => {
-		this.setState({typesOpen: true});
+		this.setState({...this.state, typesOpen: true});
 	}
 
 	render() {
-		const {gig, venue} = this.state;
+		const {event, gigs, dialog} = this.state;
 		// console.log("GIGGGINGING: ", this.state);
-		const title = (<span><b>{gig.name}</b> at <b>{venue.name}</b></span>);
+		const title = (<span><b>{event.name}</b> at <b>{event.venue && event.venue.name}</b></span>);
 
-		const subtitle = <GigTimespan gig={gig} showRelative={true}/>;
+		const subtitle = <GigTimespan gig={event} showRelative={true}/>;
 
 		return (
 			<Card>
@@ -194,29 +222,32 @@ export default class EventPage extends React.Component {
 			    	showExpandableButton={true}
 			    />
 			    <CardMedia overlay={<FlatButton label="Change poster" style={{color:'white'}}/>}  expandable={true}>
-					<img src={`/img/${gig._id}_poster.jpg`} />
+					<img src={`/img/${event._id}_poster.jpg`} />
 				</CardMedia>
 				<CardText >
-					<p>{gig.description}</p>
-
-					{this.state.gigs.map(
-						gig => <Subgig 
-							key={gig._id} 
-							gig={gig}
-							onEdit={this.handleGigEdit.bind(this, gig)}
-							onDelete={this.handleGigDelete.bind(this, gig)}
-							onSelect={this.handleGigSelect.bind(this, gig)}
-					/>)}
+					<p>{event.description}</p>
+					<Tabs>
+						{types(gigs).map(type => <Tab key={type} label={type} >
+							{gigs.filter(g => g.type===type).map(
+								gig => <Subgig 
+									key={gig._id} 
+									gig={gig}
+									onEdit={this.handleGigEdit.bind(this, gig)}
+									onDelete={this.handleGigDelete.bind(this, gig)}
+									onSelect={this.handleGigSelect.bind(this, gig)}
+							/>)}
+						</Tab>)}
+					</Tabs>
 				</CardText>
 				<Dialog
-					open={this.state.dialogOpen}
+					open={dialog.open}
 					actions={this.dialogActions()}
 					onRequestClose={this.handleDialogCancel}
 				>
 					<GigDialogForm 
-						gig={this.state.dialogGig} 
-						venues={this.state.sites}
-						errors={this.state.errors}/>
+						gig={dialog.gig} 
+						venues={dialog.sites}
+						errors={dialog.errors}/>
 				</Dialog>
 				<Dialog
 					title="Select activity type"

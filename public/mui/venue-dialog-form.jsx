@@ -7,7 +7,7 @@ export default class VenueDialogForm extends React.Component {
 	state = {
 		venue = this.props.venue
 	}
-	handleChange = (e) => {
+	handleChange = e => {
 		const { name, value } = e.target
 		const venue = Object.assign(this.state.venue, {[name] : value})
 		this.setState({...this.state, venue})
@@ -23,6 +23,12 @@ export default class VenueDialogForm extends React.Component {
 						onChange={this.handleChange} 
 						errorText={(errors.name && errors.name.message) || ''}
 						ref={focus}
+					/>
+					<TextField 
+						name='description'
+						floatingLabelText="Venue description"
+						value={venue.description || ''} 
+						onChange={this.handleChange} 
 					/>
 					<TextField 
 						name='capacity'
