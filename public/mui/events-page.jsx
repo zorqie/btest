@@ -10,7 +10,7 @@ import moment from 'moment';
 
 import app from '../main.jsx';
 import errorHandler from './err';
-import GigList from './events-list.jsx';
+import EventsList from './events-list.jsx';
 import GigDialogForm from './gig-dialog-form.jsx';
 
 const blankGig = () => {
@@ -78,7 +78,7 @@ export default class EventsPage extends React.Component {
 			/>,
 		])
 
-	handleGigSelection = gig => {
+	handleEdit = gig => {
 		app.service('venues').find({
 			query: {
 				parent: {$exists:false},
@@ -95,7 +95,7 @@ export default class EventsPage extends React.Component {
 		console.log("Events-page________");
 		return (
 			<div>				
-				<GigList onGigSelected={this.handleGigSelection} />			
+				<EventsList onEdit={this.handleEdit} />			
 				<Dialog
 					open={this.state.dialogOpen}
 					title={gig._id ? 'Edit event' : 'Add event'}

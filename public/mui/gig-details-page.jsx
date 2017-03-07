@@ -18,46 +18,11 @@ import app from '../main.jsx'
 import { mic } from './icons.jsx'
 
 import PerformanceCard from './cards/performance-card.jsx'
+import WorkshopCard from './cards/workshop-card.jsx'
+import VolunteerCard from './cards/volunteer-card.jsx'
 
-const styles = {
-	acts: {
-		fontSize: '18dp',
-		fontWeight: 300,
-	},
-	gigType: {
-		fontSize: '12dp',
-		fontWeight: '300',
-		float: 'right'
-	}
-}
 
-const WorkshopCard = ({gig, acts, fans}) => <div>
-	<span style={styles.gigType}>{gig.type}</span>
-	<h2>{gig.name}</h2>
-	<p>{gig.description}</p>
-	{gig.acts && gig.acts.length ?
-		<div>
-			<Divider style={{marginTop:'1em'}} />
-			Performing: 
-			<ul>
-				{gig.acts.map(act => <li key={act._id}>{act.name}</li>)}
-			</ul>
-		</div>
-		: ''
-	}
-	<Divider style={{marginTop:'1em'}} />
-	<div>
-		Attending: {fans.length}
-		<ul>
-			{fans.map(fan => <li key={fan._id}>{fan.user.name}</li>)}
-		</ul>
-	</div>
-</div>
 
-const VolunteerCard = ({gig}) => <div>
-	<span style={styles.gigType}>Volunteer opportunity</span> 
-	<h2>{gig.name}</h2>
-</div>
 
 
 export default class GigDetailsPage extends React.Component {
@@ -87,7 +52,8 @@ export default class GigDetailsPage extends React.Component {
 		
 		 
 		app.service('gigs').get(gigId)
-		.then(gig => {		
+		.then(gig => {	
+			document.title=gig.name	
 			this.setState({venue: gig.venue, gig})
 		})
 		.then(() => app.service('fans')

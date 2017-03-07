@@ -52,7 +52,8 @@ export default class EventPage extends React.Component {
 	componentWillMount() {
 		app.authenticate()
 		.then(this.fetchData)
-
+	}
+	componentDidMount() {
 		app.service('gigs').on('removed', this.removedListener);
 		app.service('gigs').on('created', this.createdListener);
 		app.service('gigs').on('patched', this.patchedListener);
@@ -69,6 +70,7 @@ export default class EventPage extends React.Component {
 
 		app.service('gigs').get(eventId)
 		.then(event => {
+			app.emit('gig.root', event)
 			app.service('gigs').find({
 				query: {
 					parent: new mongoose.Types.ObjectId(eventId),

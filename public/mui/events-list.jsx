@@ -41,7 +41,7 @@ const GigItem = ({gig, onSelect, onEdit, onDelete}) => {
 }
 
 
-export default class GigList extends React.Component {
+export default class EventsList extends React.Component {
 	state = { gigs: [] }
 	
 	componentDidMount() {
@@ -84,7 +84,7 @@ export default class GigList extends React.Component {
 
 	select = gig => browserHistory.push('/events/'+gig._id)
 
-    edit = gig => this.props.onGigSelected(gig || blankGig())
+    edit = gig => this.props.onEdit(gig || blankGig())
 
 	delete = gig => {
 		app.service('gigs').find({query:{parent: gig._id}})

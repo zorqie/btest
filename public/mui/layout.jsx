@@ -38,15 +38,17 @@ export default class Layout extends React.Component {
 	componentDidMount() {
 		app.authenticate()
 			.then(this.handleLogin())
-			.catch(errorHandler);
+			.catch(errorHandler)
 
-		app.on('authenticated', this.handleLogin);
-		app.on('notify', this.notifyListener);
+		app.on('authenticated', this.handleLogin)
+		app.on('notify', this.notifyListener)
+		app.on('gig.root', this.gigListener)
 	}
 	componentWillUnmount() {
 		if(app) {
-			app.removeListener('authenticated', this.handleLogin);
-			app.removeListener('notify', this.notifyListener);
+			app.removeListener('authenticated', this.handleLogin)
+			app.removeListener('notify', this.notifyListener)
+			app.removeListener('gig.root', this.gigListener)
 		}
 	}
 
@@ -58,6 +60,11 @@ export default class Layout extends React.Component {
 	notifyListener = (message, undo) => {
 		this.setState({...this.state, snackbar: {open: true, message, undo}})
 	}
+	gigListener = gig => {
+		// TODO store locally to use as home on next visit
+		this.setState({...this.state, section: gig.name})
+	}
+
 	handleSnackbarClose = () => this.setState({ snackbar: {open: false, message: '', undo: null}});
 
 	closeDrawer = () => {
