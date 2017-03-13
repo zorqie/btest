@@ -40,11 +40,7 @@ export default class ActDetailsPage extends React.Component {
 
 	createdListener = gig => {
 		console.log("Added: ", gig);
-		// if(this.state.types.indexOf(gig.type) < 0) {
-		// 	this.fetchData()
-		// } else {
-			this.setState({gigs: this.state.gigs.concat(gig)});
-		// }
+		this.setState({gigs: this.state.gigs.concat(gig)});
 	}
 	patchedListener = gig => {
 		// if(this.state.types.indexOf(gig.type) < 0) {

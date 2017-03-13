@@ -14,6 +14,7 @@ import Dialog from 'material-ui/Dialog'
 import ActsList from './acts-list.jsx'
 import ActDialogForm from './act-dialog-form.jsx'
 import GigTimespan from './gig-timespan.jsx'
+import ImageUpload from './image-upload.jsx'
 import app from '../main.jsx'
 import { mic } from './icons.jsx'
 
@@ -157,7 +158,7 @@ export default class GigDetailsPage extends React.Component {
 				avatar={<Avatar>{gig.type && gig.type.charAt(0)}</Avatar>}>
 			</CardHeader>
 			<CardText>
-				
+				<ImageUpload />
 				{card}
 			</CardText>
 			<CardActions>

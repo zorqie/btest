@@ -1,4 +1,5 @@
 import React from 'react'
+import { browserHistory } from 'react-router'
 
 import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
@@ -29,11 +30,12 @@ export default class ActsPage extends React.Component {
 	}
 
 	fetchData = () => {
-		console.log("Fetching...")
 		app.service('acts').find({query:{$sort: {name: 1}, $limit: 20}})
 		.then(result => this.setState({acts: result.data}))
 		.catch(err => console.error('Acts are acting out', err))
 	}
+
+	viewAct = act => browserHistory.push('/acts/'+act._id)
 
 	handleEdit = act => {
 		const dialog = {open: true, errors:{}, act: Object.assign({}, act)} // create new copy of act
@@ -72,6 +74,7 @@ export default class ActsPage extends React.Component {
 			<ActsList 
 				acts={acts} 
 				allowAdd={true} 
+				onSelect={this.viewAct}
 				onEdit={this.handleEdit} 
 				onDelete={this.handleDelete}
 			/>

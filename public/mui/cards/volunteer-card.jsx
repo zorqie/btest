@@ -1,8 +1,9 @@
 import React from 'react'
+import { browserHistory } from 'react-router'
 
 import Divider from 'material-ui/Divider'
-import FlatButton from 'material-ui/FlatButton';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
+import FlatButton from 'material-ui/FlatButton'
+import FloatingActionButton from 'material-ui/FloatingActionButton'
 import {ListItem} from 'material-ui/List'
 
 import app from '../../main.jsx'
@@ -72,22 +73,29 @@ export default class VolunteerCard extends React.Component {
 	}
 	patchedListener = shift => {
 		if(shift.parent === this.props.gig._id) {
-			this.setState({...this.state, shifts: this.state.shifts.filter(s => s._id !== shift._id).concat(shift)})
+			this.fetchData()
 		}
 	}
+
+	viewShift = shift => browserHistory.push('/shifts/'+shift._id)
 
 	editShift = shift => {
 		console.log("Editshifting", shift)
 		const { dialog } = this.state
 		const { gig } = this.props
 		const dialogShift = shift || Object.assign({}, gig, {parent: gig._id})
-		delete dialogShift._id
+		if(!shift) {
+			// only if clone of gig, delete its id
+			delete dialogShift._id
+		}
 		Object.assign(dialog, {open: true, errors: {}, shift: dialogShift})
 		this.setState({...this.state, dialog})
 	} 
+
 	deleteShift = shift => {
 		app.service('gigs').remove(shift._id)
 	}
+
 	dialogCancel = () => {
 		this.setState({...this.state, dialog: {open: false, shift:{}, errors:{}}})
 	}
@@ -111,11 +119,13 @@ export default class VolunteerCard extends React.Component {
 		return <div>
 			<span style={styles.gigType}>Volunteer opportunity</span> 
 			<h2>{gig.name}</h2>
+			<h3>{gig.description}</h3>
 			<ul>
 				{shifts.map(shift => 
 					<ListItem 
 						key={shift._id} 
 						primaryText={<GigTimespan gig={shift} />}
+						onTouchTap={this.viewShift.bind(this, shift)}
 						rightIconButton={
 							<Kspan>
 								<FlatButton label="Edit" onTouchTap={this.editShift.bind(this, shift)} />

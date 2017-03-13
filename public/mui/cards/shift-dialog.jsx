@@ -75,7 +75,7 @@ export default class ShiftDialog extends React.Component {
 		const {errors, open} = this.props;
 		return (
 			<Dialog 
-				title={gig.type + ' shift'}
+				title={(gig._id ? '' : 'Add ') + gig.type + ' shift'}
 				open={open}
 				actions={this.dialogActions}
 				onRequestClose={this.props.onCancel}

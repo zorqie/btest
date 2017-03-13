@@ -23,7 +23,7 @@ module.exports = {
 				// React-hot loader and
 				test: /\.jsx?$/, // All .js files
 				use: [{loader: 'babel-loader'}], // react-hot is like browser sync and babel loads jsx and es6-7
-				// exclude: [nodeModulesPath],
+				exclude: [nodeModulesPath],
 			},
 
 			{

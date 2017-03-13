@@ -209,7 +209,7 @@ export default class EventPage extends React.Component {
 
 	render() {
 		const {event, gigs, dialog} = this.state;
-		// console.log("GIGGGINGING: ", this.state);
+		// console.log("GIGGGINGING: ", this.state); 
 		const title = (<span><b>{event.name}</b> at <b>{event.venue && event.venue.name}</b></span>);
 
 		const subtitle = <GigTimespan gig={event} showRelative={true}/>;
@@ -229,7 +229,7 @@ export default class EventPage extends React.Component {
 				<CardText >
 					<p>{event.description}</p>
 					<Tabs>
-						{types(gigs).map(type => <Tab key={type} label={type} >
+						{types(gigs).map(type => <Tab key={type || 'none'} label={type} >
 							{gigs.filter(g => g.type===type).map(
 								gig => <Subgig 
 									key={gig._id} 

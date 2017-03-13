@@ -9,6 +9,7 @@ import EventDetailsPage from './mui/event-details-page.jsx';
 import EventsPage from './mui/events-page.jsx';
 import GigDetailsPage from './mui/gig-details-page.jsx';
 import LoginForm from './mui/login-form.jsx';
+import ShiftDetailsPage from './mui/shift-details-page.jsx';
 import SignupForm from './mui/signup-form.jsx';
 import UserList from './mui/user-list.jsx';
 import VenuePage from './mui/venues-page.jsx';
@@ -45,6 +46,7 @@ const app = feathers()
 const Home = () => <p>We're home</p>;
 const NotFound = () => <div style={{color:'red'}}><h2>She's not here.</h2></div>;
 
+/*
 const handleRouteChange = (prevState, nextState, replace, callback) => {
 	console.log("APP: ", app);
 	console.log("Previous state: ", prevState);
@@ -62,6 +64,7 @@ const handleRouteEnter = (nextState, replace, callback) => {
 	// console.log("Replacing ", replace);
 	callback();
 }
+*/
 
 const routes = 
 		<Router history={browserHistory}>
@@ -79,6 +82,7 @@ const routes =
 				<Route path='events' component={EventsPage} />
 				<Route path='events/:eventId' component={EventDetailsPage} />
 				<Route path='gigs/:gigId' component={GigDetailsPage} />
+				<Route path='shifts/:shiftId' component={ShiftDetailsPage} />
 				
 				<Route path='acts' component={ActsPage} />
 				<Route path='acts/:actId' component={ActDetailsPage} />
