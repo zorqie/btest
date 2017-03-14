@@ -116,7 +116,7 @@ app.authenticate().then(() => {
 
 
 socket.io.engine.on('upgrade', function(transport) {
-	console.log('transport changed');
+	console.log('transport changed', transport);
 	app.authenticate();
 });
 

@@ -4,6 +4,7 @@
   "mongoose": "mongodb://heroku_7mdwht5j:2tl93s75r110gghl0qe5onhqgh@ds133279.mlab.com:33279/heroku_7mdwht5j",
   "mongo_local": "mongodb://localhost:27017/test",
   "public": "../public/",
+  "uploads": "../uploads/",
   "auth": {
     "token": {
       "secret": "onGq8IJBYp+lhWKbY4xH+9BGrxIuZArEGf9T2Lf0Wy7MhA22DLkXyLppOQ27qUnvgxkTINvoArwih94eauCAZw=="
