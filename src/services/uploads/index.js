@@ -22,8 +22,8 @@ module.exports = function() {
 	app.use('/uploads', 
 		multipartMiddleware.single('uri'),
 		function(req, res, next) {
-			console.log("REQUESTED feathers===>>>", req.feathers)
-			console.log("REQUESTED file===>>>", req.file)
+			// console.log("REQUESTED feathers===>>>", req.feathers)
+			// console.log("REQUESTED file===>>>", req.file)
 			req.feathers.file = req.file;
 			next();
 		},

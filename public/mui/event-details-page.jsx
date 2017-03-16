@@ -8,6 +8,7 @@ import Dialog from 'material-ui/Dialog';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import {Tabs, Tab} from 'material-ui/Tabs';
@@ -266,6 +267,10 @@ export default class EventPage extends React.Component {
 				
 				<CardActions>
 					<FlatButton icon={plusOutline} label="Activity" onTouchTap={this.handleTypesOpen}/>
+					{event.public ? 
+						<RaisedButton label="Make private" /> :
+						<RaisedButton label="Publish" />
+					}
 				</CardActions>
 			</Card>
 		);

@@ -14,7 +14,6 @@ import Dialog from 'material-ui/Dialog'
 import ActsList from './acts-list.jsx'
 import ActDialogForm from './act-dialog-form.jsx'
 import GigTimespan from './gig-timespan.jsx'
-import ImageUpload from './image-upload.jsx'
 import app from '../main.jsx'
 import { mic } from './icons.jsx'
 
@@ -158,7 +157,7 @@ export default class GigDetailsPage extends React.Component {
 				avatar={<Avatar>{gig.type && gig.type.charAt(0)}</Avatar>}>
 			</CardHeader>
 			<CardText>
-				<ImageUpload />
+
 				{card}
 			</CardText>
 			<CardActions>
@@ -167,14 +166,15 @@ export default class GigDetailsPage extends React.Component {
 			<Dialog
 				title='Acts'
 				open={this.state.selectDialog}
-					actions={[
-						<FlatButton
-							label="Cancel"
-							primary={true}
-							onTouchTap={this.handleActsCancel}
-						/>
-					]}
-					onRequestClose={this.handleActsCancel}
+				actions={[
+					<FlatButton
+						label="Cancel"
+						primary={true}
+						onTouchTap={this.handleActsCancel}
+					/>
+				]}
+				onRequestClose={this.handleActsCancel}
+				autoScrollBodyContent={true}
 			>
 				<ActsList acts={dialogActs} 
 					onSelect={this.handleActsSelect} 
@@ -184,19 +184,19 @@ export default class GigDetailsPage extends React.Component {
 			<Dialog
 				title='Act'
 				open={this.state.editDialog.open}
-					actions={[
-						<FlatButton
-							label="Cancel"
-							
-							onTouchTap={this.handleActEditCancel}
-						/>,
-						<FlatButton
-							label="Save"
-							primary={true}
-							onTouchTap={this.handleActEditSubmit}
-						/>
-					]}
-					onRequestClose={this.handleActEditCancel}
+				actions={[
+					<FlatButton
+						label="Cancel"
+						
+						onTouchTap={this.handleActEditCancel}
+					/>,
+					<FlatButton
+						label="Save"
+						primary={true}
+						onTouchTap={this.handleActEditSubmit}
+					/>
+				]}
+				onRequestClose={this.handleActEditCancel}
 			>
 				<ActDialogForm act={this.state.editDialog.act}  errors={this.state.editDialog.errors}/>
 			</Dialog>
