@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "50ff3e3e2dc7e60d7e40"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "11a027b5a7e17a029fa8"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotMainModule = true; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -62911,7 +62911,7 @@ var GigItem = function GigItem(_ref) {
 			{ onTouchTap: onEdit },
 			'Edit'
 		),
-		_react2.default.createElement(
+		!gig.public && _react2.default.createElement(
 			_MenuItem2.default,
 			{ onTouchTap: onDelete },
 			'Delete'

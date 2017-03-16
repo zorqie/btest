@@ -36,7 +36,7 @@ const GigItem = ({gig, onSelect, onEdit, onDelete}) => {
 	const rightIconMenu = 
 		<IconMenu iconButtonElement={moreIcon}>
 			<MenuItem onTouchTap={onEdit}>Edit</MenuItem>
-			<MenuItem onTouchTap={onDelete}>Delete</MenuItem>
+			{!gig.public && <MenuItem onTouchTap={onDelete}>Delete</MenuItem>}
 			<Divider />
 			<MenuItem onTouchTap={publish.bind(null, gig)}>{gig.public?'Make private': 'Publish'}</MenuItem>
 		</IconMenu>
