@@ -74,7 +74,7 @@ export default class EventPage extends React.Component {
 			app.emit('gig.root', event)
 			app.service('gigs').find({
 				query: {
-					parent: new mongoose.Types.ObjectId(eventId),
+					parent: eventId,
 					$sort: { start: 1 },
 					// $limit: this.props.limit || 7
 				}
@@ -138,7 +138,7 @@ export default class EventPage extends React.Component {
 				type
 			})
 		app.service('venues')
-		.find({query: {parent: new mongoose.Types.ObjectId(event.venue_id)}})
+		.find({query: {parent: event.venue_id}})
 		.then(page => {
 			Object.assign(dialog, {open: true, gig: dg, sites: page.data, errors:{}})
 

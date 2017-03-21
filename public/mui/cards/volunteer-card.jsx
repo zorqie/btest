@@ -18,6 +18,10 @@ const styles = {
 		fontSize: '12dp',
 		fontWeight: '300',
 		float: 'right'
+	},
+	duration: {
+		fontSize: 'smaller',
+		color: 'grey'
 	}
 }
 
@@ -124,7 +128,7 @@ export default class VolunteerCard extends React.Component {
 				{shifts.map(shift => 
 					<ListItem 
 						key={shift._id} 
-						primaryText={<GigTimespan gig={shift} />}
+						primaryText={<GigTimespan gig={shift} showDuration={true} durationStyle={styles.duration}/>}
 						onTouchTap={this.viewShift.bind(this, shift)}
 						rightIconButton={
 							<Kspan>

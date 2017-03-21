@@ -113,7 +113,7 @@ export default class VenuePage extends React.Component {
 		.then(() =>
 			app.service('venues').find({
 				query: {
-					parent: new mongoose.Types.ObjectId(parentId),
+					parent: parentId,
 					// $sort: { createdAt: -1 },
 					// $limit: this.props.limit || 7
 				}

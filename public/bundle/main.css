@@ -1,0 +1,6 @@
+.gig-duration::before {
+	content: ' (';
+}
+.gig-duration::after {
+	content: ')';
+}

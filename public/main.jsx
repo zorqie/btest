@@ -32,7 +32,7 @@ const io = require('socket.io-client');
 // Establish a Socket.io connection
 // const socket = io('http://localhost:2017');
 // perhaps based on process.env.NODE_ENV
-const socket = io('https://fathomless-gorge-78924.herokuapp.com/');
+const socket = io('https://gyps.herokuapp.com/');
 // Initialize our Feathers client application through Socket.io
 // with hooks and authentication.
 const app = feathers()
