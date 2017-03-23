@@ -1,3 +1,6 @@
+html, body, * {
+	font-family: Roboto, sans-serif;
+}
 .gig-duration::before {
 	content: ' (';
 }

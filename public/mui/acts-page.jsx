@@ -79,7 +79,7 @@ export default class ActsPage extends React.Component {
 				onDelete={this.handleDelete}
 			/>
 			<Dialog 
-				title='Act'
+				title={dialog.act._id ? null : 'Add Act'}
 				open={dialog.open}
 				actions={[
 					<FlatButton

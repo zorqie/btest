@@ -16,11 +16,13 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 
 import app from '../main.jsx';
 import GigTimespan from './gig-timespan.jsx';
+import ActDialog from './act-dialog.jsx';
 
 export default class ActDetailsPage extends React.Component {
 	state = {
 		act: {},
 		gigs:[], 
+		open: false,
 	}
 
 	componentWillMount() {
@@ -70,11 +72,15 @@ export default class ActDetailsPage extends React.Component {
 		.catch(err => console.error("ERAR: ", err))
 	}
 	selectGig = gig => browserHistory.push('/gigs/'+gig._id)
-
+	editAct = act => {
+		this.setState({open: true})
+	}
+	closeDialog = () => {
+		this.setState({open: false})
+	}
 	render() {
 		// console.log("VenuePage props: ", this.props);
-		const { act, gigs } = this.state
-
+		const { act, gigs, open } = this.state
 		const title = <CardTitle 
 			title={act.name} 
 			subtitle={act.description} 
@@ -84,11 +90,14 @@ export default class ActDetailsPage extends React.Component {
 		return (
 			<Card>
 			    {title}
-			    <CardMedia overlay={title} expandable={true}>
+			    {/*<CardMedia overlay={title} expandable={true}>
 					<img src={`/img/acts/${act._id}.jpg`} />
-				</CardMedia>
-
+				</CardMedia>*/}
+				<CardActions>
+					<FlatButton label='Edit' onTouchTap={this.editAct} />
+				</CardActions>
 				<CardText>
+					<Subheader>Perfomances</Subheader>
 					{gigs.map(gig =>
 						<ListItem 
 							key={gig._id} 
@@ -98,7 +107,7 @@ export default class ActDetailsPage extends React.Component {
 						/>
 					)}
 				</CardText>
-				
+				<ActDialog act={act} open={open} onClose={this.closeDialog}/>
 			</Card>
 		)
 	}

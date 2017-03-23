@@ -9,8 +9,7 @@ import Subheader from 'material-ui/Subheader';
 import {addIcon} from './icons.jsx';
 
 function VenueItem({venue, onSelect, onEdit}) {
-	return	
-		<ListItem 
+	return <ListItem 
 			onTouchTap={onSelect}
 			primaryText={venue.name} 
 			secondaryText={'Capacity: ' + venue.capacity}
@@ -23,9 +22,8 @@ function VenueItem({venue, onSelect, onEdit}) {
 		/>	
 }
 
-export default function VenueList({venues, onSelect, onEdit}) {		
-	return 
-		<List>
+export default function VenueList({venues, onSelect, onEdit}) {	
+	return <List>
 			{venues.map(v => 
 				<VenueItem 
 					onSelect={onSelect.bind(null, v)} 

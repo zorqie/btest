@@ -11,7 +11,7 @@ export default class ActDialogForm extends React.Component {
 									description: ''
 								},
 	}
-	handleChange = (e) => {
+	handleChange = e => {
 		const { name, value } = e.target
 		const act = Object.assign(this.state.act, {[name] : value})
 		this.setState({...this.state, act})

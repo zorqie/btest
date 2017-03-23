@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "d35c799cb1148c9f51e1"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "1503749f907a44e545d1"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotMainModule = true; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -8839,6 +8839,10 @@ var _userList = __webpack_require__(448);
 
 var _userList2 = _interopRequireDefault(_userList);
 
+var _userCard = __webpack_require__(883);
+
+var _userCard2 = _interopRequireDefault(_userCard);
+
 var _venuesPage = __webpack_require__(450);
 
 var _venuesPage2 = _interopRequireDefault(_venuesPage);
@@ -8939,6 +8943,7 @@ var routes = _react2.default.createElement(
 		_react2.default.createElement(_reactRouter.Route, { path: 'acts', component: _actsPage2.default }),
 		_react2.default.createElement(_reactRouter.Route, { path: 'acts/:actId', component: _actDetailsPage2.default }),
 		_react2.default.createElement(_reactRouter.Route, { path: 'users', component: _userList2.default }),
+		_react2.default.createElement(_reactRouter.Route, { path: 'users/:userId', component: _userCard2.default }),
 		_react2.default.createElement(_reactRouter.Route, { path: '*', component: NotFound })
 	)
 );
@@ -58437,6 +58442,10 @@ var _gigTimespan = __webpack_require__(74);
 
 var _gigTimespan2 = _interopRequireDefault(_gigTimespan);
 
+var _actDialog = __webpack_require__(885);
+
+var _actDialog2 = _interopRequireDefault(_actDialog);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -58461,7 +58470,8 @@ var ActDetailsPage = function (_React$Component) {
 
 		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ActDetailsPage.__proto__ || Object.getPrototypeOf(ActDetailsPage)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
 			act: {},
-			gigs: []
+			gigs: [],
+			open: false
 		}, _this.createdListener = function (gig) {
 			console.log("Added: ", gig);
 			_this.setState({ gigs: _this.state.gigs.concat(gig) });
@@ -58492,6 +58502,10 @@ var ActDetailsPage = function (_React$Component) {
 			});
 		}, _this.selectGig = function (gig) {
 			return _reactRouter.browserHistory.push('/gigs/' + gig._id);
+		}, _this.editAct = function (act) {
+			_this.setState({ open: true });
+		}, _this.closeDialog = function () {
+			_this.setState({ open: false });
 		}, _temp), _possibleConstructorReturn(_this, _ret);
 	}
 
@@ -58521,8 +58535,8 @@ var ActDetailsPage = function (_React$Component) {
 			// console.log("VenuePage props: ", this.props);
 			var _state = this.state,
 			    act = _state.act,
-			    gigs = _state.gigs;
-
+			    gigs = _state.gigs,
+			    open = _state.open;
 
 			var title = _react2.default.createElement(_Card.CardTitle, {
 				title: act.name,
@@ -58535,13 +58549,18 @@ var ActDetailsPage = function (_React$Component) {
 				null,
 				title,
 				_react2.default.createElement(
-					_Card.CardMedia,
-					{ overlay: title, expandable: true },
-					_react2.default.createElement('img', { src: '/img/acts/' + act._id + '.jpg' })
+					_Card.CardActions,
+					null,
+					_react2.default.createElement(_FlatButton2.default, { label: 'Edit', onTouchTap: this.editAct })
 				),
 				_react2.default.createElement(
 					_Card.CardText,
 					null,
+					_react2.default.createElement(
+						_Subheader2.default,
+						null,
+						'Perfomances'
+					),
 					gigs.map(function (gig) {
 						return _react2.default.createElement(_List.ListItem, {
 							key: gig._id,
@@ -58550,7 +58569,8 @@ var ActDetailsPage = function (_React$Component) {
 							onTouchTap: _this2.selectGig.bind(_this2, gig)
 						});
 					})
-				)
+				),
+				_react2.default.createElement(_actDialog2.default, { act: act, open: open, onClose: this.closeDialog })
 			);
 		}
 	}]);
@@ -58710,7 +58730,7 @@ var ActsPage = function (_React$Component) {
 				_react2.default.createElement(
 					_Dialog2.default,
 					{
-						title: 'Act',
+						title: dialog.act._id ? null : 'Add Act',
 						open: dialog.open,
 						actions: [_react2.default.createElement(_FlatButton2.default, {
 							label: 'Cancel',
@@ -60488,6 +60508,8 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactRouter = __webpack_require__(28);
+
 var _add = __webpack_require__(84);
 
 var _add2 = _interopRequireDefault(_add);
@@ -60544,6 +60566,10 @@ var _err = __webpack_require__(72);
 
 var _err2 = _interopRequireDefault(_err);
 
+var _userListItem = __webpack_require__(882);
+
+var _userListItem2 = _interopRequireDefault(_userListItem);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -60552,118 +60578,48 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var moreButton = _react2.default.createElement(
-	_IconButton2.default,
-	{
-		touch: true,
-		tooltip: 'more',
-		tooltipPosition: 'bottom-left'
-	},
-	_react2.default.createElement(_moreVert2.default, { color: _colors.grey400 })
-);
-
-var UserItem = function (_React$Component) {
-	_inherits(UserItem, _React$Component);
-
-	function UserItem() {
-		var _ref;
-
-		var _temp, _this, _ret;
-
-		_classCallCheck(this, UserItem);
-
-		for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-			args[_key] = arguments[_key];
-		}
-
-		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = UserItem.__proto__ || Object.getPrototypeOf(UserItem)).call.apply(_ref, [this].concat(args))), _this), _this.edit = function (e) {
-			return _this.props.onSelect(_this.props.user);
-		}, _this.delete = function (e) {
-			e.preventDefault();
-			_main2.default.service('users').remove(_this.props.user._id).catch(function (err) {
-				return console.error("Couldn't delete.", err);
-			});
-			console.log('Deleting... ', _this.props.user);
-		}, _temp), _possibleConstructorReturn(_this, _ret);
-	}
-
-	_createClass(UserItem, [{
-		key: 'render',
-		value: function render() {
-			var user = this.props.user;
-
-			var self = user._id === _main2.default.get("user")._id;
-			console.log("User: ", user);
-			var rightIconMenu = _react2.default.createElement(
-				_IconMenu2.default,
-				{ iconButtonElement: moreButton },
-				_react2.default.createElement(
-					_MenuItem2.default,
-					{ onTouchTap: this.edit },
-					'Edit'
-				),
-				_react2.default.createElement(
-					_MenuItem2.default,
-					{ onTouchTap: this.delete },
-					'Delete'
-				)
-			);
-			var chatIcon = self ? _react2.default.createElement(_settings2.default, null) : user.online ? _react2.default.createElement(_chatBubble2.default, { color: _colors.lightGreen500 }) : _react2.default.createElement(_chatBubbleOutline2.default, null);
-			return _react2.default.createElement(_List.ListItem, {
-				leftIcon: chatIcon,
-				onTouchTap: this.edit,
-				primaryText: user.name,
-				secondaryText: user.email,
-				rightIconButton: rightIconMenu
-			});
-		}
-	}]);
-
-	return UserItem;
-}(_react2.default.Component);
-
-var UserList = function (_React$Component2) {
-	_inherits(UserList, _React$Component2);
+var UserList = function (_React$Component) {
+	_inherits(UserList, _React$Component);
 
 	function UserList(props) {
 		_classCallCheck(this, UserList);
 
-		var _this2 = _possibleConstructorReturn(this, (UserList.__proto__ || Object.getPrototypeOf(UserList)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (UserList.__proto__ || Object.getPrototypeOf(UserList)).call(this, props));
 
-		_this2.createdListener = function (user) {
-			return _this2.setState({
-				users: _this2.state.users.concat(user)
+		_this.createdListener = function (user) {
+			return _this.setState({
+				users: _this.state.users.concat(user)
 			});
 		};
 
-		_this2.removedListener = function (user) {
-			_this2.setState({ users: _this2.state.users.filter(function (u) {
+		_this.removedListener = function (user) {
+			_this.setState({ users: _this.state.users.filter(function (u) {
 					return u._id !== user._id;
 				}) });
 		};
 
-		_this2.patchedListener = function (user) {
+		_this.patchedListener = function (user) {
 			console.log("<<<<<<<<<< PATCHED >>>>>>>>>>", user);
 			// FIXME update only user perhaps?
-			_this2.fetchUsers();
+			_this.fetchUsers();
 		};
 
-		_this2.fetchUsers = function () {
+		_this.fetchUsers = function () {
 			_main2.default.service('users').find({
 				query: {
-					$sort: { email: 1 },
-					$limit: _this2.props.limit || 77
+					$sort: { name: 1, 'facebook.name': 1 },
+					$limit: _this.props.limit || 77
 				}
 			}).then(function (page) {
-				return _this2.setState({
+				return _this.setState({
 					users: page.data
 				});
 			}).catch(_err2.default);
 		};
 
-		_this2.state = { users: [] };
-		// this.handleSelection.bind(this);
-		return _this2;
+		_this.state = { users: [] };
+		// this.handleSelection.bind(this)
+		return _this;
 	}
 
 	_createClass(UserList, [{
@@ -60690,20 +60646,21 @@ var UserList = function (_React$Component2) {
 		value: function handleSelect(u) {
 			if (this.props.onUserSelected) {
 				this.props.onUserSelected(u || {});
+			} else {
+				_reactRouter.browserHistory.push('users/' + u._id);
 			}
 		}
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this3 = this;
+			var _this2 = this;
 
-			console.log(">>>>___USER-LIST");
 			return _react2.default.createElement(
 				_List.List,
 				null,
 				this.state.users.map(function (u) {
-					return _react2.default.createElement(UserItem, {
-						onSelect: _this3.handleSelect.bind(_this3, u),
+					return _react2.default.createElement(_userListItem2.default, {
+						onSelect: _this2.handleSelect.bind(_this2, u),
 						user: u,
 						key: u._id
 					});
@@ -63258,8 +63215,7 @@ function VenueItem(_ref) {
 	    onSelect = _ref.onSelect,
 	    onEdit = _ref.onEdit;
 
-	return;
-	_react2.default.createElement(_List.ListItem, {
+	return _react2.default.createElement(_List.ListItem, {
 		onTouchTap: onSelect,
 		primaryText: venue.name,
 		secondaryText: 'Capacity: ' + venue.capacity,
@@ -63279,8 +63235,7 @@ function VenueList(_ref2) {
 	    onSelect = _ref2.onSelect,
 	    onEdit = _ref2.onEdit;
 
-	return;
-	_react2.default.createElement(
+	return _react2.default.createElement(
 		_List.List,
 		null,
 		venues.map(function (v) {
@@ -118639,6 +118594,512 @@ module.exports = __webpack_amd_options__;
 }(this));
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(95)(module), __webpack_require__(13)))
+
+/***/ }),
+/* 882 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = UserItem;
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _colors = __webpack_require__(107);
+
+var _settings = __webpack_require__(663);
+
+var _settings2 = _interopRequireDefault(_settings);
+
+var _chatBubble = __webpack_require__(665);
+
+var _chatBubble2 = _interopRequireDefault(_chatBubble);
+
+var _chatBubbleOutline = __webpack_require__(664);
+
+var _chatBubbleOutline2 = _interopRequireDefault(_chatBubbleOutline);
+
+var _moreVert = __webpack_require__(261);
+
+var _moreVert2 = _interopRequireDefault(_moreVert);
+
+var _FloatingActionButton = __webpack_require__(48);
+
+var _FloatingActionButton2 = _interopRequireDefault(_FloatingActionButton);
+
+var _IconButton = __webpack_require__(40);
+
+var _IconButton2 = _interopRequireDefault(_IconButton);
+
+var _IconMenu = __webpack_require__(255);
+
+var _IconMenu2 = _interopRequireDefault(_IconMenu);
+
+var _MenuItem = __webpack_require__(106);
+
+var _MenuItem2 = _interopRequireDefault(_MenuItem);
+
+var _List = __webpack_require__(34);
+
+var _main = __webpack_require__(23);
+
+var _main2 = _interopRequireDefault(_main);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var moreButton = _react2.default.createElement(
+	_IconButton2.default,
+	{
+		touch: true,
+		tooltip: 'more',
+		tooltipPosition: 'bottom-left'
+	},
+	_react2.default.createElement(_moreVert2.default, null)
+);
+
+function UserItem(_ref) {
+	var user = _ref.user,
+	    onSelect = _ref.onSelect,
+	    onEdit = _ref.onEdit;
+
+	var self = user._id === _main2.default.get("user")._id;
+	console.log("UserItem: ", user);
+	var userMenu = _react2.default.createElement(
+		_IconMenu2.default,
+		{ iconButtonElement: moreButton },
+		_react2.default.createElement(
+			_MenuItem2.default,
+			{ onTouchTap: onEdit },
+			'Edit'
+		)
+	);
+	var chatIcon = self ? _react2.default.createElement(_settings2.default, null) : user.online ? _react2.default.createElement(_chatBubble2.default, { color: _colors.lightGreen500 }) : _react2.default.createElement(_chatBubbleOutline2.default, null);
+	var roles = user.roles && user.roles.join(', ') || ' ';
+	return _react2.default.createElement(_List.ListItem, {
+		leftIcon: chatIcon,
+		onTouchTap: onSelect,
+		primaryText: user.name || user.facebook && user.facebook.name,
+		secondaryText: roles,
+		rightIconButton: userMenu
+	});
+}
+
+/***/ }),
+/* 883 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = __webpack_require__(28);
+
+var _Divider = __webpack_require__(65);
+
+var _Divider2 = _interopRequireDefault(_Divider);
+
+var _FlatButton = __webpack_require__(25);
+
+var _FlatButton2 = _interopRequireDefault(_FlatButton);
+
+var _FloatingActionButton = __webpack_require__(48);
+
+var _FloatingActionButton2 = _interopRequireDefault(_FloatingActionButton);
+
+var _List = __webpack_require__(34);
+
+var _Subheader = __webpack_require__(41);
+
+var _Subheader2 = _interopRequireDefault(_Subheader);
+
+var _main = __webpack_require__(23);
+
+var _main2 = _interopRequireDefault(_main);
+
+var _icons = __webpack_require__(60);
+
+var _userRolesDialog = __webpack_require__(884);
+
+var _userRolesDialog2 = _interopRequireDefault(_userRolesDialog);
+
+var _actDialog = __webpack_require__(885);
+
+var _actDialog2 = _interopRequireDefault(_actDialog);
+
+var _hacks = __webpack_require__(148);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var UserCard = function (_React$Component) {
+	_inherits(UserCard, _React$Component);
+
+	function UserCard() {
+		var _ref;
+
+		var _temp, _this, _ret;
+
+		_classCallCheck(this, UserCard);
+
+		for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+			args[_key] = arguments[_key];
+		}
+
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = UserCard.__proto__ || Object.getPrototypeOf(UserCard)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+			user: {},
+			rolesDialog: {
+				open: false
+			},
+			actDialog: {
+				open: false,
+				act: {}
+			}
+		}, _this.fetchData = function () {
+			var userId = _this.props.params.userId;
+
+			_main2.default.service('users').get(userId).then(function (user) {
+				return _this.setState({ user: user });
+			});
+		}, _this.patchedListener = function (role) {
+			// TODO user fetch as listener
+			_this.fetchData();
+		}, _this.editRole = function () {
+			_this.setState(_extends({}, _this.state, { rolesDialog: { open: true } }));
+		}, _this.addRole = function (role) {
+			_this.setState(_extends({}, _this.state, { rolesDialog: { open: false } }));
+			var user = _this.state.user;
+
+			if (!user.roles || user.roles.indexOf(role) < 0) {
+				var roles = user.roles && user.roles.concat(role) || [role];
+				var u = Object.assign(user, { roles: roles });
+				_main2.default.service('users').patch(user._id, u);
+				if (role === 'master' || role === 'performer') {
+					// TODO check that we don't have one already
+					_main2.default.service('acts').create({ name: user.name, user_id: user._id }).then(function (act) {
+						return _this.setState({ actDialog: { open: true, act: act } });
+					});
+				}
+			}
+		}, _this.deleteRole = function (role) {
+			// TODO make sure we don't remove the last sysadmin
+			var userId = _this.state.user._id;
+			if (!(userId === _main2.default.get("user")._id && role === 'sysadmin')) {
+				var roles = _this.state.user.roles.filter(function (r) {
+					return r !== role;
+				});
+				var u = Object.assign(_this.state.user, { roles: roles });
+				_main2.default.service('users').patch(userId, u);
+			} else {
+				_main2.default.emit('notify', 'Cannot remove role "sysadmin" from self.');
+			}
+		}, _this.dialogClose = function () {
+			_this.setState(_extends({}, _this.state, { rolesDialog: { open: false } }));
+		}, _this.closeActDialog = function () {
+			_this.setState({ actDialog: { open: false, act: {} } });
+		}, _temp), _possibleConstructorReturn(_this, _ret);
+	}
+
+	_createClass(UserCard, [{
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			_main2.default.authenticate().then(this.fetchData);
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			//setup listeners
+			_main2.default.service('users').on('patched', this.patchedListener);
+		}
+	}, {
+		key: 'componentWillUnmount',
+		value: function componentWillUnmount() {
+			//remove listeners
+			if (_main2.default) {
+				_main2.default.service('users').removeListener('patched', this.patchedListener);
+			}
+		}
+
+		// Listeners
+
+		//??? 
+
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
+
+			var _state = this.state,
+			    user = _state.user,
+			    rolesDialog = _state.rolesDialog,
+			    actDialog = _state.actDialog;
+
+			return _react2.default.createElement(
+				'div',
+				{ style: { margin: '2em' } },
+				_react2.default.createElement(
+					'h2',
+					null,
+					user.name || user.facebook && user.facebook.name
+				),
+				_react2.default.createElement(
+					'h3',
+					null,
+					user.email
+				),
+				_react2.default.createElement(
+					_List.List,
+					null,
+					_react2.default.createElement(
+						_Subheader2.default,
+						null,
+						'Roles'
+					),
+					user.roles && user.roles.map(function (role) {
+						return _react2.default.createElement(_List.ListItem, {
+							key: role,
+							primaryText: role,
+							secondaryText: ' ',
+							rightIconButton: _react2.default.createElement(_FlatButton2.default, { label: 'Delete', onTouchTap: _this2.deleteRole.bind(_this2, role) })
+
+						});
+					})
+				),
+				_react2.default.createElement(
+					_FloatingActionButton2.default,
+					{ onTouchTap: this.editRole },
+					_icons.addIcon
+				),
+				_react2.default.createElement(_userRolesDialog2.default, _extends({}, rolesDialog, {
+					onClose: this.dialogClose,
+					onSelect: this.addRole
+				})),
+				_react2.default.createElement(_actDialog2.default, _extends({}, actDialog, { onClose: this.closeActDialog }))
+			);
+		}
+	}]);
+
+	return UserCard;
+}(_react2.default.Component);
+
+exports.default = UserCard;
+
+/***/ }),
+/* 884 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = UserRolesDialog;
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _Dialog = __webpack_require__(47);
+
+var _Dialog2 = _interopRequireDefault(_Dialog);
+
+var _FlatButton = __webpack_require__(25);
+
+var _FlatButton2 = _interopRequireDefault(_FlatButton);
+
+var _FloatingActionButton = __webpack_require__(48);
+
+var _FloatingActionButton2 = _interopRequireDefault(_FloatingActionButton);
+
+var _List = __webpack_require__(34);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var options = [{
+	name: "sysadmin",
+	description: "God Almighty of the System"
+}, {
+	name: "manager",
+	description: "Perhaps in charge of volunteers (not yet implemented)"
+}, {
+	name: "master",
+	description: "Master of crafts and arts workshops"
+}, {
+	name: "performer",
+	description: "Adding this role will create a performer profile"
+}];
+
+function UserRolesDialog(_ref) {
+	var open = _ref.open,
+	    onSelect = _ref.onSelect,
+	    onClose = _ref.onClose,
+	    roles = _ref.roles;
+
+	var items = roles || options;
+	return _react2.default.createElement(
+		_Dialog2.default,
+		{
+			open: open,
+			title: 'Select role to add',
+			onRequestClose: onClose,
+			actions: [_react2.default.createElement(_FlatButton2.default, { label: 'Close', onTouchTap: onClose })]
+		},
+		items.map(function (r) {
+			return _react2.default.createElement(_List.ListItem, {
+				key: r.name,
+				primaryText: r.name || r,
+				secondaryText: r.description || '',
+				onTouchTap: onSelect.bind(null, r.name)
+			});
+		})
+	);
+}
+
+/***/ }),
+/* 885 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = __webpack_require__(28);
+
+var _Dialog = __webpack_require__(47);
+
+var _Dialog2 = _interopRequireDefault(_Dialog);
+
+var _FlatButton = __webpack_require__(25);
+
+var _FlatButton2 = _interopRequireDefault(_FlatButton);
+
+var _RaisedButton = __webpack_require__(66);
+
+var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
+
+var _main = __webpack_require__(23);
+
+var _main2 = _interopRequireDefault(_main);
+
+var _actDialogForm = __webpack_require__(147);
+
+var _actDialogForm2 = _interopRequireDefault(_actDialogForm);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ActsPage = function (_React$Component) {
+	_inherits(ActsPage, _React$Component);
+
+	function ActsPage() {
+		var _ref;
+
+		var _temp, _this, _ret;
+
+		_classCallCheck(this, ActsPage);
+
+		for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+			args[_key] = arguments[_key];
+		}
+
+		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ActsPage.__proto__ || Object.getPrototypeOf(ActsPage)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+			act: Object.assign({}, _this.props.act),
+			errors: {}
+		}, _this.handleSubmit = function () {
+			var act = _this.state.act;
+
+			if (act.name && act.name.length) {
+
+				if (act._id) {
+					_main2.default.service('acts').patch(act._id, act).then(_this.props.onClose).catch(function (err) {
+						console.error('Updating acts are acting out', err);
+						_this.setState({ errors: err.errors });
+					});
+				} else {
+					_main2.default.service('acts').create(act).then(_this.props.onClose).catch(function (err) {
+						console.error('Creating acts are acting out', err);
+						_this.setState({ errors: err.errors });
+					});
+				}
+			}
+		}, _temp), _possibleConstructorReturn(_this, _ret);
+	}
+
+	_createClass(ActsPage, [{
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(nextProps) {
+			this.setState({ act: nextProps.act });
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _state = this.state,
+			    act = _state.act,
+			    errors = _state.errors;
+			var _props = this.props,
+			    open = _props.open,
+			    onClose = _props.onClose;
+
+			return _react2.default.createElement(
+				_Dialog2.default,
+				{
+					title: act._id ? null : 'Add Act',
+					open: open,
+					actions: [_react2.default.createElement(_FlatButton2.default, {
+						label: 'Cancel',
+						onTouchTap: onClose
+					}), _react2.default.createElement(_RaisedButton2.default, {
+						label: 'Save',
+						primary: true,
+						onTouchTap: this.handleSubmit
+					})],
+					onRequestClose: onClose
+				},
+				_react2.default.createElement(_actDialogForm2.default, { act: act, errors: errors })
+			);
+		}
+	}]);
+
+	return ActsPage;
+}(_react2.default.Component);
+
+exports.default = ActsPage;
 
 /***/ })
 /******/ ]);

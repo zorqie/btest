@@ -12,6 +12,7 @@ import LoginForm from './mui/login-form.jsx';
 import ShiftDetailsPage from './mui/shift-details-page.jsx';
 import SignupForm from './mui/signup-form.jsx';
 import UserList from './mui/user-list.jsx';
+import UserCard from './mui/user-card.jsx';
 import VenuePage from './mui/venues-page.jsx';
 import VenueDetailsPage from './mui/venue-details-page.jsx';
 import errorHandler from './mui/err';
@@ -88,6 +89,7 @@ const routes =
 				<Route path='acts/:actId' component={ActDetailsPage} />
 
 				<Route path='users' component={UserList} />
+				<Route path='users/:userId' component={UserCard} />
 				
 				<Route path='*' component={NotFound} />
 			</Route>
