@@ -3,18 +3,7 @@ import React from 'react'
 import Divider from 'material-ui/Divider'
 
 import ActsList from '../acts-list.jsx'
-
-const styles = {
-	acts: {
-		fontSize: '18dp',
-		fontWeight: 300,
-	},
-	gigType: {
-		fontSize: '12dp',
-		fontWeight: '300',
-		float: 'right'
-	}
-}
+import styles from '../styles'
 
 const WorkshopCard = ({gig, acts, fans, onMasterEdit, onMasterDelete, onMasterSelect}) => <div>
 	<span style={styles.gigType}>{gig.type}</span>
@@ -23,7 +12,7 @@ const WorkshopCard = ({gig, acts, fans, onMasterEdit, onMasterDelete, onMasterSe
 	{gig.acts && gig.acts.length ?
 		<div>
 			<Divider style={{marginTop:'1em'}} />
-			Taught by: 
+			Led by: 
 			<ActsList 
 					acts={gig.acts} 
 					compact={true} 
@@ -38,7 +27,7 @@ const WorkshopCard = ({gig, acts, fans, onMasterEdit, onMasterDelete, onMasterSe
 	<div>
 		Attending: {fans.length}
 		<ul>
-			{fans.map(fan => <li key={fan._id}>{fan.user.name}</li>)}
+			{fans.map(fan => <li key={fan._id}>{fan.user.name || (fan.user.facebook && fan.user.facebook.name)}</li>)}
 		</ul>
 	</div>
 </div>

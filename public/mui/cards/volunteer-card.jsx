@@ -12,18 +12,8 @@ import ActsList from '../acts-list.jsx'
 import GigTimespan from '../gig-timespan.jsx'
 import ShiftDialog from './shift-dialog.jsx'
 import { Kspan } from '../hacks.jsx'
+import styles from '../styles'
 
-const styles = {
-	gigType: {
-		fontSize: '12dp',
-		fontWeight: '300',
-		float: 'right'
-	},
-	duration: {
-		fontSize: 'smaller',
-		color: 'grey'
-	}
-}
 
 export default class VolunteerCard extends React.Component {
 	state = {

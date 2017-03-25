@@ -1,23 +1,29 @@
-import React from 'react';
+import React from 'react'
 
-import { Link, browserHistory } from 'react-router';
+import { Link, browserHistory } from 'react-router'
 
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
-import AppBar from 'material-ui/AppBar';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
-import Drawer from 'material-ui/Drawer';
+import AppBar from 'material-ui/AppBar'
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card'
+import Drawer from 'material-ui/Drawer'
 import FlatButton from 'material-ui/FlatButton'
-import MenuItem from 'material-ui/MenuItem';
-import Snackbar from 'material-ui/Snackbar';
+import MenuItem from 'material-ui/MenuItem'
+import Snackbar from 'material-ui/Snackbar'
 
-import app from '../main.jsx';
+import app from '../main.jsx'
 import errorHandler from './err'
+import styles from './styles'
+
+const sections = [
+			{ text: "Events", path: "/events"},
+			{ text: "Acts", path: "/acts"},
+			{ text: "Venues", path: "/venues"},
+			{ text: "Users", path: "/users"},
+		]
 
 export default class Layout extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = { 
+	state = { 
 			drawerOpen: false, 
 			user: null, 
 			section: 'BFest',
@@ -26,15 +32,8 @@ export default class Layout extends React.Component {
 				message: '', 
 				undo: null,
 			},
-		};
-
-		this.sections = [
-			{ text: "Events", path: "/events"},
-			{ text: "Acts", path: "/acts"},
-			{ text: "Venues", path: "/venues"},
-			{ text: "Users", path: "/users"},
-		]
-	}
+		}	
+	
 	componentDidMount() {
 		app.authenticate()
 			.then(this.handleLogin())
@@ -52,11 +51,6 @@ export default class Layout extends React.Component {
 		}
 	}
 
-	handleUserChange = u => {
-		console.log("User loginified: ", u);
-		this.setState({snackbarOpen: true, message: u.name + " just logged in"});
-	}
-
 	notifyListener = (message, undo) => {
 		this.setState({...this.state, snackbar: {open: true, message, undo}})
 	}
@@ -65,43 +59,44 @@ export default class Layout extends React.Component {
 		this.setState({...this.state, section: gig.name})
 	}
 
-	handleSnackbarClose = () => this.setState({ snackbar: {open: false, message: '', undo: null}});
+	handleSnackbarClose = () => this.setState({ snackbar: {open: false, message: '', undo: null}})
 
 	closeDrawer = () => {
 		this.setState({...this.state, drawerOpen: false})
 	}
 	toggleDrawer = () => {
-		this.setState({...this.state, drawerOpen: !this.state.drawerOpen});
+		this.setState({...this.state, drawerOpen: !this.state.drawerOpen})
 	}
 	handleMenu = section => {
-		// console.log("Menu: ", section);
-		const {path, text} = section;
-		this.setState({...this.state, section: text, drawerOpen: false});
-		// this.closeDrawer();
-		browserHistory.push(path);
+		// console.log("Menu: ", section)
+		const {path, text} = section
+		this.setState({...this.state, section: text, drawerOpen: false})
+		// this.closeDrawer()
+		browserHistory.push(path)
 	}
 	handleLogout = () => {
-		app.service('users').patch(this.state.user._id, {online: false}).then(u => {
-			console.log('User offline', u);
-			this.setState({user: null});
-			app.logout();
-			browserHistory.push('/out');
-		});
+		app.service('users').patch(this.state.user._id, {online: false})
+		.then(u => {
+			console.log('User offline', u)
+			this.setState({user: null})
+			app.logout()
+			browserHistory.push('/out')
+		})
 	}
 	handleLogin = u => {
-		const user = app.get('user');
+		const user = app.get('user')
 		if(user) {
-			console.log("-=-=- AUTHENTICATED (app.user) -=-=-", user);
-			this.setState({user});
+			console.log("-=-=- AUTHENTICATED (app.user) -=-=-", user)
+			this.setState({user})
 		}
 	}
 	handleDrawer = (open, reason) => {
-		// console.log(`Open: ${open} for ${reason}`);
+		// console.log(`Open: ${open} for ${reason}`)
 		this.setState({...this.state, drawerOpen: open})
 	}
 	render() { 
-		// console.log("------------ LAYOUT ------------");
-		const {user, snackbar} = this.state;
+		// console.log("------------ LAYOUT ------------")
+		const {user, snackbar} = this.state
 		return ( 
 		<MuiThemeProvider>
 			<div>
@@ -130,7 +125,7 @@ export default class Layout extends React.Component {
 							/>
 						</Card>
 					}
-					{this.sections.map( section => 
+					{sections.map( section => 
 						<MenuItem onTouchTap={this.handleMenu.bind(this, section)} primaryText={section.text} key={section.path}/>
 					)}
 				</Drawer>
@@ -143,11 +138,11 @@ export default class Layout extends React.Component {
 					onActionTouchTap={snackbar.undo}
 					onRequestClose={this.handleSnackbarClose}
 		        />
-				<footer style={{position: 'fixed', bottom: 0, right: 0, fontSize: 'smaller', paddingRight:'1em'}}>
+				<footer style={styles.footer}>
 					© 2017 Intergalactic Balkan Festivals Unlimited
 				</footer>
 			</div>
 		</MuiThemeProvider>
 		)
 	}
-};
+}

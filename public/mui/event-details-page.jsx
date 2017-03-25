@@ -109,14 +109,14 @@ export default class EventPage extends React.Component {
 			// .then(gig => console.log("Updated gig", gig)) // this is handled in patchedListener
 			.catch(err => {
 				console.error("Didn't update", err);
-				this.setState({...this.state, dialog: {errors: err.errors, gig}});
+				this.setState({...this.state, dialog: {open: true, errors: err.errors, gig}});
 			});
 		} else {
 			app.service('gigs').create(gig)
 			// .then(gig => console.log("Created gig", gig)) // handled in createdListener
 			.catch(err => {
 				console.error("Didn't create gig", JSON.stringify(err));
-				this.setState({...this.state, dialog: {errors: err.errors, gig}});
+				this.setState({...this.state, dialog: {open: true, errors: err.errors, gig}});
 			});
 		}
 		
@@ -156,7 +156,7 @@ export default class EventPage extends React.Component {
 			primary={true}
 			onTouchTap={this.handleDialogCancel}
 		/>,
-		<FlatButton
+		<RaisedButton
 			label={this.state.dialog.gig._id ? "Save" : "Add"}
 			primary={true}
 			onTouchTap={this.handleDialogSubmit}
@@ -267,10 +267,6 @@ export default class EventPage extends React.Component {
 				
 				<CardActions>
 					<FlatButton icon={plusOutline} label="Activity" onTouchTap={this.handleTypesOpen}/>
-					{event.public ? 
-						<RaisedButton label="Make private" /> :
-						<RaisedButton label="Publish" />
-					}
 				</CardActions>
 			</Card>
 		);

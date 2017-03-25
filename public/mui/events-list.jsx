@@ -113,7 +113,6 @@ export default class EventsList extends React.Component {
 	}
 
 	render() {
-		console.log("___Events___List___");
 		return <div>
 			<List >
 				{this.state.gigs.map(

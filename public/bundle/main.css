@@ -7,3 +7,21 @@ html, body, * {
 .gig-duration::after {
 	content: ')';
 }
+td.j-start, td.j-end {
+	border-top: 2px solid grey;
+}
+table.gig-schedule {
+	width: 100%;
+	padding-right: 2em;
+}
+table.gig-schedule tbody tr td:first-child {
+	width: 4em;
+	text-align: right;
+	background-color: white;
+	font-size: smaller;
+	font-weight: 300;
+	padding: 0.5em 1em;
+}
+table.gig-schedule tbody tr:nth-child(odd) {
+   background-color: rgba(127, 221, 233, 0.4);
+}

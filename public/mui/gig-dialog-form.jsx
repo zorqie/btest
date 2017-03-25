@@ -1,14 +1,16 @@
-import React from 'react';
+import React from 'react'
 
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
+import Dialog from 'material-ui/Dialog'
+import FlatButton from 'material-ui/FlatButton'
+import RaisedButton from 'material-ui/RaisedButton'
+import TextField from 'material-ui/TextField'
 
-import moment from 'moment';
+import moment from 'moment'
 
-import app from '../main.jsx';
-import VenueSites from './venue-sites.jsx';
+import app from '../main.jsx'
+import VenueSites from './venue-sites.jsx'
+import styles from './styles'
+
 
 const blankGig = () => {
 	return { 
@@ -20,63 +22,79 @@ const blankGig = () => {
 		start: new Date(), 
 		end: new Date()
 	}
-};
+}
 
-const focus = input => input && input.focus();
+const gigDuration = gig => {
+	if (!gig || !gig.end) return ''
+	const dur = moment.duration(moment(gig.end).diff(moment(gig.start)))
+	console.log("Dyur", dur)
+	// TODO rounding. Sometimes 1:00 to 2:00 is 59 minutes, sometimes 60 ???
+	const d = dur.days()
+	const days = d > 0 ? d > 1 ? d + ' days ' : '1 day ' : ''
+	const h = dur.hours()
+	const hours = h > 0 ? h > 1 ? h + ' hours ' : '1 hour ' : ''
+	const m = dur.minutes()
+	const minutes = m > 0 ? m > 1 ? m + ' minutes' : '1 minute' : ''
+	const duration = days + hours + minutes
+	return duration
+}
+
+const focus = input => input && input.focus()
 
 export default class GigDialogForm extends React.Component {
-	constructor(props) {
-    	super(props);
-		this.state = {
-			gig: props.gig || blankGig(),
-			dialogOpen: false,
-		};
+	state = {
+		gig: this.props.gig || blankGig(),
+		venueName: (this.props.gig.venue && this.props.gig.venue.name) || '',
+		dialogOpen: false,
 	}
 
 	handleChange = e => {
 		// TODO: ensure end Date is after start Date
 		// TODO: keep the time if the date changes
 		
-		const { name, value } = e.target;
-		const { gig } = this.state;
-		// console.log("Changed: " + name + " -> " + JSON.stringify(value));
+		const { name, value } = e.target
+		const { gig } = this.state
+		// console.log("Changed: " + name + " -> " + JSON.stringify(value))
 		if( name.indexOf("Time") > -1 ) {
 			//handle time changes
-			const dateName = name.substr(0, name.indexOf("Time"));
-			const date = this.state.gig[dateName];
-			const hours = moment(value, 'HH:mm');
+			const dateName = name.substr(0, name.indexOf("Time"))
+			const date = this.state.gig[dateName]
+			const hours = moment(value, 'HH:mm')
 			const newDate = moment(date)
 				.hours(hours.hours())
 				.minutes(hours.minutes())
-				.toDate();
-			// console.log("Changing: " + dateName + " = " + (date) + "\n--> " + newDate);
-			Object.assign(gig, {[dateName] : newDate});
+				.toDate()
+			// console.log("Changing: " + dateName + " = " + (date) + "\n--> " + newDate)
+			Object.assign(gig, {[dateName] : newDate})
 		} else {
-			Object.assign(gig, {[name] : value});
+			Object.assign(gig, {[name] : value})
 		}
-		// this.validate(gig);
-		this.setState({...this.state, gig });
-		// console.log("State: " + JSON.stringify(this.state));
-	};
+
+		// this.validate(gig)
+		this.setState({...this.state, gig})
+		// console.log("State: " + JSON.stringify(this.state))
+	}
+
+
 	// TODO do validate
 	// validate = (gig) => {
 	// 	if(gig.start && gig.end && !moment(gig.start).isBefore(moment(gig.end))) {
 	// 		console.log("WHAT are you thinking.")
 	// 	}
-	// 	// const v = new mongoose.Document(Gig, GigSchema);//
-	// 	// console.log("Validificating: " + JSON.stringify(v));
-	// };
+	// 	// const v = new mongoose.Document(Gig, GigSchema)//
+	// 	// console.log("Validificating: " + JSON.stringify(v))
+	// }
 	chooseVenue = () => {
-		this.setState({...this.state, dialogOpen: true});
+		this.setState({...this.state, dialogOpen: true})
 	}
 	handleDialogSelect = venue => {
-		console.log("Selected ", venue);
-		const { gig } = this.state;
-		Object.assign(gig, {venue_id: venue._id});
-		this.setState({...this.state, dialogOpen: false, gig})
+		console.log("Selected ", venue)
+		const { gig } = this.state
+		Object.assign(gig, {venue_id: venue._id})
+		this.setState({...this.state, dialogOpen: false, venueName: venue.name, gig})
 	}
 	handleDialogCancel = e => {
-		// console.log("Canceling...");
+		// console.log("Canceling...")
 		this.setState({dialogOpen: false})
 	}
 	dialogActions = () => [
@@ -85,11 +103,11 @@ export default class GigDialogForm extends React.Component {
 			primary={true}
 			onTouchTap={this.handleDialogCancel}
 		/>,
-	];
+	]
 
 	render() {
-		const {gig} = this.state;
-		const {errors, venues} = this.props;
+		const {gig, duration, venueName} = this.state
+		const {errors, venues} = this.props
 		return (
 			<form >
 				<TextField 
@@ -120,11 +138,11 @@ export default class GigDialogForm extends React.Component {
 					<TextField 
 						name='venue_id'
 						floatingLabelText="Venue ID"
-						value={gig.venue_id || ''} 
-						onChange={this.handleChange} 
+						value={venueName || gig.venue_id || ''} 
 						errorText={(errors.venue_id && errors.venue_id.message) || ''}
 					/>
-					{venues && <RaisedButton label="Choose" onTouchTap={this.chooseVenue}/>}
+					{' '}
+					{venues && <FlatButton label="Choose venue" onTouchTap={this.chooseVenue}/>}
 				</div>
 				<div>
 					<TextField 
@@ -135,6 +153,7 @@ export default class GigDialogForm extends React.Component {
 						value={(gig.start && moment(gig.start).format('YYYY-MM-DD')) || ''} 
 						errorText={(errors.start && errors.start.message) || ''}
 						onChange={this.handleChange} 
+						style={styles.dateInput}
 					/>
 					<TextField 
 						type='time'
@@ -143,6 +162,13 @@ export default class GigDialogForm extends React.Component {
 						floatingLabelText="Start time"
 						value={(gig.start && moment(gig.start).format('HH:mm')) || ''} 
 						onChange={this.handleChange} 
+						style={styles.timeInput}
+					/>
+					<TextField 
+						name='duration'
+						floatingLabelFixed={true}
+						floatingLabelText="Duration"
+						value={gigDuration(gig)} 
 					/>
 				</div>
 				<div>
@@ -154,6 +180,7 @@ export default class GigDialogForm extends React.Component {
 						value={(gig.end && moment(gig.end).format('YYYY-MM-DD')) || ''} 
 						errorText={(errors.end && errors.end.message) || ''}
 						onChange={this.handleChange} 
+						style={styles.dateInput}
 					/>
 					<TextField 
 						type='time'
@@ -162,6 +189,7 @@ export default class GigDialogForm extends React.Component {
 						floatingLabelText="End time"
 						value={(gig.end && moment(gig.end).format('HH:mm')) || ''} 
 						onChange={this.handleChange} 
+						style={styles.timeInput}
 					/>
 				</div>
 				<Dialog
@@ -173,6 +201,6 @@ export default class GigDialogForm extends React.Component {
 					<VenueSites venues={venues} onSelect={this.handleDialogSelect}/>
 				</Dialog>
 			</form>
-		);
+		)
 	}
-};
+}

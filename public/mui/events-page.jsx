@@ -92,13 +92,12 @@ export default class EventsPage extends React.Component {
 
 	render() {
 		const {gig, errors, venues} = this.state;
-		console.log("Events-page________");
 		return (
 			<div>				
 				<EventsList onEdit={this.handleEdit} />			
 				<Dialog
 					open={this.state.dialogOpen}
-					title={gig._id ? 'Edit event' : 'Add event'}
+					title={gig._id ? null : 'Add event'}
 					onRequestClose={this.handleRequestClose}
 					actions={this.dialogActions()}
 		        >	
