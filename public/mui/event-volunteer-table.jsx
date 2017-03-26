@@ -32,14 +32,53 @@ const JobCell = ({job, date, hour, ...others}) => {
 	// console.log("end: ", mEnd.format("YYYY-MM-DD HH:mm"))
 	const end = mEnd && mEnd.isSame(t, 'hour')
 	const show = t.isSameOrAfter(mStart, 'hour') && t.isBefore(mEnd, 'hour')
-	return <td className={start ? 'j-start' : end ? 'j-end' : ''}>
+	const shifts = job.shifts && job.shifts.length
+	return <td  className={(show ? 'j-shift ' : '') + (start ? 'j-start' : end ? 'j-end' : '')}>
 		{start && <span>{mStart.format('hh:mm a')}-{mEnd && mEnd.format('hh:mm a')}</span>}
 		{show && <div className='j-shift'> </div>}
-		{end ? '^' : ''}
 	</td>
 }
+
+function shouldShow(date, hour, job) {
+	const t = moment(date).add(hour, 'hours')
+	const mStart = moment(job.start)
+	// console.log("T: ", t.format("YYYY-MM-DD HH:mm"))
+	// const starts = mStart.isSame(t, 'hour')
+	const mEnd  = job.end && moment(job.end)
+	// console.log("end: ", mEnd.format("YYYY-MM-DD HH:mm"))
+	// const ends = mEnd && mEnd.isSame(t, 'hour')
+	
+	return t.isSameOrAfter(mStart, 'hour') && t.isBefore(mEnd, 'hour')
+}
+
+function prepareTable(date, jobs) {
+	let header = []
+	const table = hours.map(hour => {
+		let row = []
+		jobs.forEach(job => {
+			let shifts = []
+			if(job.shifts && job.shifts.length) {
+				job.shifts.forEach(shift => {
+					if(shouldShow(date, hour, shift)) {
+						shifts = shifts.concat(shift)
+					}
+				})
+			} else if(shouldShow(date, hour, job)) {
+				shifts = shifts.concat(job)
+			}
+			if(shifts.length) {
+				row = row.concat({job, shifts})
+			}
+		}) 
+		return row
+	})
+
+	return table
+}
+
 const JobHeader = ({job, ...others}) => {
-	return <th>{job.name}</th> 
+	const shifts = job.shifts && job.shifts.length
+	return <th colSpan={shifts}>{job.name}</th> 
 }
 
 export default class VolunteerTable extends React.Component {
@@ -47,7 +86,7 @@ export default class VolunteerTable extends React.Component {
 		gigs: [],
 		jobs: [],
 	}
-	componentWillMount() {
+	componentDidMount() {
 		const {eventId} = this.props.params
 		app.service('gigs').find({
 			query: {
@@ -98,7 +137,8 @@ export default class VolunteerTable extends React.Component {
 
 	render() {
 		const { gigs, jobs } = this.state
-		// console.log('Scheduled', this.state)
+		console.log('Schedule')
+		days(jobs).forEach(date => console.log("Prepared", prepareTable(date, jobs)))
 		return <div>
 			Here comes the table.
 			{jobs.length && days(jobs).map(date =>	
@@ -119,7 +159,9 @@ export default class VolunteerTable extends React.Component {
 							<tr key={i} >
 								<td>{i}:00</td>
 								{daysJobs(date, jobs).map(job =>
-									<JobCell key={job._id} job={job} date={date} hour={i}/>
+									job.shifts && job.shifts.length
+									? job.shifts.map(shift => <JobCell key={shift._id} job={shift} date={date} hour={i}/>)
+									: <JobCell key={job._id} job={job} date={date} hour={i}/>
 								)}
 							</tr>
 						)}
