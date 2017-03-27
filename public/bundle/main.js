@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "1b0daa6e003ac467dc4c"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "6b465881ddaa7ae0fda1"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotMainModule = true; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -61108,9 +61108,16 @@ var startTimeSort = function startTimeSort(a, b) {
 	return +(a.start > b.start) || +(a.start === b.start) - 1;
 };
 
+var format = function format(t) {
+	return (0, _moment2.default)(t).format('YYYY-MM-DD');
+};
+
 var days = function days(gigs) {
-	var formatted = gigs.map(function (g) {
-		return (0, _moment2.default)(g.start).format('YYYY-MM-DD');
+	var formatted = [];
+	gigs.forEach(function (g) {
+		return formatted = formatted.concat(g.shifts.length ? g.shifts.map(function (s) {
+			return format(s.start);
+		}) : format(g.start));
 	});
 	// console.log("Formated", formatted)
 	var unique = formatted.filter(function (e, i, a) {
@@ -61131,87 +61138,164 @@ var daysJobs = function daysJobs(date, jobs) {
 	});
 };
 
-var hours = Array.from(Array(24).keys());
-
-var JobCell = function JobCell(_ref) {
-	var job = _ref.job,
-	    date = _ref.date,
-	    hour = _ref.hour,
-	    others = _objectWithoutProperties(_ref, ['job', 'date', 'hour']);
-
-	var t = (0, _moment2.default)(date).add(hour, 'hours');
-	var mStart = (0, _moment2.default)(job.start);
-	// console.log("T: ", t.format("YYYY-MM-DD HH:mm"))
-	var start = mStart.isSame(t, 'hour');
-	var mEnd = job.end && (0, _moment2.default)(job.end);
-	// console.log("end: ", mEnd.format("YYYY-MM-DD HH:mm"))
-	var end = mEnd && mEnd.isSame(t, 'hour');
-	var show = t.isSameOrAfter(mStart, 'hour') && t.isBefore(mEnd, 'hour');
-	var shifts = job.shifts && job.shifts.length;
-	return _react2.default.createElement(
-		'td',
-		{ className: (show ? 'j-shift ' : '') + (start ? 'j-start' : end ? 'j-end' : '') },
-		start && _react2.default.createElement(
-			'span',
-			null,
-			mStart.format('hh:mm a'),
-			'-',
-			mEnd && mEnd.format('hh:mm a')
-		),
-		show && _react2.default.createElement(
-			'div',
-			{ className: 'j-shift' },
-			' '
-		)
-	);
+var empty = function empty(n) {
+	return Array.from(Array(n).keys());
 };
+var hours24 = empty(24);
+
+// const JobCell = ({job, date, hour, ...others}) => {
+// 	const t = moment(date).add(hour, 'hours')
+// 	const mStart = moment(job.start)
+// 	// console.log("T: ", t.format("YYYY-MM-DD HH:mm"))
+// 	const start = mStart.isSame(t, 'hour')
+// 	const mEnd  = job.end && moment(job.end)
+// 	// console.log("end: ", mEnd.format("YYYY-MM-DD HH:mm"))
+// 	const end = mEnd && mEnd.isSame(t, 'hour')
+// 	const show = t.isSameOrAfter(mStart, 'hour') && t.isBefore(mEnd, 'hour')
+// 	const shifts = job.shifts && job.shifts.length
+// 	return <td  className={(show ? 'j-shift ' : '') + (start ? 'j-start' : end ? 'j-end' : '')}>
+// 		{start && <span>{mStart.format('hh:mm a')}-{mEnd && mEnd.format('hh:mm a')}</span>}
+// 		{show && <div className='j-shift'> </div>}
+// 	</td>
+// }
 
 function shouldShow(date, hour, job) {
 	var t = (0, _moment2.default)(date).add(hour, 'hours');
 	var mStart = (0, _moment2.default)(job.start);
 	// console.log("T: ", t.format("YYYY-MM-DD HH:mm"))
-	// const starts = mStart.isSame(t, 'hour')
+	var starts = mStart.isSame(t, 'hour');
 	var mEnd = job.end && (0, _moment2.default)(job.end);
 	// console.log("end: ", mEnd.format("YYYY-MM-DD HH:mm"))
-	// const ends = mEnd && mEnd.isSame(t, 'hour')
+	var ends = mEnd && mEnd.diff(t, 'hours') == 1; //mEnd.isSame(t, 'hour')
 
-	return t.isSameOrAfter(mStart, 'hour') && t.isBefore(mEnd, 'hour');
+	var show = t.isSameOrAfter(mStart, 'hour') && t.isBefore(mEnd, 'hour');
+	return show ? { show: show, starts: starts, ends: ends } : null;
 }
 
-function prepareTable(date, jobs) {
-	var header = [];
-	var table = hours.map(function (hour) {
-		var row = [];
-		jobs.forEach(function (job) {
-			var shifts = [];
-			if (job.shifts && job.shifts.length) {
-				job.shifts.forEach(function (shift) {
-					if (shouldShow(date, hour, shift)) {
-						shifts = shifts.concat(shift);
-					}
-				});
-			} else if (shouldShow(date, hour, job)) {
-				shifts = shifts.concat(job);
-			}
-			if (shifts.length) {
-				row = row.concat({ job: job, shifts: shifts });
-			}
+function prepareTables(jobs) {
+	if (jobs && !jobs.length) return [];
+	var tables = days(jobs).map(function (date) {
+		var header = [];
+		var body = hours24.map(function (hour) {
+			var row = [];
+			jobs.forEach(function (job, j) {
+				var shifts = [];
+				if (job.shifts && job.shifts.length) {
+					job.shifts.forEach(function (shift, i) {
+						if (shouldShow(date, hour, shift)) {
+							shifts = shifts.concat({ shift: shift, j: j, i: i });
+						}
+					});
+				} else if (shouldShow(date, hour, job)) {
+					shifts = shifts.concat({ shift: job, j: j, i: 1 });
+				}
+				if (shifts.length) {
+					row = row.concat({ job: job, shifts: shifts });
+					header = header.filter(function (h) {
+						return h.job._id !== job._id;
+					}).concat({ job: job, j: j });
+				}
+			});
+			return row;
 		});
-		return row;
+		var table = { header: header, body: body };
+		console.log("TABLE", table);
+		return { date: date, header: header, body: body };
+	});
+	return tables;
+}
+
+function byDate(jobs) {
+	var tables = [];
+	var dates = new Map();
+	jobs.forEach(function (job) {
+		if (job.shifts.length) {
+			job.shifts.forEach(function (shift, i) {
+				var date = format(shift.start);
+				var t = dates.get(date) || { date: date, jobs: new Map() };
+				var tjob = Object.assign({}, t.jobs.get(job._id) || { job: job, span: 1, hours: [] });
+				hours24.forEach(function (hour) {
+					var show = shouldShow(date, hour, shift);
+					var shown = 1;
+					if (show) {
+						shown++;
+						var slot = tjob.hours[hour] || new Array(i);
+						slot[i] = { shift: shift, show: show };
+						tjob.hours[hour] = slot;
+					}
+					tjob.span = Math.max(tjob.span, shown);
+				});
+				t.jobs.set(job._id, tjob);
+				dates.set(date, t);
+			});
+		} else {
+			var date = format(job.start);
+			var t = dates.get(date) || { date: date, jobs: new Map() };
+			var tjob = Object.assign({}, t.jobs.get(job._id) || { job: job, span: 1, hours: [] });
+			hours24.forEach(function (hour) {
+				var show = shouldShow(date, hour, job);
+				if (show) {
+					tjob.hours[hour] = Array.of({ shift: job, show: show });
+				}
+			});
+			t.jobs.set(job._id, tjob);
+			dates.set(date, t);
+		}
 	});
 
-	return table;
+	tables = Array.from(dates.entries(), function (e) {
+		var _e$ = e[1],
+		    date = _e$.date,
+		    jobs = _e$.jobs;
+
+		return {
+			date: (0, _moment2.default)(date),
+			jobs: Array.from(jobs.entries(), function (j) {
+				var _j$ = j[1],
+				    job = _j$.job,
+				    span = _j$.span,
+				    hours = _j$.hours;
+
+				var compact = hours.map(function (h) {
+					return h.length > span ? squeeze(h, span) : h;
+				});
+				return { job: job, span: span, hours: compact };
+			})
+		};
+	});
+	console.log("TABLES>>>>", tables);
+	return tables;
 }
 
-var JobHeader = function JobHeader(_ref2) {
-	var job = _ref2.job,
-	    others = _objectWithoutProperties(_ref2, ['job']);
+function squeeze(hour, n) {
+	var a = new Array(n);
+	hour.forEach(function (h, i) {
+		return a[i % n] = h;
+	});
+	return a;
+}
+
+var JobHeader = function JobHeader(_ref) {
+	var job = _ref.job,
+	    others = _objectWithoutProperties(_ref, ['job']);
 
 	var shifts = job.shifts && job.shifts.length;
 	return _react2.default.createElement(
 		'th',
 		{ colSpan: shifts },
 		job.name
+	);
+};
+
+var tspan = function tspan(_ref2) {
+	var start = _ref2.start,
+	    end = _ref2.end;
+	return _react2.default.createElement(
+		'span',
+		null,
+		(0, _moment2.default)(start).format('HH:mm'),
+		'-',
+		(0, _moment2.default)(end).format('HH:mm')
 	);
 };
 
@@ -61230,14 +61314,14 @@ var VolunteerTable = function (_React$Component) {
 		}
 
 		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref3 = VolunteerTable.__proto__ || Object.getPrototypeOf(VolunteerTable)).call.apply(_ref3, [this].concat(args))), _this), _this.state = {
-			gigs: [],
+			// shifts: [],
 			jobs: []
 		}, _temp), _possibleConstructorReturn(_this, _ret);
 	}
 
 	_createClass(VolunteerTable, [{
-		key: 'componentDidMount',
-		value: function componentDidMount() {
+		key: 'componentWillMount',
+		value: function componentWillMount() {
 			var _this2 = this;
 
 			var eventId = this.props.params.eventId;
@@ -61245,19 +61329,20 @@ var VolunteerTable = function (_React$Component) {
 			_main2.default.service('gigs').find({
 				query: {
 					parent: eventId,
-					type: 'Volunteer'
+					type: 'Volunteer',
+					$sort: { start: 1 }
 				}
 			}).then(function (jobs) {
 				jobs.data.forEach(function (job) {
 					_main2.default.service('gigs').find({
 						query: {
-							parent: job._id
+							parent: job._id,
+							$sort: { start: 1 }
 						}
 					}).then(function (shifts) {
 						Object.assign(job, { shifts: shifts.data });
 						_this2.setState({
-							jobs: _this2.state.jobs.concat(job),
-							gigs: _this2.state.gigs.concat(shifts.data)
+							jobs: _this2.state.jobs.concat(job)
 						});
 					});
 				});
@@ -61289,19 +61374,17 @@ var VolunteerTable = function (_React$Component) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _state = this.state,
-			    gigs = _state.gigs,
-			    jobs = _state.jobs;
+			var jobs = this.state.jobs;
 
 			console.log('Schedule');
-			days(jobs).forEach(function (date) {
-				return console.log("Prepared", prepareTable(date, jobs));
-			});
+
 			return _react2.default.createElement(
 				'div',
 				null,
 				'Here comes the table.',
-				jobs.length && days(jobs).map(function (date) {
+				byDate(jobs).map(function (_ref4) {
+					var date = _ref4.date,
+					    jobs = _ref4.jobs;
 					return _react2.default.createElement(
 						'table',
 						{ key: date, className: 'gig-schedule' },
@@ -61321,28 +61404,53 @@ var VolunteerTable = function (_React$Component) {
 								'tr',
 								null,
 								_react2.default.createElement('th', null),
-								daysJobs(date, jobs).map(function (job) {
-									return _react2.default.createElement(JobHeader, { key: job._id, job: job });
+								jobs.map(function (_ref5) {
+									var job = _ref5.job,
+									    span = _ref5.span;
+									return _react2.default.createElement(
+										'th',
+										{ key: job._id, colSpan: span },
+										job.name
+									);
 								})
 							)
 						),
 						_react2.default.createElement(
 							'tbody',
 							null,
-							hours.map(function (e, i) {
+							hours24.map(function (hour) {
 								return _react2.default.createElement(
 									'tr',
-									{ key: i },
+									{ key: hour },
 									_react2.default.createElement(
 										'td',
 										null,
-										i,
+										hour,
 										':00'
 									),
-									daysJobs(date, jobs).map(function (job) {
-										return job.shifts && job.shifts.length ? job.shifts.map(function (shift) {
-											return _react2.default.createElement(JobCell, { key: shift._id, job: shift, date: date, hour: i });
-										}) : _react2.default.createElement(JobCell, { key: job._id, job: job, date: date, hour: i });
+									jobs.map(function (_ref6) {
+										var hours = _ref6.hours,
+										    job = _ref6.job,
+										    span = _ref6.span;
+
+										return hours[hour] && empty(span).map(function (i) {
+											var slot = hours[hour][i];
+											var starts = slot && slot.show && slot.show.starts;
+											var c = 'j-shift ' + (slot && slot.show && (slot.show.starts ? 'j-start' : slot.show.ends ? 'j-end' : ''));
+											return slot && _react2.default.createElement(
+												'td',
+												{ key: hour + i, className: c },
+												starts && tspan(slot.shift)
+											) || _react2.default.createElement(
+												'td',
+												{ key: hour + i },
+												' '
+											);
+										}) || _react2.default.createElement(
+											'td',
+											{ key: job._id + hour, colSpan: span },
+											' '
+										);
 									})
 								);
 							})

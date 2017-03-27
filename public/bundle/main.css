@@ -26,10 +26,14 @@ table.gig-schedule tbody tr td:first-child {
 	background-color: rgba(127, 221, 233, 0.14);
 }*/
 table.gig-schedule tbody tr td {
+	
 	border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
-td.j-start, td.j-end {
+td.j-start {
 	border-top: 2px solid grey !important;
+}
+td.j-end {
+	border-bottom: 2px solid grey !important;
 }
 td.j-shift {
 	border-right: 2px solid grey;
