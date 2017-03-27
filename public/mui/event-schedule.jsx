@@ -1,5 +1,8 @@
 import React from 'react'
 import moment from 'moment'
+import { Link } from 'react-router'
+
+import LinearProgress from 'material-ui/LinearProgress'
 
 import app from '../main.jsx'
 import styles from './styles'
@@ -136,7 +139,7 @@ function byDate(jobs) {
 			})
 		}
 	})
-	console.log("TABLES>>>>", tables)
+	// console.log("TABLES>>>>", tables)
 	return tables
 }
 
@@ -151,24 +154,31 @@ const JobHeader = ({job, ...others}) => {
 	return <th colSpan={shifts}>{job.name}</th> 
 }
 
-const tspan = ({start, end}) => <span>{moment(start).format('HH:mm')}-{moment(end).format('HH:mm')}</span>
+const tspan = ({_id, start, end}) => 
+	<span>
+		<Link to={'/shifts/'+_id}>
+		{moment(start).format('HH:mm')}-{moment(end).format('HH:mm')}
+		</Link>
+	</span>
 
 
 export default class VolunteerTable extends React.Component {
 	state = {
-		// shifts: [],
+		total: 100,
+		loaded: 0,
 		jobs: [],
 	}
 	componentWillMount() {
-		const {eventId} = this.props.params
+		const {eventId, type} = this.props.params
 		app.service('gigs').find({
 			query: {
 				parent: eventId,
-				type: 'Volunteer',
+				type: type || 'Volunteer',
 				$sort: {start: 1}
 			}
 		})
 		.then(jobs => {
+			this.setState({total: jobs.total})
 			jobs.data.forEach(job => {
 				app.service('gigs').find({
 					query: {
@@ -178,54 +188,43 @@ export default class VolunteerTable extends React.Component {
 				})
 				.then(shifts => {
 					Object.assign(job, {shifts: shifts.data})
-					this.setState({
-						jobs: this.state.jobs.concat(job),
-						// shifts: this.state.shifts.concat(shifts.data)
+					this.setState(prev => {
+						return { 
+							loaded: prev.loaded + 1, 
+							jobs: prev.jobs.concat(job) 
+						}
 					})
 				})
 			})
 		})
-		// .then(masters => {
-		// 	console.log("JOBS", masters)
-		// 	app.service('gigs').find({
-		// 		query: {
-		// 			parent: {$in: masters.data.map(g => g._id)},
-		// 			// $sort: {start: 1}
-		// 		}
-		// 	})
-		// 	.then(shifts => {
-		// 		console.log("SHIFTS", shifts)
-		// 		const gigs = shifts.data
-		// 		const jobnames = masters.data.map(g => g.name).filter((e, i, a) => a.indexOf(e)===i)
-
-		// 		const formatted = shifts.data.map(g => moment(g.start).format('YYYY-MM-DD'))
-		// 		// console.log("Formated", formated)
-		// 		const unique = formatted.filter((e, i, a) => a.indexOf(e)===i)
-		// 		// console.log("Unique", unique)
-		// 		const sorted = unique.sort()
-		// 		const dates = sorted.map(s => moment(s, 'YYYY-MM-DD'))
-
-		// 		this.setState({gigs, dates, jobs, jobnames})
-		// 	})
-		// })
 	}
 
 	render() {
-		const { jobs } = this.state
-		console.log('Schedule' )
+		const { jobs, total, loaded } = this.state
+		const loading = loaded != total
+		// console.log('Schedule', this.state )
 		
 		return <div>
-			Here comes the table.
-			
-			{byDate(jobs).map(({date, jobs}) => 
+			{ loading && 
+				<LinearProgress 
+					mode='determinate'
+					max={total}
+					value={loaded}
+				/> 
+				|| 
+				byDate(jobs).map(({date, jobs}) => 
 				<table key={date} className='gig-schedule'>
 					<thead>
 						<tr>
-							<th colSpan={3} style={styles.scheduleDate}>{date.format('MMM D, dddd')}</th>
+							<th colSpan={jobs.length+1} style={styles.scheduleDate}>{date.format('MMM D, dddd')}</th>
 						</tr>
 						<tr>
 							<th></th>
-							{jobs.map(({job, span}) => <th key={job._id} colSpan={span}>{job.name}</th>)}
+							{jobs.map(({job, span}) => 
+								<th key={job._id} colSpan={span}>
+									<Link to={'/gigs/'+job._id}>{job.name}</Link>
+								</th>
+							)}
 						</tr>
 					</thead>
 					<tbody>
@@ -248,31 +247,7 @@ export default class VolunteerTable extends React.Component {
 						)}
 					</tbody>
 				</table>
-			)}
-				{/*prepareTables(jobs).map(({date, header, body}, d)=> 
-				<table key={d+date} className='gig-schedule'>
-					
-					<thead>
-						<tr>
-							<th colSpan={3} style={styles.scheduleDate}>{date.format('MMM D, dddd')}</th>
-						</tr>
-						<tr>
-							<th></th>
-							{header.map(({job, j}) => <th key={job._id}>({j}){job.name}</th>)}
-						</tr>
-					</thead>
-					<tbody>
-						{body.map((row, r) =>
-							<tr key={r}>
-								<td>{r}:00</td>
-								{row.map(({job, shifts}, c)=>
-									<td key={r+c}>{job.name} {shifts && shifts.map(({shift, i, j}) => <span>{j}/{i}</span>)} </td>
-								)}
-							</tr>
-						)}
-					</tbody>
-				</table>
-				)*/}
+			)}				
 		</div>
 	}
 }

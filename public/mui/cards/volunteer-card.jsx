@@ -113,7 +113,7 @@ export default class VolunteerCard extends React.Component {
 		return <div>
 			<span style={styles.gigType}>Volunteer opportunity</span> 
 			<h2>{gig.name}</h2>
-			<h3>{gig.description}</h3>
+			<p>{gig.description}</p>
 			<ul>
 				{shifts.map(shift => 
 					<ListItem 

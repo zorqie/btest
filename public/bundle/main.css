@@ -8,7 +8,7 @@ html, body, * {
 	content: ')';
 }
 table.gig-schedule {
-	width: 100%;
+	
 	padding-right: 2em;
 	border-collapse: separate;
 	border-spacing: 4px 0;
@@ -26,8 +26,10 @@ table.gig-schedule tbody tr td:first-child {
 	background-color: rgba(127, 221, 233, 0.14);
 }*/
 table.gig-schedule tbody tr td {
-	
 	border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+table.gig-schedule tbody tr td:hover {
+	background-color: rgba(0, 0, 0, 0.1);
 }
 td.j-start {
 	border-top: 2px solid grey !important;
@@ -38,4 +40,16 @@ td.j-end {
 td.j-shift {
 	border-right: 2px solid grey;
 	border-left: 2px solid grey;
+	width: 10em;
+}
+table.gig-schedule tbody tr td a {
+	font-size: smaller;
+	text-decoration: none;
+	color: rgba(0,0,0,0.7);
+}
+table.gig-schedule thead tr th a {
+	font-size: smaller;
+	text-decoration: none;
+	text-transform: uppercase;
+	color: rgba(0,0,0,0.7);
 }

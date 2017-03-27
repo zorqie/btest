@@ -1,9 +1,11 @@
 import React from 'react';
-import { browserHistory } from 'react-router';
+import {Link, browserHistory} from 'react-router';
 import moment from 'moment'
 import mongoose from 'mongoose'; 
 
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import ActionDashboard from 'material-ui/svg-icons/action/dashboard';
+
 import Dialog from 'material-ui/Dialog';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import IconButton from 'material-ui/IconButton';
@@ -18,24 +20,13 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 
 import app from '../main.jsx'
 import GigDialogForm from './gig-dialog-form.jsx'
-import GigTypes from './gig-types.jsx'
+import GigTypesList from './gig-types-list.jsx'
 import GigTimespan from './gig-timespan.jsx'
+import GigsTab from './gigs-tab.jsx'
+import { Kspan } from './hacks.jsx'
 import { plusOutline } from './icons.jsx'
 
 const types = gigs => gigs.map(g => g.type).filter((e, i, a) => a.indexOf(e)===i)
-
-//hack because Material-UI forces a onKeyboardFocus onto the span and React complains
-const Kspan = ({onKeyboardFocus, ...others}) => <span {...others}/>; 
-
-const Subgig = ({ gig, onSelect, onEdit, onDelete }) => <ListItem 
-		primaryText={gig.name} 
-		secondaryText={<GigTimespan gig={gig} />} 
-		rightIconButton={<Kspan>
-			<FlatButton label="Edit" onTouchTap={onEdit}/>
-			<FlatButton label="Delete" onTouchTap={onDelete}/>
-		</Kspan>}
-		onTouchTap={onSelect}
-	/>;
 
 
 export default class EventPage extends React.Component {
@@ -230,16 +221,12 @@ export default class EventPage extends React.Component {
 				<CardText >
 					<p>{event.description}</p>
 					<Tabs>
-						{types(gigs).map(type => <Tab key={type || 'none'} label={type} >
-							{gigs.filter(g => g.type===type).map(
-								gig => <Subgig 
-									key={gig._id} 
-									gig={gig}
-									onEdit={this.handleGigEdit.bind(this, gig)}
-									onDelete={this.handleGigDelete.bind(this, gig)}
-									onSelect={this.handleGigSelect.bind(this, gig)}
-							/>)}
-						</Tab>)}
+						{types(gigs).map(type => 
+							GigsTab({event, type, gigs, onEdit:this.handleGigEdit, 
+								onDelete:this.handleGigDelete,
+								onSelect:this.handleGigSelect,
+							})
+						)}
 					</Tabs>
 				</CardText>
 				<Dialog
@@ -262,11 +249,13 @@ export default class EventPage extends React.Component {
 					/>]}
 					onRequestClose={this.handleTypesCancel}
 				>
-					<GigTypes onSelect={this.handleTypesSelect} />
+					<GigTypesList onSelect={this.handleTypesSelect} />
 				</Dialog>
 				
 				<CardActions>
-					<FlatButton icon={plusOutline} label="Activity" onTouchTap={this.handleTypesOpen}/>
+					<FloatingActionButton onTouchTap={this.handleTypesOpen}>
+						<ContentAdd />
+					</FloatingActionButton>
 				</CardActions>
 			</Card>
 		);

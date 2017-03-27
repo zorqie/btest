@@ -10,6 +10,7 @@ import moment from 'moment'
 import app from '../main.jsx'
 import VenueSites from './venue-sites.jsx'
 import styles from './styles'
+import { gigDuration, focus } from './hacks.jsx'
 
 
 const blankGig = () => {
@@ -24,22 +25,7 @@ const blankGig = () => {
 	}
 }
 
-const gigDuration = gig => {
-	if (!gig || !gig.end) return ''
-	const dur = moment.duration(moment(gig.end).diff(moment(gig.start)))
-	console.log("Dyur", dur)
-	// TODO rounding. Sometimes 1:00 to 2:00 is 59 minutes, sometimes 60 ???
-	const d = dur.days()
-	const days = d > 0 ? d > 1 ? d + ' days ' : '1 day ' : ''
-	const h = dur.hours()
-	const hours = h > 0 ? h > 1 ? h + ' hours ' : '1 hour ' : ''
-	const m = dur.minutes()
-	const minutes = m > 0 ? m > 1 ? m + ' minutes' : '1 minute' : ''
-	const duration = days + hours + minutes
-	return duration
-}
 
-const focus = input => input && input.focus()
 
 export default class GigDialogForm extends React.Component {
 	state = {

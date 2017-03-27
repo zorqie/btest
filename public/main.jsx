@@ -14,7 +14,7 @@ import SignupForm from './mui/signup-form.jsx';
 import UserList from './mui/user-list.jsx';
 import UserCard from './mui/user-card.jsx';
 import VenuePage from './mui/venues-page.jsx';
-import VolunteerTable from './mui/event-volunteer-table.jsx';
+import Schedule from './mui/event-schedule.jsx';
 import VenueDetailsPage from './mui/venue-details-page.jsx';
 import errorHandler from './mui/err';
 
@@ -89,7 +89,8 @@ const routes =
 				<Route path='acts' component={ActsPage} />
 				<Route path='acts/:actId' component={ActDetailsPage} />
 
-				<Route path='schedule/:eventId' component={VolunteerTable} />
+				<Route path='schedule/:eventId' component={Schedule} />
+				<Route path='schedule/:eventId/:type' component={Schedule} />
 
 				<Route path='users' component={UserList} />
 				<Route path='users/:userId' component={UserCard} />

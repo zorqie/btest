@@ -29,6 +29,7 @@ const styles = {
 		fontWeight: 300,
 		fontSize: '24px',
 		padding: '24px',
+		textAlign: 'left',
 		whiteSpace: 'nowrap',
 	},
 }

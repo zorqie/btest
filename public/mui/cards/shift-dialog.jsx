@@ -1,27 +1,14 @@
-import React from 'react';
+import React from 'react'
+import moment from 'moment'
 
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
+import Dialog from 'material-ui/Dialog'
+import FlatButton from 'material-ui/FlatButton'
+import RaisedButton from 'material-ui/RaisedButton'
+import TextField from 'material-ui/TextField'
 
-import moment from 'moment';
-
-import app from '../../main.jsx';
-
-const blankGig = () => {
-	return { 
-		name: '', 
-		description: '', 
-		venue: '',
-		act: '',
-		type: '', 
-		start: new Date(), 
-		end: new Date()
-	}
-}
-
-const focus = input => input && input.focus();
+import app from '../../main.jsx'
+import { focus, gigDuration, blankGig } from '../hacks.jsx'
+import styles from '../styles'
 
 export default class ShiftDialog extends React.Component {
 	state = {
@@ -75,7 +62,7 @@ export default class ShiftDialog extends React.Component {
 		const {errors, open} = this.props;
 		return (
 			<Dialog 
-				title={(gig._id ? '' : 'Add ') + gig.type + ' shift'}
+				title={(gig._id ? '' : 'Add ') + gig.type + ' session'}
 				open={open}
 				actions={this.dialogActions}
 				onRequestClose={this.props.onCancel}
@@ -86,7 +73,6 @@ export default class ShiftDialog extends React.Component {
 							name='name'
 							floatingLabelText="Name"
 							value={gig.name || ''} 
-							maxLength={30}
 						/>
 						<TextField 
 							name='venue'
@@ -111,6 +97,7 @@ export default class ShiftDialog extends React.Component {
 							value={(gig.start && moment(gig.start).format('YYYY-MM-DD')) || ''} 
 							errorText={(errors.start && errors.start.message) || ''}
 							onChange={this.handleChange} 
+							style={styles.dateInput}
 							ref={focus}
 						/>
 						<TextField 
@@ -120,6 +107,13 @@ export default class ShiftDialog extends React.Component {
 							floatingLabelText="Start time"
 							value={(gig.start && moment(gig.start).format('HH:mm')) || ''} 
 							onChange={this.handleChange} 
+							style={styles.timeInput}
+						/>
+						<TextField 
+							name='duration'
+							floatingLabelFixed={true}
+							floatingLabelText="Duration"
+							value={gigDuration(gig)} 
 						/>
 					</div>
 					<div>
@@ -131,6 +125,7 @@ export default class ShiftDialog extends React.Component {
 							value={(gig.end && moment(gig.end).format('YYYY-MM-DD')) || ''} 
 							errorText={(errors.end && errors.end.message) || ''}
 							onChange={this.handleChange} 
+							style={styles.dateInput}
 						/>
 						<TextField 
 							type='time'
@@ -139,6 +134,7 @@ export default class ShiftDialog extends React.Component {
 							floatingLabelText="End time"
 							value={(gig.end && moment(gig.end).format('HH:mm')) || ''} 
 							onChange={this.handleChange} 
+							style={styles.timeInput}
 						/>
 					</div>
 				</form>
