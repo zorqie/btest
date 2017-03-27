@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router'
 
 import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
+import RaisedButton from 'material-ui/RaisedButton'
 
 import app from '../main.jsx'
 import ActsList from './acts-list.jsx'
@@ -86,7 +87,7 @@ export default class ActsPage extends React.Component {
 						label="Cancel"
 						onTouchTap={this.handleEditCancel}
 					/>,
-					<FlatButton
+					<RaisedButton
 						label="Save"
 						primary={true}
 						onTouchTap={this.handleEditSubmit}

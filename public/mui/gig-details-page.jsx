@@ -1,6 +1,5 @@
 import React from 'react'
 import moment from 'moment'
-import mongoose from 'mongoose'
 import { browserHistory } from 'react-router';
 
 import Avatar from 'material-ui/Avatar'
@@ -20,10 +19,6 @@ import { mic } from './icons.jsx'
 import PerformanceCard from './cards/performance-card.jsx'
 import WorkshopCard from './cards/workshop-card.jsx'
 import VolunteerCard from './cards/volunteer-card.jsx'
-
-
-
-
 
 export default class GigDetailsPage extends React.Component {
 	state = {
@@ -49,8 +44,7 @@ export default class GigDetailsPage extends React.Component {
 
 	fetchData = () => {
 		const { gigId } = this.props.params
-		
-		 
+
 		app.service('gigs').get(gigId)
 		.then(gig => {	
 			document.title=gig.name	

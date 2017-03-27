@@ -20,8 +20,7 @@ import Subheader from 'material-ui/Subheader'
 import app from '../main.jsx';
 import errorHandler from './err';
 import GigTimespan from './gig-timespan.jsx'
-
-const blankGig = () => { return { name: '', description: '', type: '', start: new Date(), end: new Date()}};
+import { blankGig } from './hacks.jsx'
 
 const moreIcon = <IconButton touch={true} >
 					<MoreVertIcon color={grey400} />
@@ -60,7 +59,7 @@ export default class EventsList extends React.Component {
 		.then(this.fetchData)	
 		.catch(errorHandler)
 
-		// Listen to newly created/removed gigs
+		// Listen to newly created/removed/patched gigs
 		app.service('gigs').on('created', this.createdListener)
 		app.service('gigs').on('patched', this.fetchData)
 		app.service('gigs').on('removed', this.removedListener)
@@ -115,8 +114,8 @@ export default class EventsList extends React.Component {
 	render() {
 		return <div>
 			<List >
-				{this.state.gigs.map(
-					g => <GigItem 
+				{this.state.gigs.map(g => 
+					<GigItem 
 						onSelect={this.select.bind(this, g)} 
 						onEdit={this.edit.bind(this, g)}
 						onDelete={this.delete.bind(this, g)}
@@ -124,7 +123,7 @@ export default class EventsList extends React.Component {
 						key={g._id}
 					/>
 				)}
-				<FloatingActionButton secondary onTouchTap={this.edit.bind(this, null)}>
+				<FloatingActionButton secondary={true} onTouchTap={this.edit.bind(this, null)}>
 					<ContentAdd />
 				</FloatingActionButton>
 			</List>

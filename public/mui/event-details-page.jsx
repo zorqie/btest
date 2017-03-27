@@ -1,22 +1,20 @@
-import React from 'react';
-import {Link, browserHistory} from 'react-router';
+import React from 'react'
+import {Link, browserHistory} from 'react-router'
 import moment from 'moment'
-import mongoose from 'mongoose'; 
 
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import ActionDashboard from 'material-ui/svg-icons/action/dashboard';
+import ContentAdd from 'material-ui/svg-icons/content/add'
+import ActionDashboard from 'material-ui/svg-icons/action/dashboard'
 
-import Dialog from 'material-ui/Dialog';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-import IconButton from 'material-ui/IconButton';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
-import {Tabs, Tab} from 'material-ui/Tabs';
+import Dialog from 'material-ui/Dialog'
+import FloatingActionButton from 'material-ui/FloatingActionButton'
+import IconButton from 'material-ui/IconButton'
+import FlatButton from 'material-ui/FlatButton'
+import RaisedButton from 'material-ui/RaisedButton'
+import {List, ListItem} from 'material-ui/List'
+import {Tabs, Tab} from 'material-ui/Tabs'
 
 
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card'
 
 import app from '../main.jsx'
 import GigDialogForm from './gig-dialog-form.jsx'
@@ -46,19 +44,19 @@ export default class EventPage extends React.Component {
 		.then(this.fetchData)
 	}
 	componentDidMount() {
-		app.service('gigs').on('removed', this.removedListener);
-		app.service('gigs').on('created', this.createdListener);
-		app.service('gigs').on('patched', this.patchedListener);
+		app.service('gigs').on('removed', this.removedListener)
+		app.service('gigs').on('created', this.createdListener)
+		app.service('gigs').on('patched', this.patchedListener)
 	}
 	componentWillUnmount() {
 		if(app) {
-			app.service('gigs').removeListener('removed', this.removedListener);
-			app.service('gigs').removeListener('created', this.createdListener);
-			app.service('gigs').removeListener('patched', this.patchedListener);
+			app.service('gigs').removeListener('removed', this.removedListener)
+			app.service('gigs').removeListener('created', this.createdListener)
+			app.service('gigs').removeListener('patched', this.patchedListener)
 		}
 	}
 	fetchData = () => {
-		const eventId = this.props.params.eventId;
+		const {eventId} = this.props.params
 
 		app.service('gigs').get(eventId)
 		.then(event => {
@@ -71,27 +69,27 @@ export default class EventPage extends React.Component {
 				}
 			})
 			.then(page => {
-				// console.log("Got result: ", page);
+				// console.log("Got result: ", page)
 				
-				this.setState({...this.state, event, gigs: page.data });
+				this.setState({...this.state, event, gigs: page.data })
 			})
 		})
-		.catch(err => console.error("ERAR: ", err));
+		.catch(err => console.error("ERAR: ", err))
 	}
 
 	/*
 	
 	*/
 
-	handleDialogCancel = e => {
-		// console.log("Canceling...");
+	handleDialogCancel = () => {
+		// console.log("Canceling...")
 		const { dialog } = this.state
 		Object.assign(dialog, {open: false})
 		this.setState({...this.state, dialog})
 	}
-	handleDialogSubmit = e => {
-		const {gig} = this.state.dialog;
-		// console.log("Submitting...", gig);
+	handleDialogSubmit = () => {
+		const {gig} = this.state.dialog
+		// console.log("Submitting...", gig)
 		if(!gig.venue_id) { //mutating ?!?!?!
 			gig.venue_id = this.state.venue_id
 		}
@@ -99,28 +97,28 @@ export default class EventPage extends React.Component {
 			app.service('gigs').patch(gig._id, gig)
 			// .then(gig => console.log("Updated gig", gig)) // this is handled in patchedListener
 			.catch(err => {
-				console.error("Didn't update", err);
-				this.setState({...this.state, dialog: {open: true, errors: err.errors, gig}});
-			});
+				console.error("Didn't update", err)
+				this.setState({...this.state, dialog: {open: true, errors: err.errors, gig}})
+			})
 		} else {
 			app.service('gigs').create(gig)
 			// .then(gig => console.log("Created gig", gig)) // handled in createdListener
 			.catch(err => {
-				console.error("Didn't create gig", JSON.stringify(err));
-				this.setState({...this.state, dialog: {open: true, errors: err.errors, gig}});
-			});
+				console.error("Didn't create gig", JSON.stringify(err))
+				this.setState({...this.state, dialog: {open: true, errors: err.errors, gig}})
+			})
 		}
 		
 	}
 	handleGigDelete = gig => {
-		console.log("Deleting gig ", gig);
+		console.log("Deleting gig ", gig)
 		app.service('gigs').remove(gig._id)
 		// .then(gig => console.log("Deleted gig", gig)) // this is handled in removedListener
-		.catch(err => console.error("Delete failed: ", err));
+		.catch(err => console.error("Delete failed: ", err))
 	}
 	handleGigEdit = (gig, type) => {
-		// console.log("Hanlediting...", gig);
-		const { dialog, event } = this.state;
+		// console.log("Hanlediting...", gig)
+		const { dialog, event } = this.state
 		const dg = gig ? 
 			Object.assign({}, gig) 
 			: Object.assign({}, {
@@ -144,7 +142,6 @@ export default class EventPage extends React.Component {
 	dialogActions = () => [
 		<FlatButton
 			label="Cancel"
-			primary={true}
 			onTouchTap={this.handleDialogCancel}
 		/>,
 		<RaisedButton
@@ -155,56 +152,56 @@ export default class EventPage extends React.Component {
 	]
 
 	removedListener = gig => {
-		// console.log("Removed: ", gig);
+		// console.log("Removed: ", gig)
 		const {dialog, gigs} = this.state
 		Object.assign(dialog, {open: false,  errors:{}})
 		this.setState({
 			...this.state, 
 			gigs: gigs.filter(g => g._id !== gig._id),
 			dialog
-		});
+		})
 	}
 	createdListener = gig => {
-		// console.log("Added: ", gig);
-		const {dialog, gigs} = this.state;
+		// console.log("Added: ", gig)
+		const {dialog, gigs} = this.state
 		Object.assign(dialog, {open: false, errors: {}})
 		this.setState({
 			...this.state, 
 			gigs: gigs.concat(gig),
 			dialog,
-		});
+		})
 	}
 	patchedListener = gig => {
-		// console.log("Updated: ", gig);
+		// console.log("Updated: ", gig)
 		// do something to reflect update
-		const {dialog, gigs} = this.state;
+		const {dialog, gigs} = this.state
 		Object.assign(dialog, {open: false, errors: {}})
 		this.setState({
 			...this.state, 
 			gigs: gigs.filter(g => g._id !== gig._id).concat(gig), //remove+add ?
 			dialog,
-		});
+		})
 	}
 
 // types 
 	handleTypesCancel = () => {
-		// console.log("Canceling...");
+		// console.log("Canceling...")
 		this.setState({typesOpen: false})
 	}
 	handleTypesSelect = type => {
-		// this.setState({...this.state, typesOpen: false});
-		this.handleGigEdit(null, type.name);
+		// this.setState({...this.state, typesOpen: false})
+		this.handleGigEdit(null, type.name)
 	}
-	handleTypesOpen = () => {
-		this.setState({...this.state, typesOpen: true});
+	openTypesDialog = () => {
+		this.setState({...this.state, typesOpen: true})
 	}
 
 	render() {
-		const {event, gigs, dialog} = this.state;
-		// console.log("GIGGGINGING: ", this.state); 
-		const title = (<span><b>{event.name}</b> at <b>{event.venue && event.venue.name}</b></span>);
+		const {event, gigs, dialog} = this.state
+		// console.log("GIGGGINGING: ", this.state) 
+		const title = (<span><b>{event.name}</b> at <b>{event.venue && event.venue.name}</b></span>)
 
-		const subtitle = <GigTimespan gig={event} showRelative={true}/>;
+		const subtitle = <GigTimespan gig={event} showRelative={true}/>
 
 		return (
 			<Card>
@@ -253,11 +250,11 @@ export default class EventPage extends React.Component {
 				</Dialog>
 				
 				<CardActions>
-					<FloatingActionButton onTouchTap={this.handleTypesOpen}>
+					<FloatingActionButton onTouchTap={this.openTypesDialog}>
 						<ContentAdd />
 					</FloatingActionButton>
 				</CardActions>
 			</Card>
-		);
+		)
 	}
 }

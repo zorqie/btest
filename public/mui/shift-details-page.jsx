@@ -1,6 +1,5 @@
 import React from 'react'
 import moment from 'moment'
-import mongoose from 'mongoose'
 import { browserHistory } from 'react-router';
 
 import Avatar from 'material-ui/Avatar'
@@ -135,7 +134,10 @@ export default class ShiftDetailsPage extends React.Component {
 				)}
 			</CardText>
 			<CardActions>
-				<FlatButton icon={addBoxIcon} label='Assign' onTouchTap={this.selectAct}/>}
+				{gig.type && gig.type==='Volunteer' && 
+					<FlatButton icon={addBoxIcon} label='Assign' onTouchTap={this.selectAct}/>
+					|| ''
+				}
 			</CardActions>
 
 			<Dialog

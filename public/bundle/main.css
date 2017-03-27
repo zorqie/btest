@@ -27,6 +27,7 @@ table.gig-schedule tbody tr td:first-child {
 }*/
 table.gig-schedule tbody tr td {
 	border-top: 1px solid rgba(0, 0, 0, 0.1);
+	transition: all 0.5s ease;
 }
 table.gig-schedule tbody tr td:hover {
 	background-color: rgba(0, 0, 0, 0.1);
@@ -40,16 +41,22 @@ td.j-end {
 td.j-shift {
 	border-right: 2px solid grey;
 	border-left: 2px solid grey;
-	width: 10em;
+	width: 12em;
 }
 table.gig-schedule tbody tr td a {
-	font-size: smaller;
+	font-size: x-small;
 	text-decoration: none;
 	color: rgba(0,0,0,0.7);
+	padding-left: 0.3em;
 }
+
+/*table.gig-schedule thead tr:nth-child(2) th {
+	background-color: rgba(0,0,0,0.5);
+}*/
 table.gig-schedule thead tr th a {
 	font-size: smaller;
 	text-decoration: none;
 	text-transform: uppercase;
-	color: rgba(0,0,0,0.7);
+	letter-spacing: 1px;
+	color: rgba(0,0,0,0.5);
 }

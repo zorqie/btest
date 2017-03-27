@@ -1,5 +1,4 @@
 import React from 'react';
-import mongoose from 'mongoose'; 
 import { browserHistory } from 'react-router';
 
 import ContentAdd from 'material-ui/svg-icons/content/add';
