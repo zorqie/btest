@@ -12,10 +12,10 @@ import styles from '../styles'
 
 export default class ShiftDialog extends React.Component {
 	state = {
-		gig: this.props.shift || blankGig(),
+		gig: this.props.session || blankGig(),
 	}
 	componentWillReceiveProps(nextProps) {
-		this.setState({gig: nextProps.shift})
+		this.setState({gig: nextProps.session})
 	}
 	handleChange = e => {
 		// TODO: ensure end is after start
@@ -61,7 +61,7 @@ export default class ShiftDialog extends React.Component {
 		const {errors, open} = this.props;
 		return (
 			<Dialog 
-				title={(gig._id ? '' : 'Add ') + gig.type + ' shift'}
+				title={(gig._id ? '' : 'Add ') + gig.type + ' session'}
 				open={open}
 				actions={this.dialogActions}
 				onRequestClose={this.props.onCancel}
@@ -72,6 +72,7 @@ export default class ShiftDialog extends React.Component {
 							name='name'
 							floatingLabelText="Name"
 							value={gig.name || ''} 
+							onChange={this.handleChange}
 						/>
 						<TextField 
 							name='venue'

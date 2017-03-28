@@ -10,11 +10,12 @@ import {jobsByDate, sequence, hours24} from './hacks.jsx'
 
 const startTimeSort = (a, b) => +(a.start > b.start) || +(a.start === b.start) - 1
 
-const tspan = ({_id, start, end}) => 
+const tspan = (job, {_id, name, start, end}) => 
 	<span>
 		<Link to={'/shifts/'+_id}>
 		{moment(start).format('HH:mm')}-{moment(end).format('HH:mm')}
 		</Link>
+		{job.name!==name && name}
 	</span>
 
 
@@ -92,9 +93,9 @@ export default class VolunteerTable extends React.Component {
 										sequence(span).map(i => {
 											const slot = hours[hour][i]
 											const starts = slot && slot.show && slot.show.starts
-											const c = 'j-shift ' + (slot && slot.show && (slot.show.starts ? 'j-start' : slot.show.ends ? 'j-end' : ''))
+											const c = 'j-shift ' + (slot && slot.show && (slot.show.starts ? 'j-start ' : '') + (slot.show.ends ? 'j-end' : ''))
 											return slot 
-												&& <td key={hour+i} className={c}>{starts && tspan(slot.shift)}</td> 
+												&& <td key={hour+i} className={c}>{starts && tspan(job, slot.shift)}</td> 
 												|| <td key={hour+i}> </td>
 										})
 										|| <td key={job._id+hour} colSpan={span}> </td>

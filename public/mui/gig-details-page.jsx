@@ -1,24 +1,25 @@
 import React from 'react'
-import moment from 'moment'
 import { browserHistory } from 'react-router';
 
 import Avatar from 'material-ui/Avatar'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card'
 import FlatButton from 'material-ui/FlatButton'
 import {List, ListItem} from 'material-ui/List'
-import Subheader from 'material-ui/Subheader'
 import Divider from 'material-ui/Divider'
 import Dialog from 'material-ui/Dialog'
 
 import ActsList from './acts-list.jsx'
-import ActDialogForm from './act-dialog-form.jsx'
+import ActDialog from './act-dialog.jsx'
+import ActSelectDialog from './act-select-dialog.jsx'
 import GigTimespan from './gig-timespan.jsx'
+
 import app from '../main.jsx'
 import { mic } from './icons.jsx'
 
 import PerformanceCard from './cards/performance-card.jsx'
 import WorkshopCard from './cards/workshop-card.jsx'
 import VolunteerCard from './cards/volunteer-card.jsx'
+import GigActsList from './cards/gig-acts-list.jsx'
 
 export default class GigDetailsPage extends React.Component {
 	state = {
@@ -59,20 +60,23 @@ export default class GigDetailsPage extends React.Component {
 		app.service('acts').find()
 		.then(result => {
 			if(result.total > 0) {
-				this.setState({dialogActs: result.data, selectDialog: true})
+				this.setState({dialogActs: result.data, selectDialog: true, editDialog:{open: false}})
 			}
 		})
 	}
+
 	removeAct = act => {
 		console.log("Remove act", act)
 		const { gig } = this.state
 		Object.assign(gig, {act_id: gig.act_id.filter(a_id => a_id !== act._id)})
 		app.service('gigs').patch(gig._id, gig)
 	}
+
 	replaceAct = act => {
 		this.removeAct(act)
 		this.selectAct()
 	}
+
 	viewActDetails = act => browserHistory.push('/acts/'+act._id)
 
 	handleActsEdit = act => {
@@ -81,6 +85,7 @@ export default class GigDetailsPage extends React.Component {
 		Object.assign(editDialog, {open: true, errors:{}, act: act || {}})
 		this.setState({selectDialog:false, editDialog})
 	}
+
 	handleActsSelect = act => {
 		console.log("Act selected", act)
 		const { gig } = this.state
@@ -89,6 +94,7 @@ export default class GigDetailsPage extends React.Component {
 		.then(gig => console.log("Gig patched", gig))
 		.catch(err => console.error("Most erroneous thing happened", err))
 	}
+
 	handleActsCancel = () => {
 		this.setState({selectDialog: false})
 	}
@@ -98,7 +104,7 @@ export default class GigDetailsPage extends React.Component {
 		this.setState({editDialog: {open: false}})
 	}
 
-	handleActEditSubmit = e => {
+	/*handleActEditSubmit = e => {
 		const {act} = this.state.editDialog
 		if(act._id) {
 			// patch
@@ -112,34 +118,37 @@ export default class GigDetailsPage extends React.Component {
 			.catch(this.handleActEditError)
 		}
 		// this.selectAct()
-	}
+	}*/
 
-	handleActEditError = err => {
+	/*handleActEditError = err => {
 		console.log("Act error", err)
 		const { editDialog } = this.state;
 		Object.assign(editDialog, {errors: err.errors})
 		this.setState({...this.state, editDialog})
-	}
+	}*/
 
 	render() {
 		const { gig, venue, fans, dialogActs } =  this.state
 		// console.log("GIIG", this.state)
+		const actsList = 
+			<GigActsList 
+				gig={gig} 
+				onSelect={this.viewActDetails}
+				onEdit={this.replaceAct} 
+				onDelete={this.removeAct} 
+			/>
 		const card = 
 			gig.type==='Workshop' ? 
 				<WorkshopCard 
 					gig={gig} 
 					fans={fans}
-					onMasterSelect={this.viewActDetails}
-					onMasterEdit={this.replaceAct} 
-					onMasterDelete={this.removeAct} 
+					acts={actsList}
 				/> : 
 				gig.type==='Volunteer' ?
 					<VolunteerCard gig={gig} /> : 
 					<PerformanceCard 
 						gig={gig} 
-						onPerformerSelect={this.viewActDetails}
-						onPerformerEdit={this.replaceAct} 
-						onPerformerDelete={this.removeAct} 
+						acts={actsList}
 					/>
 		const gigTitle = <span>
 					<span className='acts'>{gig.acts && gig.acts.map(a => a.name).join(', ')}</span>
@@ -157,12 +166,19 @@ export default class GigDetailsPage extends React.Component {
 			<CardActions>
 				{gig.type !== 'Volunteer' && <FlatButton icon={mic} label='Add performer' onTouchTap={this.selectAct}/>}
 			</CardActions>
-			<Dialog
+			<ActSelectDialog 
+				open={this.state.selectDialog}
+				onCancel={this.handleActsCancel}
+				onSelect={this.handleActsSelect} 
+				allowAdd={true}
+				onEdit={this.handleActsEdit}/>
+			/>
+			{/*<Dialog
 				title='Acts'
 				open={this.state.selectDialog}
 				actions={[
 					<FlatButton
-						label="Cancel"
+						label="Close"
 						primary={true}
 						onTouchTap={this.handleActsCancel}
 					/>
@@ -174,14 +190,19 @@ export default class GigDetailsPage extends React.Component {
 					onSelect={this.handleActsSelect} 
 					allowAdd={true}
 					onEdit={this.handleActsEdit}/>
-			</Dialog>
-			<Dialog
+			</Dialog>*/}
+			<ActDialog 
+				act={this.state.editDialog.act} 
+				open={this.state.editDialog.open} 
+				onClose={this.handleActEditCancel} 
+				onAfterSubmit={this.selectAct}
+			/>
+			{/*<Dialog 
 				title='Act'
 				open={this.state.editDialog.open}
 				actions={[
 					<FlatButton
 						label="Cancel"
-						
 						onTouchTap={this.handleActEditCancel}
 					/>,
 					<FlatButton
@@ -193,7 +214,7 @@ export default class GigDetailsPage extends React.Component {
 				onRequestClose={this.handleActEditCancel}
 			>
 				<ActDialogForm act={this.state.editDialog.act}  errors={this.state.editDialog.errors}/>
-			</Dialog>
+			</Dialog>*/}
 		</Card>
 	}
 }

@@ -8,7 +8,7 @@ import RaisedButton from 'material-ui/RaisedButton'
 import app from '../main.jsx'
 import ActDialogForm from './act-dialog-form.jsx'
 
-export default class ActsPage extends React.Component {
+export default class ActDialog extends React.Component {
 	state = {
 		act: Object.assign({}, this.props.act),
 		errors: {},
@@ -20,18 +20,19 @@ export default class ActsPage extends React.Component {
 
 	handleSubmit = () => {
 		const {act} = this.state
+		const onClose = this.props.onAfterSubmit || this.props.onClose
 		if(act.name && act.name.length) {
 			
 			if(act._id) {
 				app.service('acts').patch(act._id, act)
-				.then(this.props.onClose)
+				.then(onClose)
 				.catch(err => {
 					console.error('Updating acts are acting out', err)
 					this.setState({errors: err.errors})
 				})
 			} else {
 				app.service('acts').create(act)
-				.then(this.props.onClose)
+				.then(onClose)
 				.catch(err => {
 					console.error('Creating acts are acting out', err)
 					this.setState({errors: err.errors})
@@ -44,7 +45,7 @@ export default class ActsPage extends React.Component {
 		const {act, errors} = this.state
 		const {open, onClose} = this.props
 		return <Dialog 
-				title={act._id ? null : 'Add Act'}
+				title={act && act._id ? null : 'Add Act'}
 				open={open}
 				actions={[
 					<FlatButton

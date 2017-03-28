@@ -1,7 +1,6 @@
 import React from 'react'
 import { browserHistory } from 'react-router'
 
-import Divider from 'material-ui/Divider'
 import FlatButton from 'material-ui/FlatButton'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import {ListItem} from 'material-ui/List'

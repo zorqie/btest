@@ -86,7 +86,7 @@ export default class Layout extends React.Component {
 	handleLogin = u => {
 		const user = app.get('user')
 		if(user) {
-			console.log("-=-=- AUTHENTICATED (app.user) -=-=-", user)
+			// console.log("-=-=- AUTHENTICATED (app.user) -=-=-", user)
 			this.setState({user})
 		}
 	}
