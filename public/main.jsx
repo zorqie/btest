@@ -84,6 +84,7 @@ const routes =
 				<Route path='events' component={EventsPage} />
 				<Route path='events/:eventId' component={EventDetailsPage} />
 				<Route path='gigs/:gigId' component={GigDetailsPage} />
+				<Route path='sessions/:gigId' component={GigDetailsPage} />
 				<Route path='shifts/:shiftId' component={ShiftDetailsPage} />
 				
 				<Route path='acts' component={ActsPage} />

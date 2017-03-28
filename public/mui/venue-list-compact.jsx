@@ -1,7 +1,6 @@
 import React from 'react';
 
 import Checkbox from 'material-ui/Checkbox';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 import Divider from 'material-ui/Divider';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import IconButton from 'material-ui/IconButton';
@@ -9,6 +8,7 @@ import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 
 import app from '../main.jsx'
+import {addIcon} from './icons.jsx'
 
 class ExpandableVenueItem extends React.Component {
 	constructor(props) {
@@ -67,7 +67,7 @@ export default class VenueList extends React.Component {
 						/>
 				)}
 				<FloatingActionButton secondary onClick={this.handleSelection.bind(this, {name:"", capacity:""})}>
-					<ContentAdd />
+					{addIcon}
 				</FloatingActionButton>
 			</List>
 		);

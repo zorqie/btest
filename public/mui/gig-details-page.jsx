@@ -22,6 +22,21 @@ import WorkshopCard from './cards/workshop-card.jsx'
 import VolunteerCard from './cards/volunteer-card.jsx'
 import GigActsList from './cards/gig-acts-list.jsx'
 
+function GigCard({gig, fans, actsList}) {
+	return gig.type==='Workshop' 
+			? 	<WorkshopCard 
+					gig={gig} 
+					fans={fans}
+					acts={actsList}
+				/> 
+				: gig.type==='Volunteer' 
+					? <VolunteerCard gig={gig} /> 
+					: <PerformanceCard 
+						gig={gig} 
+						acts={actsList}
+					/>
+}
+
 export default class GigDetailsPage extends React.Component {
 	state = {
 		fans: [],  
@@ -29,22 +44,38 @@ export default class GigDetailsPage extends React.Component {
 		selectDialog: false,
 		editDialog: {open: false, act: {}, errors: {}},
 	}
+
 	componentWillMount() {
 		app.authenticate().then(this.fetchData)
 		.catch(err => console.error("It can't be, an erro: ", err))
 	}
+
 	componentDidMount() {
 		// attach listeners
 		app.service('gigs').on('patched', this.fetchData)
 	}
+
 	componentWillUnmount() {
 		// remove listners
 		app.service('gigs').removeListener('patched', this.fetchData)
 	}
 
-	fetchData = () => {
-		const { gigId } = this.props.params
+	componentWillReceiveProps(nextProps) {
+		if(nextProps.params.gigId !== this.props.gigId) {
+			this.setState({
+				fans: [],  
+				gig: {},
+				selectDialog: false,
+				editDialog: {open: false, act: {}, errors: {}},
+			})
+			app.authenticate().then(this.fetchData) // TODO hack to force fetch after we're out of here...
+		}
+	}
 
+	
+	fetchData = () => {
+		const { gigId } =  this.props.params
+		console.log("Fetching", gigId)
 		app.service('gigs').get(gigId)
 		.then(gig => {	
 			document.title=gig.name	
@@ -104,61 +135,53 @@ export default class GigDetailsPage extends React.Component {
 		this.setState({editDialog: {open: false}})
 	}
 
+	micButton = <FlatButton icon={mic} label='Add performer' onTouchTap={this.selectAct}/>
+
 	render() {
 		const { gig, fans } =  this.state
-		// console.log("GIIG", this.state)
-		const actsList = 
-			<GigActsList 
-				gig={gig} 
-				onSelect={this.viewActDetails}
-				onEdit={this.replaceAct} 
-				onDelete={this.removeAct} 
-				allowAdd={true}
-				addButton={<FlatButton icon={mic} label='Add performer' onTouchTap={this.selectAct}/>}
-			/>
-
-		const card = 
-			gig.type==='Workshop' ? 
-				<WorkshopCard 
-					gig={gig} 
-					fans={fans}
-					acts={actsList}
-				/> : 
-				gig.type==='Volunteer' ?
-					<VolunteerCard gig={gig} /> : 
-					<PerformanceCard 
-						gig={gig} 
-						acts={actsList}
-					/>
+		// console.log("GIIG", this.state)			
 		
-		return <Card>
-			<CardHeader 
-				title={<GigTitle gig={gig} />} 
-				subtitle={<GigTimespan gig={gig} showDuration={true} />}
-				avatar={<Avatar>{gig.type && gig.type.charAt(0)}</Avatar>}>
-			</CardHeader>
-			<CardText>
+		return <div>
+					{gig._id && <Card>
+							<CardHeader 
+								title={<GigTitle gig={gig} />} 
+								subtitle={<GigTimespan gig={gig} showDuration={true} />}
+								avatar={<Avatar>{gig.type && gig.type.charAt(0)}</Avatar>}>
+							</CardHeader>
+							<CardText>
+								<GigCard 
+									gig={gig} 
+									fans={fans} 
+									actsList={<GigActsList 
+										gig={gig} 
+										onSelect={this.viewActDetails}
+										onEdit={this.replaceAct} 
+										onDelete={this.removeAct} 
+										allowAdd={true}
+										addButton={this.micButton}
+									/>}
+								/>
+							</CardText>
+							<CardActions>
+								
+							</CardActions>			
+						</Card>
+					}
 
-				{card}
-			</CardText>
-			<CardActions>
-				
-			</CardActions>
-			<ActSelectDialog 
-				open={this.state.selectDialog}
-				onCancel={this.handleActsCancel}
-				onSelect={this.handleActsSelect} 
-				allowAdd={true}
-				onEdit={this.handleActsEdit}/>
-			/>
-			
-			<ActDialog 
-				act={this.state.editDialog.act} 
-				open={this.state.editDialog.open} 
-				onClose={this.handleActEditCancel} 
-				onAfterSubmit={this.selectAct}
-			/>
-
-		</Card>
+					<ActSelectDialog 
+						open={this.state.selectDialog}
+						onCancel={this.handleActsCancel}
+						onSelect={this.handleActsSelect} 
+						allowAdd={true}
+						onEdit={this.handleActsEdit}
+					/>
+					
+					<ActDialog 
+						act={this.state.editDialog.act} 
+						open={this.state.editDialog.open} 
+						onClose={this.handleActEditCancel} 
+						onAfterSubmit={this.selectAct}
+					/>
+				</div>
 	}
 }

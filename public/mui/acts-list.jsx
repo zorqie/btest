@@ -13,7 +13,7 @@ export default function ActsList ({ acts, onSelect, onEdit, onDelete, allowAdd, 
 		(addButton || <FloatingActionButton onTouchTap={onEdit.bind(null, null)}>{addIcon}</FloatingActionButton>)
 	return <div>
 		<List>
-			{acts.map(act => 
+			{acts && acts.map(act => 
 				<ListItem 
 					key={act._id} 
 					primaryText={act.name}

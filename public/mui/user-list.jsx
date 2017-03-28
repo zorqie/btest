@@ -1,7 +1,6 @@
 import React from 'react'
 import { browserHistory } from 'react-router'
 
-import ContentAdd from 'material-ui/svg-icons/content/add'
 import ActionSettings from 'material-ui/svg-icons/action/settings'
 import CommunicationChatBubble from 'material-ui/svg-icons/communication/chat-bubble'
 import CommunicationChatBubbleOutline from 'material-ui/svg-icons/communication/chat-bubble-outline'

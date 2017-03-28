@@ -1,7 +1,6 @@
 import React from 'react'
 import { browserHistory } from 'react-router'
 
-import ContentAdd from 'material-ui/svg-icons/content/add'
 
 import {grey400, darkBlack, lightBlack} from 'material-ui/styles/colors'
 import Avatar from 'material-ui/Avatar'
@@ -18,6 +17,7 @@ import {List, ListItem} from 'material-ui/List'
 import Subheader from 'material-ui/Subheader'
 
 import app from '../main.jsx';
+import { addIcon } from './icons.jsx'
 import errorHandler from './err';
 import GigTimespan from './gig-timespan.jsx'
 import { blankGig } from './hacks.jsx'
@@ -124,7 +124,7 @@ export default class EventsList extends React.Component {
 					/>
 				)}
 				<FloatingActionButton secondary={true} onTouchTap={this.edit.bind(this, null)}>
-					<ContentAdd />
+					{addIcon}
 				</FloatingActionButton>
 			</List>
 

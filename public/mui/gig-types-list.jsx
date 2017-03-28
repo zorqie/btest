@@ -1,6 +1,5 @@
 import React from 'react'
 
-import ContentAdd from 'material-ui/svg-icons/content/add'
 import {List, ListItem} from 'material-ui/List'
 import Subheader from 'material-ui/Subheader'
 

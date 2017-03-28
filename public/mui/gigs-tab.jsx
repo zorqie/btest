@@ -2,7 +2,6 @@ import React from 'react'
 import { Link } from 'react-router'
 
 import ActionDashboard from 'material-ui/svg-icons/action/dashboard';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import FlatButton from 'material-ui/FlatButton'
 import FloatingActionButton from 'material-ui/FloatingActionButton';

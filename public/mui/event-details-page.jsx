@@ -2,7 +2,7 @@ import React from 'react'
 import {Link, browserHistory} from 'react-router'
 import moment from 'moment'
 
-import ContentAdd from 'material-ui/svg-icons/content/add'
+
 import ActionDashboard from 'material-ui/svg-icons/action/dashboard'
 
 import Dialog from 'material-ui/Dialog'
@@ -22,7 +22,7 @@ import GigTypesList from './gig-types-list.jsx'
 import GigTimespan from './gig-timespan.jsx'
 import GigsTab from './gigs-tab.jsx'
 import { Kspan } from './hacks.jsx'
-import { plusOutline } from './icons.jsx'
+import { addIcon, plusOutline } from './icons.jsx'
 
 const types = gigs => gigs.map(g => g.type).filter((e, i, a) => a.indexOf(e)===i)
 
@@ -251,7 +251,7 @@ export default class EventPage extends React.Component {
 				
 				<CardActions>
 					<FloatingActionButton onTouchTap={this.openTypesDialog}>
-						<ContentAdd />
+						{addIcon}
 					</FloatingActionButton>
 				</CardActions>
 			</Card>
