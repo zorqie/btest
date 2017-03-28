@@ -97,7 +97,7 @@ export default class UserCard extends React.Component {
 		const { user, rolesDialog, actDialog } = this.state
 		return <div style={{margin:'2em'}}>
 			<h2>{user.name || (user.facebook && user.facebook.name)}</h2>
-			<h3>{user.email}</h3>
+			<p>{user.email}</p>
 			<List>
 				<Subheader>Roles</Subheader>
 				{user.roles && user.roles.map(role => 

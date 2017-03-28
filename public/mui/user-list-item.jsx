@@ -28,12 +28,12 @@ const moreButton = (
 export default function UserItem({user, onSelect, onEdit}) {
 	const self = user._id === app.get("user")._id
 	console.log("UserItem: ", user)
-	const userMenu = (
+	const userMenu = user.facebookId ? null : (
 		<IconMenu iconButtonElement={moreButton}>
 			<MenuItem onTouchTap={onEdit}>Edit</MenuItem>
 			{/*<MenuItem onTouchTap={this.delete}>Delete</MenuItem>*/}
 		</IconMenu>
-	)
+	) 
 	const chatIcon = self 
 		? <ActionSettings /> 
 		: user.online 

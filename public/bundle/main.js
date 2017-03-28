@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "b6d63774f8c0d5a66241"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "3d9d75f26161ead8ef67"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotMainModule = true; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -9716,8 +9716,14 @@ function ActsList(_ref) {
 	    onEdit = _ref.onEdit,
 	    onDelete = _ref.onDelete,
 	    allowAdd = _ref.allowAdd,
-	    compact = _ref.compact;
+	    compact = _ref.compact,
+	    addButton = _ref.addButton;
 
+	var addAction = allowAdd && (addButton || _react2.default.createElement(
+		_FloatingActionButton2.default,
+		{ onTouchTap: onEdit.bind(null, null) },
+		_icons.addIcon
+	));
 	return _react2.default.createElement(
 		'div',
 		null,
@@ -9739,11 +9745,7 @@ function ActsList(_ref) {
 				});
 			})
 		),
-		allowAdd && _react2.default.createElement(
-			_FloatingActionButton2.default,
-			{ onTouchTap: onEdit.bind(null, null) },
-			_icons.addIcon
-		)
+		addAction
 	);
 }
 
@@ -41893,6 +41895,10 @@ var _gigTimespan = __webpack_require__(57);
 
 var _gigTimespan2 = _interopRequireDefault(_gigTimespan);
 
+var _gigTitle = __webpack_require__(749);
+
+var _gigTitle2 = _interopRequireDefault(_gigTitle);
+
 var _main = __webpack_require__(15);
 
 var _main2 = _interopRequireDefault(_main);
@@ -41940,9 +41946,7 @@ var GigDetailsPage = function (_React$Component) {
 		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = GigDetailsPage.__proto__ || Object.getPrototypeOf(GigDetailsPage)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
 			fans: [],
 			gig: {},
-			venue: {},
 			selectDialog: false,
-			dialogActs: [],
 			editDialog: { open: false, act: {}, errors: {} }
 		}, _this.fetchData = function () {
 			var gigId = _this.props.params.gigId;
@@ -41950,18 +41954,19 @@ var GigDetailsPage = function (_React$Component) {
 
 			_main2.default.service('gigs').get(gigId).then(function (gig) {
 				document.title = gig.name;
-				_this.setState({ venue: gig.venue, gig: gig });
+				_this.setState({ gig: gig });
 			}).then(function () {
-				return _main2.default.service('fans').find({ query: { gig_id: gigId, status: 'Attending' } }).then(function (result) {
+				return _main2.default.service('fans').find({
+					query: {
+						gig_id: gigId,
+						status: 'Attending'
+					}
+				}).then(function (result) {
 					return _this.setState({ fans: result.data });
 				});
 			});
 		}, _this.selectAct = function () {
-			_main2.default.service('acts').find().then(function (result) {
-				if (result.total > 0) {
-					_this.setState({ dialogActs: result.data, selectDialog: true, editDialog: { open: false } });
-				}
-			});
+			_this.setState({ selectDialog: true, editDialog: { open: false } });
 		}, _this.removeAct = function (act) {
 			console.log("Remove act", act);
 			var gig = _this.state.gig;
@@ -42019,45 +42024,21 @@ var GigDetailsPage = function (_React$Component) {
 		}
 	}, {
 		key: 'render',
-
-
-		/*handleActEditSubmit = e => {
-  	const {act} = this.state.editDialog
-  	if(act._id) {
-  		// patch
-  		app.service('acts').patch(act._id, act)
-  		.then(this.selectAct)
-  		.catch(this.handleActEditError)
-  	} else {
-  		//create
-  		app.service('acts').create(act)
-  		.then(this.selectAct)
-  		.catch(this.handleActEditError)
-  	}
-  	// this.selectAct()
-  }*/
-
-		/*handleActEditError = err => {
-  	console.log("Act error", err)
-  	const { editDialog } = this.state;
-  	Object.assign(editDialog, {errors: err.errors})
-  	this.setState({...this.state, editDialog})
-  }*/
-
 		value: function render() {
 			var _state = this.state,
 			    gig = _state.gig,
-			    venue = _state.venue,
-			    fans = _state.fans,
-			    dialogActs = _state.dialogActs;
+			    fans = _state.fans;
 			// console.log("GIIG", this.state)
 
 			var actsList = _react2.default.createElement(_gigActsList2.default, {
 				gig: gig,
 				onSelect: this.viewActDetails,
 				onEdit: this.replaceAct,
-				onDelete: this.removeAct
+				onDelete: this.removeAct,
+				allowAdd: true,
+				addButton: _react2.default.createElement(_FlatButton2.default, { icon: _icons.mic, label: 'Add performer', onTouchTap: this.selectAct })
 			});
+
 			var card = gig.type === 'Workshop' ? _react2.default.createElement(_workshopCard2.default, {
 				gig: gig,
 				fans: fans,
@@ -42066,28 +42047,12 @@ var GigDetailsPage = function (_React$Component) {
 				gig: gig,
 				acts: actsList
 			});
-			var gigTitle = _react2.default.createElement(
-				'span',
-				null,
-				_react2.default.createElement(
-					'span',
-					{ className: 'acts' },
-					gig.acts && gig.acts.map(function (a) {
-						return a.name;
-					}).join(', ')
-				),
-				venue && _react2.default.createElement(
-					'span',
-					null,
-					' at the ',
-					venue.name
-				)
-			);
+
 			return _react2.default.createElement(
 				_Card.Card,
 				null,
 				_react2.default.createElement(_Card.CardHeader, {
-					title: gigTitle,
+					title: _react2.default.createElement(_gigTitle2.default, { gig: gig }),
 					subtitle: _react2.default.createElement(_gigTimespan2.default, { gig: gig, showDuration: true }),
 					avatar: _react2.default.createElement(
 						_Avatar2.default,
@@ -42099,11 +42064,7 @@ var GigDetailsPage = function (_React$Component) {
 					null,
 					card
 				),
-				_react2.default.createElement(
-					_Card.CardActions,
-					null,
-					gig.type !== 'Volunteer' && _react2.default.createElement(_FlatButton2.default, { icon: _icons.mic, label: 'Add performer', onTouchTap: this.selectAct })
-				),
+				_react2.default.createElement(_Card.CardActions, null),
 				_react2.default.createElement(_actSelectDialog2.default, {
 					open: this.state.selectDialog,
 					onCancel: this.handleActsCancel,
@@ -43094,7 +43055,7 @@ var UserCard = function (_React$Component) {
 					user.name || user.facebook && user.facebook.name
 				),
 				_react2.default.createElement(
-					'h3',
+					'p',
 					null,
 					user.email
 				),
@@ -45252,7 +45213,7 @@ function UserItem(_ref) {
 
 	var self = user._id === _main2.default.get("user")._id;
 	console.log("UserItem: ", user);
-	var userMenu = _react2.default.createElement(
+	var userMenu = user.facebookId ? null : _react2.default.createElement(
 		_IconMenu2.default,
 		{ iconButtonElement: moreButton },
 		_react2.default.createElement(
@@ -85258,6 +85219,9 @@ module.exports = __webpack_amd_options__;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 exports.default = GigActsList;
 
 var _react = __webpack_require__(0);
@@ -85270,12 +85234,12 @@ var _actsList2 = _interopRequireDefault(_actsList);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 function GigActsList(_ref) {
 	var gig = _ref.gig,
 	    header = _ref.header,
-	    onSelect = _ref.onSelect,
-	    onEdit = _ref.onEdit,
-	    onDelete = _ref.onDelete;
+	    others = _objectWithoutProperties(_ref, ['gig', 'header']);
 
 	return gig.acts && gig.acts.length && _react2.default.createElement(
 		'div',
@@ -85285,13 +85249,9 @@ function GigActsList(_ref) {
 			null,
 			header || 'Featuring: '
 		),
-		_react2.default.createElement(_actsList2.default, {
-			acts: gig.acts,
-			compact: true,
-			onSelect: onSelect,
-			onEdit: onEdit,
-			onDelete: onDelete
-		})
+		_react2.default.createElement(_actsList2.default, _extends({
+			acts: gig.acts
+		}, others))
 	) || null;
 }
 
@@ -85404,6 +85364,50 @@ var ActSelectDialog = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = ActSelectDialog;
+
+/***/ }),
+/* 749 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = GigTitle;
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function GigTitle(_ref) {
+	var gig = _ref.gig;
+
+	return _react2.default.createElement(
+		'span',
+		null,
+		_react2.default.createElement(
+			'span',
+			{ className: 'gig-acts' },
+			gig.acts && gig.acts.map(function (a) {
+				return a.name;
+			}).join(', ')
+		),
+		gig.venue && _react2.default.createElement(
+			'span',
+			null,
+			' at the ',
+			_react2.default.createElement(
+				'span',
+				{ className: 'gig-venue' },
+				gig.venue.name
+			)
+		)
+	);
+}
 
 /***/ })
 /******/ ]);

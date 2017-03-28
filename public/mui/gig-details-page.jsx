@@ -12,6 +12,7 @@ import ActsList from './acts-list.jsx'
 import ActDialog from './act-dialog.jsx'
 import ActSelectDialog from './act-select-dialog.jsx'
 import GigTimespan from './gig-timespan.jsx'
+import GigTitle from './gig-title.jsx'
 
 import app from '../main.jsx'
 import { mic } from './icons.jsx'
@@ -25,9 +26,7 @@ export default class GigDetailsPage extends React.Component {
 	state = {
 		fans: [],  
 		gig: {},
-		venue: {},
 		selectDialog: false,
-		dialogActs: [],
 		editDialog: {open: false, act: {}, errors: {}},
 	}
 	componentWillMount() {
@@ -49,20 +48,21 @@ export default class GigDetailsPage extends React.Component {
 		app.service('gigs').get(gigId)
 		.then(gig => {	
 			document.title=gig.name	
-			this.setState({venue: gig.venue, gig})
+			this.setState({gig})
 		})
 		.then(() => app.service('fans')
-			.find({query:{gig_id:gigId, status: 'Attending'}})
-			.then(result => this.setState({fans: result.data})))
+			.find({
+				query:{
+					gig_id:gigId, 
+					status: 'Attending'
+				}
+			})
+			.then(result => this.setState({fans: result.data}))
+		)
 	} 
 
 	selectAct = () => {
-		app.service('acts').find()
-		.then(result => {
-			if(result.total > 0) {
-				this.setState({dialogActs: result.data, selectDialog: true, editDialog:{open: false}})
-			}
-		})
+		this.setState({selectDialog: true, editDialog:{open: false}})
 	}
 
 	removeAct = act => {
@@ -104,31 +104,8 @@ export default class GigDetailsPage extends React.Component {
 		this.setState({editDialog: {open: false}})
 	}
 
-	/*handleActEditSubmit = e => {
-		const {act} = this.state.editDialog
-		if(act._id) {
-			// patch
-			app.service('acts').patch(act._id, act)
-			.then(this.selectAct)
-			.catch(this.handleActEditError)
-		} else {
-			//create
-			app.service('acts').create(act)
-			.then(this.selectAct)
-			.catch(this.handleActEditError)
-		}
-		// this.selectAct()
-	}*/
-
-	/*handleActEditError = err => {
-		console.log("Act error", err)
-		const { editDialog } = this.state;
-		Object.assign(editDialog, {errors: err.errors})
-		this.setState({...this.state, editDialog})
-	}*/
-
 	render() {
-		const { gig, venue, fans, dialogActs } =  this.state
+		const { gig, fans } =  this.state
 		// console.log("GIIG", this.state)
 		const actsList = 
 			<GigActsList 
@@ -136,7 +113,10 @@ export default class GigDetailsPage extends React.Component {
 				onSelect={this.viewActDetails}
 				onEdit={this.replaceAct} 
 				onDelete={this.removeAct} 
+				allowAdd={true}
+				addButton={<FlatButton icon={mic} label='Add performer' onTouchTap={this.selectAct}/>}
 			/>
+
 		const card = 
 			gig.type==='Workshop' ? 
 				<WorkshopCard 
@@ -150,12 +130,10 @@ export default class GigDetailsPage extends React.Component {
 						gig={gig} 
 						acts={actsList}
 					/>
-		const gigTitle = <span>
-					<span className='acts'>{gig.acts && gig.acts.map(a => a.name).join(', ')}</span>
-					{venue && <span> at the {venue.name}</span>}</span>
+		
 		return <Card>
 			<CardHeader 
-				title={gigTitle} 
+				title={<GigTitle gig={gig} />} 
 				subtitle={<GigTimespan gig={gig} showDuration={true} />}
 				avatar={<Avatar>{gig.type && gig.type.charAt(0)}</Avatar>}>
 			</CardHeader>
@@ -164,7 +142,7 @@ export default class GigDetailsPage extends React.Component {
 				{card}
 			</CardText>
 			<CardActions>
-				{gig.type !== 'Volunteer' && <FlatButton icon={mic} label='Add performer' onTouchTap={this.selectAct}/>}
+				
 			</CardActions>
 			<ActSelectDialog 
 				open={this.state.selectDialog}
@@ -173,48 +151,14 @@ export default class GigDetailsPage extends React.Component {
 				allowAdd={true}
 				onEdit={this.handleActsEdit}/>
 			/>
-			{/*<Dialog
-				title='Acts'
-				open={this.state.selectDialog}
-				actions={[
-					<FlatButton
-						label="Close"
-						primary={true}
-						onTouchTap={this.handleActsCancel}
-					/>
-				]}
-				onRequestClose={this.handleActsCancel}
-				autoScrollBodyContent={true}
-			>
-				<ActsList acts={dialogActs} 
-					onSelect={this.handleActsSelect} 
-					allowAdd={true}
-					onEdit={this.handleActsEdit}/>
-			</Dialog>*/}
+			
 			<ActDialog 
 				act={this.state.editDialog.act} 
 				open={this.state.editDialog.open} 
 				onClose={this.handleActEditCancel} 
 				onAfterSubmit={this.selectAct}
 			/>
-			{/*<Dialog 
-				title='Act'
-				open={this.state.editDialog.open}
-				actions={[
-					<FlatButton
-						label="Cancel"
-						onTouchTap={this.handleActEditCancel}
-					/>,
-					<FlatButton
-						label="Save"
-						primary={true}
-						onTouchTap={this.handleActEditSubmit}
-					/>
-				]}
-				onRequestClose={this.handleActEditCancel}
-			>
-				<ActDialogForm act={this.state.editDialog.act}  errors={this.state.editDialog.errors}/>
-			</Dialog>*/}
+
 		</Card>
 	}
 }

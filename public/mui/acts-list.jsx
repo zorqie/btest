@@ -8,7 +8,9 @@ import { addIcon } from './icons.jsx'
 import { Kspan } from './hacks.jsx'
 
 
-export default function ActsList ({ acts, onSelect, onEdit, onDelete, allowAdd, compact}) {
+export default function ActsList ({ acts, onSelect, onEdit, onDelete, allowAdd, compact, addButton}) {
+	const addAction = allowAdd && 
+		(addButton || <FloatingActionButton onTouchTap={onEdit.bind(null, null)}>{addIcon}</FloatingActionButton>)
 	return <div>
 		<List>
 			{acts.map(act => 
@@ -25,6 +27,6 @@ export default function ActsList ({ acts, onSelect, onEdit, onDelete, allowAdd, 
 			)}
 			
 		</List>
-		{allowAdd && <FloatingActionButton onTouchTap={onEdit.bind(null, null)}>{addIcon}</FloatingActionButton>}
+		{addAction}
 	</div>
 }
