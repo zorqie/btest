@@ -6,6 +6,7 @@ import Layout from './mui/layout.jsx';
 import ActsPage from './mui/acts-page.jsx';
 import ActDetailsPage from './mui/act-details-page.jsx';
 import EventDetailsPage from './mui/event-details-page.jsx';
+import NewEventPage from './mui/event/event-page.jsx';
 import EventsPage from './mui/events-page.jsx';
 import GigDetailsPage from './mui/gig-details-page.jsx';
 import LoginForm from './mui/login-form.jsx';
@@ -86,6 +87,10 @@ const routes =
 				<Route path='gigs/:gigId' component={GigDetailsPage} />
 				<Route path='sessions/:gigId' component={GigDetailsPage} />
 				<Route path='shifts/:shiftId' component={ShiftDetailsPage} />
+				
+				<Route path='event/:eventId(/:type)' component={NewEventPage} />
+				<Route path='sched/:eventId(/:type)' component={NewEventPage} />
+				<Route path='event/:eventId/:type/:mode' component={NewEventPage} />
 				
 				<Route path='acts' component={ActsPage} />
 				<Route path='acts/:actId' component={ActDetailsPage} />
