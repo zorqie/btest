@@ -22,7 +22,7 @@ const Subgig = ({ gig, showAvatar, onSelect, onEdit, onDelete }) =>
 			{onEdit && <FlatButton label="Edit" onTouchTap={onEdit.bind(null, gig)}/>}
 			{onDelete && <FlatButton label="Delete" onTouchTap={onDelete.bind(null, gig)}/>}
 		</Kspan>}
-		leftAvatar={showAvatar && <Avatar>{gig.type && gig.type.charAt(0)}</Avatar>}
+		leftAvatar={showAvatar && <Avatar>{gig.type && gig.type.charAt(0)}</Avatar> || null}
 		onTouchTap={onSelect && onSelect.bind(null, gig)}
 	/>
 
