@@ -58,6 +58,7 @@ export default class VolunteerTable extends React.Component {
 
 	render() {
 		const { jobs, total, loaded } = this.state
+		const { type } = this.props.params
 		const loading = loaded != total
 		// console.log('Schedule', this.state )
 		
@@ -73,7 +74,10 @@ export default class VolunteerTable extends React.Component {
 				<table key={date} className='gig-schedule'>
 					<thead>
 						<tr>
-							<th colSpan={jobs.length+1} style={styles.scheduleDate}>{date.format('MMM D, dddd')}</th>
+							<th colSpan={jobs.length+1} style={styles.scheduleDate}>
+								{date.format('MMM D, dddd')} 
+								<span className="sch-type"> - {type || 'Volunteer'} Schedule</span>
+							</th>
 						</tr>
 						<tr>
 							<th></th>

@@ -7,11 +7,14 @@ import FlatButton from 'material-ui/FlatButton'
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { ListItem } from 'material-ui/List'
 import { Tab } from 'material-ui/Tabs'
+import ActionLockIcon from 'material-ui/svg-icons/action/lock'
+import ActionLockOpenIcon from 'material-ui/svg-icons/action/lock-open'
 
 import GigTimespan from './gig-timespan.jsx'
 import { Kspan } from './hacks.jsx'
 
 const Subgig = ({ gig, onSelect, onEdit, onDelete }) => <ListItem 
+		
 		primaryText={gig.name} 
 		secondaryText={<GigTimespan gig={gig} />} 
 		rightIconButton={<Kspan>

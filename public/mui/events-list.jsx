@@ -13,6 +13,7 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
 import SocialPublicIcon from 'material-ui/svg-icons/social/public'
 import ActionLockIcon from 'material-ui/svg-icons/action/lock'
 import ActionLockOpenIcon from 'material-ui/svg-icons/action/lock-open'
+import NotificationEventAvailable from 'material-ui/svg-icons/notification/event-available'
 import {List, ListItem} from 'material-ui/List'
 import Subheader from 'material-ui/Subheader'
 

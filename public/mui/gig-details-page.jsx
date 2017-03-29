@@ -142,7 +142,7 @@ export default class GigDetailsPage extends React.Component {
 		// console.log("GIIG", this.state)			
 		
 		return <div>
-					{gig._id && <Card>
+					{gig._id && <div>
 							<CardHeader 
 								title={<GigTitle gig={gig} />} 
 								subtitle={<GigTimespan gig={gig} showDuration={true} />}
@@ -165,7 +165,7 @@ export default class GigDetailsPage extends React.Component {
 							<CardActions>
 								
 							</CardActions>			
-						</Card>
+						</div>
 					}
 
 					<ActSelectDialog 
