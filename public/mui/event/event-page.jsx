@@ -98,7 +98,11 @@ export default class EventPage extends React.Component{
 		// console.log("Updated: ", gig)
 		// do something to reflect update
 		if(gig._id === this.state.event._id) {
-			this.setState({event: gig})
+			// so far only public is editable 
+			// otherwise we lose venue
+			this.setState({
+				event: Object.assign(this.state.event, {public: gig.public})
+			})
 		} else {
 			const {gigs} = this.state
 			this.setState({
