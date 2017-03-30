@@ -10,22 +10,7 @@ import moment from 'moment'
 import app from '../main.jsx'
 import VenueSites from './venue-sites.jsx'
 import styles from './styles'
-import { gigDuration, focus } from './hacks.jsx'
-
-
-const blankGig = () => {
-	return { 
-		name: '', 
-		description: '', 
-		venue: '',
-		act: '',
-		type: '', 
-		start: new Date(), 
-		end: new Date()
-	}
-}
-
-
+import { gigDuration, focus, blankGig } from './hacks.jsx'
 
 export default class GigDialogForm extends React.Component {
 	state = {

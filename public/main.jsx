@@ -92,6 +92,7 @@ const routes =
 				<Route path='sched/:eventId(/:type)' component={NewEventPage} />
 				<Route path='event/:eventId/:type/:mode' component={NewEventPage} />
 				
+				
 				<Route path='acts' component={ActsPage} />
 				<Route path='acts/:actId' component={ActDetailsPage} />
 

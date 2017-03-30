@@ -71,7 +71,7 @@ export default class EventPage extends React.Component {
 			.then(page => {
 				// console.log("Got result: ", page)
 				
-				this.setState({...this.state, event, gigs: page.data })
+				this.setState({event, gigs: page.data })
 			})
 		})
 		.catch(err => console.error("ERAR: ", err))
@@ -85,7 +85,7 @@ export default class EventPage extends React.Component {
 		// console.log("Canceling...")
 		const { dialog } = this.state
 		Object.assign(dialog, {open: false})
-		this.setState({...this.state, dialog})
+		this.setState({dialog})
 	}
 	handleDialogSubmit = () => {
 		const {gig} = this.state.dialog
@@ -98,14 +98,14 @@ export default class EventPage extends React.Component {
 			// .then(gig => console.log("Updated gig", gig)) // this is handled in patchedListener
 			.catch(err => {
 				console.error("Didn't update", err)
-				this.setState({...this.state, dialog: {open: true, errors: err.errors, gig}})
+				this.setState({dialog: {open: true, errors: err.errors, gig}})
 			})
 		} else {
 			app.service('gigs').create(gig)
 			// .then(gig => console.log("Created gig", gig)) // handled in createdListener
 			.catch(err => {
 				console.error("Didn't create gig", JSON.stringify(err))
-				this.setState({...this.state, dialog: {open: true, errors: err.errors, gig}})
+				this.setState({dialog: {open: true, errors: err.errors, gig}})
 			})
 		}
 		
@@ -119,19 +119,20 @@ export default class EventPage extends React.Component {
 	handleGigEdit = (gig, type) => {
 		// console.log("Hanlediting...", gig)
 		const { dialog, event } = this.state
-		const dg = gig ? 
-			Object.assign({}, gig) 
+		const dg = gig 
+			? Object.assign({}, gig) 
 			: Object.assign({}, {
 				parent: event._id, 
 				start: event.start, 
 				type
 			})
+			
 		app.service('venues')
 		.find({query: {parent: event.venue_id}})
 		.then(page => {
 			Object.assign(dialog, {open: true, gig: dg, sites: page.data, errors:{}})
 
-			this.setState({...this.state, typesOpen: false, gig, })
+			this.setState({typesOpen: false, gig, })
 		})
 	}
 	handleGigSelect = gig => {
@@ -156,7 +157,7 @@ export default class EventPage extends React.Component {
 		const {dialog, gigs} = this.state
 		Object.assign(dialog, {open: false,  errors:{}})
 		this.setState({
-			...this.state, 
+			
 			gigs: gigs.filter(g => g._id !== gig._id),
 			dialog
 		})
@@ -166,7 +167,7 @@ export default class EventPage extends React.Component {
 		const {dialog, gigs} = this.state
 		Object.assign(dialog, {open: false, errors: {}})
 		this.setState({
-			...this.state, 
+			
 			gigs: gigs.concat(gig),
 			dialog,
 		})
@@ -177,7 +178,7 @@ export default class EventPage extends React.Component {
 		const {dialog, gigs} = this.state
 		Object.assign(dialog, {open: false, errors: {}})
 		this.setState({
-			...this.state, 
+			
 			gigs: gigs.filter(g => g._id !== gig._id).concat(gig), //remove+add ?
 			dialog,
 		})
@@ -189,11 +190,11 @@ export default class EventPage extends React.Component {
 		this.setState({typesOpen: false})
 	}
 	handleTypesSelect = type => {
-		// this.setState({...this.state, typesOpen: false})
+		// this.setState({typesOpen: false})
 		this.handleGigEdit(null, type.name)
 	}
 	openTypesDialog = () => {
-		this.setState({...this.state, typesOpen: true})
+		this.setState({typesOpen: true})
 	}
 
 	render() {
